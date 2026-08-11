@@ -14,159 +14,163 @@ const VipCard = () => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="max-w-6xl mx-auto mb-16">
-      <div className="relative group bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-3xl p-8 border-2 border-[#0FF1CE]/30 hover:border-[#0FF1CE]/50 transition-all duration-300 overflow-hidden">
-        {/* Background Effects */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0FF1CE]/5 to-transparent rounded-3xl opacity-50"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2/3 h-2/3 bg-[#0FF1CE]/10 blur-[60px] rounded-full"></div>
-        
-        {/* Content */}
-        <div className="relative z-10">
-          {/* Header Section - Always Visible */}
-          <div 
-            className="cursor-pointer"
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                {/* Badge */}
-                <div className="inline-block bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-black px-4 py-2 rounded-full text-sm font-bold mb-4">
-                  NEW: VIP PROGRAM
-                </div>
-                
-                {/* Title */}
-                <h2 className="text-3xl md:text-4xl font-extrabold text-[#0FF1CE] mb-4">
-                  Shockwave VIP
-                </h2>
-                
-                {/* Description */}
-                <p className="text-white text-base md:text-lg leading-relaxed">
-                  Trade bigger. Keep it simple. Up to <span className="text-[#0FF1CE] font-semibold">$3,000,000</span> in funded allocation 
-                  for experienced traders who have outgrown traditional prop firm account sizes.
-                </p>
-              </div>
-              
-              {/* Expand/Collapse Button */}
-              <button 
-                className="flex-shrink-0 w-10 h-10 rounded-full bg-[#0FF1CE]/20 border border-[#0FF1CE]/40 flex items-center justify-center hover:bg-[#0FF1CE]/30 transition-all"
-                aria-label={isExpanded ? "Collapse details" : "Expand details"}
+    <div className="flex justify-center">
+      <div style={{ transform: "scale(0.85)", transformOrigin: "top center", width: "100%" }}>
+        <div className="max-w-6xl mx-auto mb-16">
+          <div className="relative group bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-3xl p-8 border-2 border-[#0FF1CE]/30 hover:border-[#0FF1CE]/50 transition-all duration-300 overflow-hidden">
+            {/* Background Effects */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#0FF1CE]/5 to-transparent rounded-3xl opacity-50"></div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2/3 h-2/3 bg-[#0FF1CE]/10 blur-[60px] rounded-full"></div>
+            
+            {/* Content */}
+            <div className="relative z-10">
+              {/* Header Section - Always Visible */}
+              <div 
+                className="cursor-pointer"
+                onClick={() => setIsExpanded(!isExpanded)}
               >
-                <ChevronDown 
-                  size={24} 
-                  className={`text-[#0FF1CE] transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
-                />
-              </button>
-            </div>
-          </div>
-
-          {/* Expandable Details Section */}
-          <div 
-            className={`overflow-hidden transition-all duration-500 ease-in-out ${
-              isExpanded ? 'max-h-[2000px] opacity-100 mt-8' : 'max-h-0 opacity-0'
-            }`}
-          >
-            <div className="space-y-6">
-              {/* Key Points Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                <div className="group bg-gradient-to-br from-[#0FF1CE]/15 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl p-4 border border-[#0FF1CE]/30 hover:border-[#0FF1CE]/50 transition-all duration-300">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#0FF1CE]/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <div className="w-3 h-3 bg-[#0FF1CE] rounded-full"></div>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    {/* Badge */}
+                    <div className="inline-block bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-black px-4 py-2 rounded-full text-sm font-bold mb-4">
+                      NEW: VIP PROGRAM
                     </div>
-                    <div>
-                      <div className="text-[#0FF1CE] font-bold text-sm">Up to $3M Allocation</div>
-                      <div className="text-gray-300 text-xs">One larger account, not ten small ones</div>
-                    </div>
+                    
+                    {/* Title */}
+                    <h2 className="text-3xl md:text-4xl font-extrabold text-[#0FF1CE] mb-4">
+                      Shockwave VIP
+                    </h2>
+                    
+                    {/* Description */}
+                    <p className="text-white text-base md:text-lg leading-relaxed">
+                      Trade bigger. Keep it simple. Up to <span className="text-[#0FF1CE] font-semibold">$3,000,000</span> in funded allocation 
+                      for experienced traders who have outgrown traditional prop firm account sizes.
+                    </p>
                   </div>
-                </div>
-                
-                <div className="group bg-gradient-to-br from-[#0FF1CE]/15 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl p-4 border border-[#0FF1CE]/30 hover:border-[#0FF1CE]/50 transition-all duration-300">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#0FF1CE]/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <div className="w-3 h-3 bg-[#0FF1CE] rounded-full"></div>
-                    </div>
-                    <div>
-                      <div className="text-[#0FF1CE] font-bold text-sm">Simple Rules</div>
-                      <div className="text-gray-300 text-xs">No consistency rules, no restrictions</div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="group bg-gradient-to-br from-[#0FF1CE]/15 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl p-4 border border-[#0FF1CE]/30 hover:border-[#0FF1CE]/50 transition-all duration-300 sm:col-span-2 lg:col-span-1">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#0FF1CE]/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <div className="w-3 h-3 bg-[#0FF1CE] rounded-full"></div>
-                    </div>
-                    <div>
-                      <div className="text-[#0FF1CE] font-bold text-sm">VIP Infrastructure</div>
-                      <div className="text-gray-300 text-xs">Dedicated 24/7 account manager</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Allocations Breakdown */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {[
-                  { name: "Professional", level: "$1M", price: "$5,499" },
-                  { name: "Executive", level: "$2M", price: "$9,999" },
-                  { name: "Institutional", level: "$3M", price: "$14,999" }
-                ].map((item, index) => (
-                  <div key={index} className="text-center bg-[#0FF1CE]/5 rounded-xl p-4 border border-[#0FF1CE]/20">
-                    <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">{item.name}</div>
-                    <div className="text-[#0FF1CE] font-bold text-2xl">{item.level}</div>
-                    <div className="text-white font-semibold text-sm mt-1">{item.price}</div>
-                  </div>
-                ))}
-              </div>
-              
-              {/* Special Callout */}
-              <div className="bg-gradient-to-r from-[#0FF1CE]/20 via-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl p-4 border border-[#0FF1CE]/40 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-r from-[#0FF1CE]/5 to-transparent rounded-xl"></div>
-                <div className="relative z-10 text-center">
-                  <div className="text-[#0FF1CE] font-bold text-sm mb-1">
-                    Live Copy Trading to Corporate Accounts
-                  </div>
-                  <div className="text-gray-300 text-xs">
-                    All trades are live copy traded to our corporate accounts — your performance moves real capital.
-                  </div>
-                </div>
-              </div>
-              
-              {/* Features */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                  { label: "Max DD", value: "15%" },
-                  { label: "Daily DD", value: "8%" },
-                  { label: "Leverage", value: "1:100" },
-                  { label: "Profit Split", value: "80%" }
-                ].map((item, index) => (
-                  <div key={index} className="text-center bg-[#0FF1CE]/5 rounded-lg p-3 border border-[#0FF1CE]/20">
-                    <div className="text-[#0FF1CE] font-bold text-xl">{item.value}</div>
-                    <div className="text-gray-300 text-sm">{item.label}</div>
-                  </div>
-                ))}
-              </div>
-              
-              {/* CTA */}
-              <div className="flex flex-col items-center gap-3 pt-4">
-                <Link href="/vip">
-                  <button className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-black text-lg font-bold rounded-xl hover:scale-105 transition-transform shadow-lg hover:shadow-[#0FF1CE]/25 group">
-                    <div className="flex items-center justify-center gap-2">
-                      <span>Explore Shockwave VIP</span>
-                      <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                    </div>
+                  
+                  {/* Expand/Collapse Button */}
+                  <button 
+                    className="flex-shrink-0 w-10 h-10 rounded-full bg-[#0FF1CE]/20 border border-[#0FF1CE]/40 flex items-center justify-center hover:bg-[#0FF1CE]/30 transition-all"
+                    aria-label={isExpanded ? "Collapse details" : "Expand details"}
+                  >
+                    <ChevronDown 
+                      size={24} 
+                      className={`text-[#0FF1CE] transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
+                    />
                   </button>
-                </Link>
-                <p className="text-center text-gray-400 text-sm">Monthly payouts via bank transfer, Wise or crypto — VIP dashboard included</p>
+                </div>
+              </div>
+
+              {/* Expandable Details Section */}
+              <div 
+                className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                  isExpanded ? 'max-h-[2000px] opacity-100 mt-8' : 'max-h-0 opacity-0'
+                }`}
+              >
+                <div className="space-y-6">
+                  {/* Key Points Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="group bg-gradient-to-br from-[#0FF1CE]/15 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl p-4 border border-[#0FF1CE]/30 hover:border-[#0FF1CE]/50 transition-all duration-300">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-[#0FF1CE]/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <div className="w-3 h-3 bg-[#0FF1CE] rounded-full"></div>
+                        </div>
+                        <div>
+                          <div className="text-[#0FF1CE] font-bold text-sm">Up to $3M Allocation</div>
+                          <div className="text-gray-300 text-xs">One larger account, not ten small ones</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="group bg-gradient-to-br from-[#0FF1CE]/15 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl p-4 border border-[#0FF1CE]/30 hover:border-[#0FF1CE]/50 transition-all duration-300">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-[#0FF1CE]/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <div className="w-3 h-3 bg-[#0FF1CE] rounded-full"></div>
+                        </div>
+                        <div>
+                          <div className="text-[#0FF1CE] font-bold text-sm">Simple Rules</div>
+                          <div className="text-gray-300 text-xs">No consistency rules, no restrictions</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="group bg-gradient-to-br from-[#0FF1CE]/15 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl p-4 border border-[#0FF1CE]/30 hover:border-[#0FF1CE]/50 transition-all duration-300 sm:col-span-2 lg:col-span-1">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-[#0FF1CE]/20 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <div className="w-3 h-3 bg-[#0FF1CE] rounded-full"></div>
+                        </div>
+                        <div>
+                          <div className="text-[#0FF1CE] font-bold text-sm">VIP Infrastructure</div>
+                          <div className="text-gray-300 text-xs">Dedicated 24/7 account manager</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Allocations Breakdown */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {[
+                      { name: "Professional", level: "$1M", price: "$5,499" },
+                      { name: "Executive", level: "$2M", price: "$9,999" },
+                      { name: "Institutional", level: "$3M", price: "$14,999" }
+                    ].map((item, index) => (
+                      <div key={index} className="text-center bg-[#0FF1CE]/5 rounded-xl p-4 border border-[#0FF1CE]/20">
+                        <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">{item.name}</div>
+                        <div className="text-[#0FF1CE] font-bold text-2xl">{item.level}</div>
+                        <div className="text-white font-semibold text-sm mt-1">{item.price}</div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* Special Callout */}
+                  <div className="bg-gradient-to-r from-[#0FF1CE]/20 via-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl p-4 border border-[#0FF1CE]/40 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#0FF1CE]/5 to-transparent rounded-xl"></div>
+                    <div className="relative z-10 text-center">
+                      <div className="text-[#0FF1CE] font-bold text-sm mb-1">
+                        Live Copy Trading to Corporate Accounts
+                      </div>
+                      <div className="text-gray-300 text-xs">
+                        All trades are live copy traded to our corporate accounts — your performance moves real capital.
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Features */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {[
+                      { label: "Max DD", value: "15%" },
+                      { label: "Daily DD", value: "8%" },
+                      { label: "Leverage", value: "1:100" },
+                      { label: "Profit Split", value: "80%" }
+                    ].map((item, index) => (
+                      <div key={index} className="text-center bg-[#0FF1CE]/5 rounded-lg p-3 border border-[#0FF1CE]/20">
+                        <div className="text-[#0FF1CE] font-bold text-xl">{item.value}</div>
+                        <div className="text-gray-300 text-sm">{item.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  {/* CTA */}
+                  <div className="flex flex-col items-center gap-3 pt-4">
+                    <Link href="/vip">
+                      <button className="w-full md:w-auto px-8 py-4 bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-black text-lg font-bold rounded-xl hover:scale-105 transition-transform shadow-lg hover:shadow-[#0FF1CE]/25 group">
+                        <div className="flex items-center justify-center gap-2">
+                          <span>Explore Shockwave VIP</span>
+                          <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                        </div>
+                      </button>
+                    </Link>
+                    <p className="text-center text-gray-400 text-sm">Monthly payouts via bank transfer, Wise or crypto — VIP dashboard included</p>
+                  </div>
+                </div>
               </div>
             </div>
+            
+            {/* Decorative Elements */}
+            <div className="absolute top-4 right-4 w-16 h-16 bg-[#0FF1CE]/10 rounded-full blur-xl"></div>
+            <div className="absolute bottom-4 left-4 w-12 h-12 bg-[#0FF1CE]/10 rounded-full blur-xl"></div>
           </div>
         </div>
-        
-        {/* Decorative Elements */}
-        <div className="absolute top-4 right-4 w-16 h-16 bg-[#0FF1CE]/10 rounded-full blur-xl"></div>
-        <div className="absolute bottom-4 left-4 w-12 h-12 bg-[#0FF1CE]/10 rounded-full blur-xl"></div>
       </div>
     </div>
   );
@@ -306,87 +310,9 @@ const ShockwaveSundayModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: (
   */
 };
 
-// Promotional Modal - Introducing Shockwave VIP
-const VipAnnouncementModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto">
-      <div className="min-h-full flex items-start md:items-center justify-center p-4 pt-8 md:pt-12 pb-8 md:pb-12">
-        <div className="relative w-full max-w-lg mx-auto" style={{ transform: 'scale(0.75)' }}>
-          {/* Close Button */}
-          <button
-            onClick={onClose}
-            className="absolute -top-2 -right-2 z-10 w-10 h-10 bg-white text-black rounded-full flex items-center justify-center font-bold hover:scale-110 transition-transform shadow-lg text-2xl"
-          >
-            ×
-          </button>
-
-          {/* Modal Content */}
-          <div className="relative bg-gradient-to-br from-[#0D0D0D] via-[#121212] to-[#0D0D0D] border-2 border-[#0FF1CE]/30 rounded-3xl overflow-hidden shadow-2xl p-8">
-            {/* Promo Badge */}
-            <div className="absolute top-0 right-0 bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-black px-6 py-2 rounded-bl-2xl font-bold text-sm shadow-lg">
-              NEW: VIP PROGRAM
-            </div>
-
-            {/* Content */}
-            <div className="text-center pt-6">
-              {/* Main Heading */}
-              <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-2">
-                Shockwave VIP
-              </h2>
-
-              {/* Subheading */}
-              <div className="bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-transparent bg-clip-text text-2xl md:text-3xl font-bold mb-8">
-                $1,000,000+ Funded  Accounts
-              </div>
-
-              {/* Key Benefits */}
-              <div className="space-y-3 mb-8 text-left max-w-md mx-auto">
-                <div className="flex items-start gap-3 bg-[#1A1A1A]/50 p-4 rounded-lg border border-[#0FF1CE]/20">
-                  <div className="text-[#0FF1CE] text-2xl mt-1 font-bold">•</div>
-                  <div>
-                    <div className="text-white font-bold text-lg">Simple Rules, Big Capital</div>
-                    <div className="text-gray-400 text-sm">15% drawdown, no consistency or extra rules</div>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 bg-[#1A1A1A]/50 p-4 rounded-lg border border-[#0FF1CE]/20">
-                  <div className="text-[#0FF1CE] text-2xl mt-1 font-bold">•</div>
-                  <div>
-                    <div className="text-white font-bold text-lg">VIP Support</div>
-                    <div className="text-gray-400 text-sm">24/7 account manager & VIP dashboard</div>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 bg-[#1A1A1A]/50 p-4 rounded-lg border border-[#0FF1CE]/20">
-                  <div className="text-[#0FF1CE] text-2xl mt-1 font-bold">•</div>
-                  <div>
-                    <div className="text-white font-bold text-lg">80% Profit Split</div>
-                    <div className="text-gray-400 text-sm">$1M, $2M & $3M allocations</div>
-                  </div>
-                </div>
-           
-              </div>
-
-              {/* CTA Button */}
-              <Link href="/vip" onClick={onClose}>
-                <button className="w-full bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-black font-bold py-4 px-8 rounded-xl hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgba(15,241,206,0.4)] hover:shadow-[0_0_30px_rgba(15,241,206,0.6)] text-lg">
-                  EXPLORE VIP ALLOCATIONS →
-                </button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 export default function ShockwaveLandingPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(true);
-    const [showVipModal, setShowVipModal] = useState(false); // VIP announcement modal enabled
     
     useEffect(() => {
       const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -398,17 +324,6 @@ export default function ShockwaveLandingPage() {
   
       return () => unsubscribe();
     }, [router, loading]);
-
-    // Show VIP announcement modal after page loads
-    useEffect(() => {
-      if (!loading) {
-        const timer = setTimeout(() => {
-          setShowVipModal(true);
-        }, 1500); // Show modal 1.5 seconds after page loads
-  
-        return () => clearTimeout(timer);
-      }
-    }, [loading]);
     
     if (loading) {
       return (
@@ -422,157 +337,97 @@ export default function ShockwaveLandingPage() {
       <div className="bg-black text-white min-h-screen font-sans">
         <Header />
         
-        {/* VIP Announcement Modal */}
-        <VipAnnouncementModal 
-          isOpen={showVipModal} 
-          onClose={() => setShowVipModal(false)}
-        />
-        
         {/* Hero Section */}
-        <section className="relative z-10 px-6 pt-24 md:pt-28 pb-12 md:pb-10 text-center overflow-hidden bg-black">
+        <section className="relative z-10 px-6 pt-36 md:pt-44 pb-12 md:pb-10 text-center overflow-hidden bg-black">
           <Particles />
           <div className="max-w-5xl mx-auto">
-          
-            {/* Main Hero Image */}
-            <div className="relative mb-6 md:mb-4">
-              <div className="relative w-full max-w-3xl mx-auto aspect-[16/9]">
-                <Image
-                  src="/shockwavehero.png"
-                  alt="Shockwave Capital - Funded or Fried"
-                  fill
-                  className="object-contain"
-                  priority
-                />
+
+            {/* Mobile-scaling container for hero eyebrow, title, stats, and CTA */}
+            <div className="
+              w-full flex flex-col items-center 
+              md:scale-100 md:w-auto
+              scale-[0.85] 
+              origin-top 
+              md:origin-center
+              "
+              style={{}}
+            >
+              {/* Eyebrow */}
+              <div className="inline-block bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-black font-bold px-4 py-1.5 rounded-full text-xs md:text-sm mb-4 md:mb-5">
+                Prop trading without the training wheels
+              </div>
+
+              {/* Title */}
+              <h1 className="text-5xl md:text-6xl font-extrabold bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-transparent bg-clip-text mb-8 leading-tight">
+                We sponsor your<br />trading journey
+              </h1>
+
+              {/* Floating Stats Cards */}
+              <div className="grid grid-cols-3 gap-2 md:flex md:flex-row md:justify-center md:items-center md:gap-8 px-2 md:px-0 mb-8">
+                {[
+                  { value: "15%", label: "Max Drawdown", delay: "0s" },
+                  { value: "8%", label: "Daily Drawdown", delay: "0.1s" },
+                  { value: "1:200", label: "Leverage", delay: "0.2s" }
+                ].map(({ value, label, delay }) => (
+                  <div
+                    key={label}
+                    className="group relative w-full bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl p-3 md:p-4 md:w-44 hover:scale-105 transition-all duration-300 animate-float"
+                    style={{
+                      animation: `float 3s ease-in-out infinite`,
+                      animationDelay: delay,
+                      boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)'
+                    }}
+                  >
+                    <div className="text-xl md:text-3xl font-bold text-[#0FF1CE] mb-1">{value}</div>
+                    <div className="text-xs md:text-sm text-gray-400">{label}</div>
+                    <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#0FF1CE]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </div>
+                ))}
+              </div>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-6 max-w-sm md:max-w-[600px] mx-auto w-full mb-8 md:mb-10">
+                <Link href="/challenge">
+                  <button className="px-10 py-3 md:py-4 bg-[#0FF1CE] text-black text-sm md:text-lg font-bold rounded-lg hover:scale-105 transition-transform w-full md:w-[300px]">
+                    START CHALLENGE
+                  </button>             
+                </Link>
               </div>
             </div>
+       
 
-            {/* Title */}
-            <h1 className="text-3xl md:text-5xl font-extrabold bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-transparent bg-clip-text mb-3 md:mb-2">
-              Funded or Fried
-            </h1>
-            
-            {/* Badge */}
-            <div className="inline-block bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-black font-bold px-5 py-2 rounded-full text-sm md:text-base mb-6 md:mb-5">
-              Prop trading without the training wheels
-            </div>
-
-            <p className="text-gray-400 max-w-3xl mx-auto text-sm md:text-base mb-8">
-              High-octane funding for elite traders. Push your trading into Overdrive with industry-leading conditions.
-            </p>
-
-            {/* Floating Stats Cards */}
-            <div className="grid grid-cols-3 gap-2 md:flex md:flex-row md:justify-center md:items-center md:gap-8 px-2 md:px-0 mb-8">
-              {[
-                { value: "15%", label: "Max Drawdown", delay: "0s" },
-                { value: "8%", label: "Daily Drawdown", delay: "0.1s" },
-                { value: "1:200", label: "Leverage", delay: "0.2s" }
-              ].map(({ value, label, delay }) => (
-                <div
-                  key={label}
-                  className="group relative w-full bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl p-3 md:p-4 md:w-44 hover:scale-105 transition-all duration-300 animate-float"
-                  style={{
-                    animation: `float 3s ease-in-out infinite`,
-                    animationDelay: delay,
-                    boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)'
-                  }}
-                >
-                  <div className="text-xl md:text-3xl font-bold text-[#0FF1CE] mb-1">{value}</div>
-                  <div className="text-xs md:text-sm text-gray-400">{label}</div>
-                  <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#0FF1CE]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                </div>
-              ))}
-            </div>
-
-            {/* NO BS Rules Card */}
-            <div className="max-w-2xl mx-auto mb-8">
-              <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-6 md:p-8 border border-[#0FF1CE]/20"
-                style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
-                <h3 className="text-xl md:text-2xl font-bold text-[#0FF1CE] mb-6 text-center">NO BS Funded Account RULES</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Payouts showcase card with running glow border */}
+            <div className="relative max-w-3xl mx-auto rounded-2xl p-[2px] overflow-hidden">
+              <div
+                className={`
+                  absolute 
+                  inset-[-200%] 
+                  animate-[borderGlowSpin_3.75s_linear_infinite]
+                  md:inset-0 
+                  md:w-full 
+                  md:h-full
+                `}
+                style={{
+                  background: 'conic-gradient(from 0deg, transparent 0deg, transparent 320deg, rgba(15, 241, 206, 0.2) 340deg, #0FF1CE 350deg, #ffffff 355deg, #00D9FF 358deg, transparent 360deg)'
+                }}
+              />
+              <div className="relative bg-black rounded-[14px] px-2.5 py-6 md:px-8 md:py-7 border border-[#0FF1CE]/10">
+                <div className="flex flex-row justify-between items-center gap-2 md:grid md:grid-cols-3 md:gap-4">
                   {[
-                    "No consistency rules",
-                    "News trading allowed",
-                    "Hold over weekends",
-                    "EAs & Bots allowed",
-                    "No Profit Caps",
-                    "No Position size caps"
-                  ].map((rule, index) => (
-                    <div key={index} className="flex items-center space-x-3 group">
-                      <div className="w-6 h-6 rounded-full bg-[#0FF1CE]/10 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
-                        <span className="text-[#0FF1CE] text-sm">✓</span>
-                      </div>
-                      <span className="text-gray-300 text-sm md:text-base group-hover:text-white transition-colors">{rule}</span>
+                    { value: "$2M+", label: "Paid Out" },
+                    { value: "4 Hours", label: "Avg. Processing Time" },
+                    { value: "1,000+", label: "Funded Traders" }
+                  ].map(({ value, label }) => (
+                    <div key={label} className="flex-1 text-center">
+                      <div className="text-2xl md:text-3xl font-bold text-[#0FF1CE] mb-1">{value}</div>
+                      <div className="text-xs md:text-sm text-gray-400">{label}</div>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-6 max-w-sm md:max-w-[600px] mx-auto w-full mb-12">
-              <Link href="/challenge">
-                <button className="px-10 py-3 md:py-4 bg-[#0FF1CE] text-black text-sm md:text-lg font-bold rounded-lg hover:scale-105 transition-transform w-full md:w-[300px]">
-                  START CHALLENGE
-                </button>             
-              </Link>
-            </div>
-
-            {/* Tradable Assets */}
-            <div className="flex flex-wrap justify-center gap-6 md:gap-12 max-w-4xl mx-auto">
-                {[
-                  {
-                    name: "Forex",
-                    icon: (
-                      <svg className="w-4 h-4 md:w-5 md:h-5" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M2 12C2 6.48 6.48 2 12 2s10 4.48 10 10-4.48 10-10 10S2 17.52 2 12zm16.5-4.5h-2.79l-2.33 7h-2.76l-2.33-7H5.5v-2h13v2z"/>
-                      </svg>
-                    )
-                  },
-                  {
-                    name: "Metals",
-                    icon: (
-                      <svg className="w-4 h-4 md:w-5 md:h-5" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2L4 8v3h16V8l-8-6zM4 19v-6h16v6H4z"/>
-                      </svg>
-                    )
-                  },
-                  {
-                    name: "Indices",
-                    icon: (
-                      <svg className="w-4 h-4 md:w-5 md:h-5" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M3.5 18.5l6-6 4 4L22 7.5L20.5 6l-7 7-4-4-6 6z"/>
-                      </svg>
-                    )
-                  },
-                  {
-                    name: "Crypto",
-                    icon: (
-                      <svg className="w-4 h-4 md:w-5 md:h-5" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/>
-                      </svg>
-                    )
-                  },
-                  {
-                    name: "Stocks",
-                    icon: (
-                      <svg className="w-4 h-4 md:w-5 md:h-5" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M3 3h6v4H3V3zm12 0h6v4h-6V3zM3 11h6v4H3v-4zm12 0h6v4h-6v-4zM3 19h6v4H3v-4zm12 0h6v4h-6v-4z"/>
-                      </svg>
-                    )
-                  }
-                ].map(({ name, icon }) => (
-                  <div key={name} className="flex flex-col items-center gap-2 group">
-                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#0FF1CE]/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                      <span className="text-[#0FF1CE] group-hover:text-white transition-colors">
-                        {icon}
-                      </span>
-                    </div>
-                    <span className="text-[0.6rem] md:text-xs text-gray-400 group-hover:text-[#0FF1CE] transition-colors">
-                      {name}
-                    </span>
-                  </div>
-                ))}
-              </div>
+      
+      
           </div>
         </section>
   
@@ -730,8 +585,9 @@ export default function ShockwaveLandingPage() {
                   {/* Mobile: Infinite Scroll */}
                   <div className="md:hidden relative overflow-hidden -mx-6">
                     {/* Gradient overlays */}
-                    <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-[#131313] to-transparent z-10"></div>
-                    <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#131313] to-transparent z-10"></div>
+                    <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-black to-transparent z-10"></div>
+                    <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-black to-transparent z-10"></div>
+               
                     
                     {/* Scrolling Track */}
                     <div className="flex animate-infinite-scroll-mobile" style={{ width: '800%' }}>
@@ -1027,8 +883,10 @@ export default function ShockwaveLandingPage() {
         {/* Infinite Scroll Container */}
         <div className="relative overflow-hidden">
           {/* Gradient overlays for smooth edges */}
-          <div className="absolute left-0 top-0 bottom-0 w-20 md:w-32 bg-gradient-to-r from-[#111111] via-[#111111]/80 to-transparent z-10"></div>
-          <div className="absolute right-0 top-0 bottom-0 w-20 md:w-32 bg-gradient-to-l from-[#111111] via-[#111111]/80 to-transparent z-10"></div>
+          <div className="absolute left-0 top-0 bottom-0 w-20 md:w-32 bg-gradient-to-r from-black to-transparent z-10"></div>
+          <div className="absolute right-0 top-0 bottom-0 w-20 md:w-32 bg-gradient-to-l from-black to-transparent z-10"></div>
+     
+     
           
           {/* Scrolling Track */}
           <div className="flex animate-infinite-scroll md:animate-infinite-scroll-mobile" style={{ width: '600%' }}>
@@ -1101,7 +959,7 @@ export default function ShockwaveLandingPage() {
         </div>
   
         {/* How It Works Section */}
-        <section className="py-12 md:py-20 px-4 md:px-6 bg-black relative overflow-hidden">
+        <section className="py-12 md:py-20 px-4 md:px-6 bg-black relative overflow-hidden hidden">
           <div className="absolute top-1/3 right-0 w-1/2 h-[300px] bg-[#0FF1CE]/[0.015] blur-[120px] rounded-full"></div>
           <div className="absolute bottom-1/3 left-0 w-1/2 h-[300px] bg-[#0FF1CE]/[0.01] blur-[120px] rounded-full"></div>
           <div className="relative z-10 max-w-6xl mx-auto">
@@ -1937,6 +1795,11 @@ export default function ShockwaveLandingPage() {
             0% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
             100% { transform: translateY(0px); }
+          }
+
+          @keyframes borderGlowSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
           }
 
           @keyframes fadeIn {
