@@ -506,7 +506,7 @@ function GauntletActivationContent() {
             Activate Your Funded Account
           </h1>
           <p className="text-sm md:text-lg lg:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed mb-4 md:mb-8">
-            Pay your activation fee to unlock your funded account with zero restrictions.
+            Skip the challenge, Pay your activation fee to unlock your funded account with zero restrictions.
           </p>
 
           {/* Price Increase Notice */}
