@@ -510,10 +510,11 @@ function GauntletActivationContent() {
           </p>
 
           {/* Price Increase Notice */}
-          <div className="inline-flex items-center gap-2 bg-orange-500/10 border border-orange-500/40 text-orange-400 px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-bold mb-6 md:mb-8 animate-pulse">
+          {/* <div className="inline-flex items-center gap-2 bg-orange-500/10 border border-orange-500/40 text-orange-400 px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-bold mb-6 md:mb-8 animate-pulse">
             <span className="w-2 h-2 rounded-full bg-orange-400"></span>
             PRICES INCREASE TOMORROW — LOCK IN TODAY
-          </div>
+          </div> */}
+     
 
           {/* Floating Stats Cards */}
           <div className="grid grid-cols-3 gap-2 md:flex md:flex-row md:justify-center md:items-center md:gap-8 px-1 md:px-0 mb-6 md:mb-8">
