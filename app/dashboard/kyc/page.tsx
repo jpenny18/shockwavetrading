@@ -216,11 +216,11 @@ export default function KYCPage() {
   if (!isEligible && !existingSubmission) {
     return (
       <div className="max-w-2xl mx-auto">
-        <div className="bg-[#1A1A1A] rounded-xl p-8 border border-[#2F2F2F]">
+        <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl p-8 border border-[#2F2F2F]/50">
           <div className="flex items-center justify-center w-16 h-16 bg-yellow-500/20 rounded-full mx-auto mb-6">
             <Lock className="w-8 h-8 text-yellow-500" />
           </div>
-          <h1 className="text-2xl font-bold text-white text-center mb-4">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent text-center mb-4">
             KYC Verification Locked
           </h1>
           <p className="text-gray-400 text-center mb-6">
@@ -229,7 +229,7 @@ export default function KYCPage() {
           </p>
           <button
             onClick={() => router.push('/dashboard/accounts')}
-            className="w-full bg-[#0FF1CE] text-black py-3 rounded-lg font-medium hover:bg-[#0FF1CE]/90 transition-colors"
+            className="w-full bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black py-3 rounded-xl font-bold hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300"
           >
             View My Accounts
           </button>
@@ -267,10 +267,14 @@ export default function KYCPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="relative max-w-4xl mx-auto">
+      {/* Decorative glow orbs */}
+      <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse pointer-events-none"></div>
+      <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse delay-1000 pointer-events-none"></div>
+
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-3xl font-bold text-white">KYC Verification</h1>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent">KYC Verification</h1>
           {getStatusBadge()}
         </div>
         <p className="text-gray-400">
@@ -290,8 +294,8 @@ export default function KYCPage() {
               <div className="flex items-center">
                 <div
                   className={`
-                    w-12 h-12 rounded-full flex items-center justify-center
-                    ${isCompleted ? 'bg-[#0FF1CE]' : isActive ? 'bg-[#0FF1CE]/20 border-2 border-[#0FF1CE]' : 'bg-[#2F2F2F]'}
+                    w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300
+                    ${isCompleted ? 'bg-[#0FF1CE] border-[#0FF1CE] text-black shadow-[0_0_12px_rgba(15,241,206,0.45)]' : isActive ? 'bg-[#0FF1CE]/15 border-[#0FF1CE] text-[#0FF1CE] shadow-[0_0_12px_rgba(15,241,206,0.35)]' : 'bg-[#151515] border-[#2F2F2F] text-gray-500'}
                   `}
                 >
                   {isCompleted ? (
@@ -331,7 +335,7 @@ export default function KYCPage() {
       )}
 
       {/* Step Content */}
-      <div className="bg-[#1A1A1A] rounded-xl p-8 border border-[#2F2F2F]">
+      <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl p-8 border border-[#2F2F2F]/50">
         {/* Step 1: Personal Information */}
         {currentStep === 1 && (
           <div>
@@ -346,7 +350,7 @@ export default function KYCPage() {
                   type="text"
                   value={personalInfo.firstName}
                   onChange={(e) => setPersonalInfo({ ...personalInfo, firstName: e.target.value })}
-                  className="w-full bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                  className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
                   placeholder="John"
                 />
                 {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
@@ -360,7 +364,7 @@ export default function KYCPage() {
                   type="text"
                   value={personalInfo.lastName}
                   onChange={(e) => setPersonalInfo({ ...personalInfo, lastName: e.target.value })}
-                  className="w-full bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                  className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
                   placeholder="Doe"
                 />
                 {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
@@ -374,7 +378,7 @@ export default function KYCPage() {
                   type="text"
                   value={personalInfo.address}
                   onChange={(e) => setPersonalInfo({ ...personalInfo, address: e.target.value })}
-                  className="w-full bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                  className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
                   placeholder="123 Main Street"
                 />
                 {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
@@ -388,7 +392,7 @@ export default function KYCPage() {
                   type="text"
                   value={personalInfo.city}
                   onChange={(e) => setPersonalInfo({ ...personalInfo, city: e.target.value })}
-                  className="w-full bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                  className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
                   placeholder="New York"
                 />
                 {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
@@ -402,7 +406,7 @@ export default function KYCPage() {
                   type="text"
                   value={personalInfo.state}
                   onChange={(e) => setPersonalInfo({ ...personalInfo, state: e.target.value })}
-                  className="w-full bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                  className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
                   placeholder="NY"
                 />
                 {errors.state && <p className="text-red-500 text-sm mt-1">{errors.state}</p>}
@@ -416,7 +420,7 @@ export default function KYCPage() {
                   type="text"
                   value={personalInfo.postalCode}
                   onChange={(e) => setPersonalInfo({ ...personalInfo, postalCode: e.target.value })}
-                  className="w-full bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                  className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
                   placeholder="10001"
                 />
                 {errors.postalCode && <p className="text-red-500 text-sm mt-1">{errors.postalCode}</p>}
@@ -430,7 +434,7 @@ export default function KYCPage() {
                   type="text"
                   value={personalInfo.country}
                   onChange={(e) => setPersonalInfo({ ...personalInfo, country: e.target.value })}
-                  className="w-full bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                  className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
                   placeholder="United States"
                 />
                 {errors.country && <p className="text-red-500 text-sm mt-1">{errors.country}</p>}
@@ -444,7 +448,7 @@ export default function KYCPage() {
                   type="tel"
                   value={personalInfo.phone}
                   onChange={(e) => setPersonalInfo({ ...personalInfo, phone: e.target.value })}
-                  className="w-full bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                  className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
                   placeholder="+1 (555) 123-4567"
                 />
                 {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
@@ -458,7 +462,7 @@ export default function KYCPage() {
                   type="email"
                   value={personalInfo.email}
                   onChange={(e) => setPersonalInfo({ ...personalInfo, email: e.target.value })}
-                  className="w-full bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                  className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
                   placeholder="john.doe@example.com"
                 />
                 {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
@@ -474,7 +478,7 @@ export default function KYCPage() {
             <button
               onClick={handlePersonalInfoSubmit}
               disabled={isSaving}
-              className="mt-6 w-full bg-[#0FF1CE] text-black py-3 rounded-lg font-medium hover:bg-[#0FF1CE]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="mt-6 w-full bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black py-3 rounded-xl font-bold hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isSaving ? (
                 <>
@@ -510,7 +514,7 @@ export default function KYCPage() {
                 </p>
                 
                 {existingSubmission?.documents.governmentIdUrl && !governmentId ? (
-                  <div className="flex items-center justify-between p-4 bg-[#0D0D0D] rounded-lg border border-[#2F2F2F]">
+                  <div className="flex items-center justify-between p-4 bg-[#151515]/50 backdrop-blur-sm rounded-lg border border-[#2F2F2F]">
                     <div className="flex items-center gap-3">
                       <CheckCircle className="w-5 h-5 text-green-500" />
                       <span className="text-white">{existingSubmission.documents.governmentIdFileName}</span>
@@ -530,7 +534,7 @@ export default function KYCPage() {
                       onChange={(e) => setGovernmentId(e.target.files?.[0] || null)}
                       className="hidden"
                     />
-                    <div className="p-8 bg-[#0D0D0D] rounded-lg border-2 border-dashed border-[#2F2F2F] hover:border-[#0FF1CE]/50 cursor-pointer transition-colors text-center">
+                    <div className="p-8 bg-[#151515]/50 backdrop-blur-sm rounded-xl border-2 border-dashed border-[#2F2F2F] hover:border-[#0FF1CE]/50 cursor-pointer transition-all duration-300 text-center">
                       <Upload className="w-12 h-12 text-gray-500 mx-auto mb-3" />
                       <p className="text-white mb-1">
                         {governmentId ? governmentId.name : 'Click to upload or drag and drop'}
@@ -551,7 +555,7 @@ export default function KYCPage() {
                 </p>
                 
                 {existingSubmission?.documents.proofOfAddressUrl && !proofOfAddress ? (
-                  <div className="flex items-center justify-between p-4 bg-[#0D0D0D] rounded-lg border border-[#2F2F2F]">
+                  <div className="flex items-center justify-between p-4 bg-[#151515]/50 backdrop-blur-sm rounded-lg border border-[#2F2F2F]">
                     <div className="flex items-center gap-3">
                       <CheckCircle className="w-5 h-5 text-green-500" />
                       <span className="text-white">{existingSubmission.documents.proofOfAddressFileName}</span>
@@ -571,7 +575,7 @@ export default function KYCPage() {
                       onChange={(e) => setProofOfAddress(e.target.files?.[0] || null)}
                       className="hidden"
                     />
-                    <div className="p-8 bg-[#0D0D0D] rounded-lg border-2 border-dashed border-[#2F2F2F] hover:border-[#0FF1CE]/50 cursor-pointer transition-colors text-center">
+                    <div className="p-8 bg-[#151515]/50 backdrop-blur-sm rounded-xl border-2 border-dashed border-[#2F2F2F] hover:border-[#0FF1CE]/50 cursor-pointer transition-all duration-300 text-center">
                       <Upload className="w-12 h-12 text-gray-500 mx-auto mb-3" />
                       <p className="text-white mb-1">
                         {proofOfAddress ? proofOfAddress.name : 'Click to upload or drag and drop'}
@@ -592,14 +596,14 @@ export default function KYCPage() {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setCurrentStep(1)}
-                className="flex-1 bg-[#2F2F2F] text-white py-3 rounded-lg font-medium hover:bg-[#2F2F2F]/80 transition-colors"
+                className="flex-1 bg-transparent border border-[#0FF1CE]/50 text-[#0FF1CE] py-3 rounded-xl font-bold hover:bg-[#0FF1CE]/10 transition-all duration-300"
               >
                 Back
               </button>
               <button
                 onClick={handleDocumentUpload}
                 disabled={isSaving || (!governmentId && !existingSubmission?.documents.governmentIdUrl) || (!proofOfAddress && !existingSubmission?.documents.proofOfAddressUrl)}
-                className="flex-1 bg-[#0FF1CE] text-black py-3 rounded-lg font-medium hover:bg-[#0FF1CE]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black py-3 rounded-xl font-bold hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isSaving ? (
                   <>
@@ -622,7 +626,7 @@ export default function KYCPage() {
           <div>
             <h2 className="text-xl font-bold text-white mb-6">Shockwave Funded Trader Agreement</h2>
             
-            <div className="bg-[#0D0D0D] rounded-lg p-6 mb-6 max-h-96 overflow-y-auto">
+            <div className="bg-[#0D0D0D]/60 backdrop-blur-sm border border-[#2F2F2F]/50 rounded-xl p-6 mb-6 max-h-96 overflow-y-auto">
               <div className="space-y-6 text-sm text-gray-400">
                 <div className="text-center mb-6">
                   <h3 className="text-lg font-semibold text-white mb-2">SHOCKWAVE CAPITAL FUNDED TRADER AGREEMENT</h3>
@@ -827,7 +831,7 @@ export default function KYCPage() {
               </div>
             </div>
 
-            <div className="p-4 bg-[#0D0D0D] rounded-lg border border-[#2F2F2F] mb-6">
+            <div className="p-4 bg-[#151515]/50 backdrop-blur-sm rounded-lg border border-[#2F2F2F] mb-6">
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
                   type="checkbox"
@@ -855,14 +859,14 @@ export default function KYCPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => setCurrentStep(2)}
-                className="flex-1 bg-[#2F2F2F] text-white py-3 rounded-lg font-medium hover:bg-[#2F2F2F]/80 transition-colors"
+                className="flex-1 bg-transparent border border-[#0FF1CE]/50 text-[#0FF1CE] py-3 rounded-xl font-bold hover:bg-[#0FF1CE]/10 transition-all duration-300"
               >
                 Back
               </button>
               <button
                 onClick={handleAgreementSign}
                 disabled={isSaving || !agreementSigned}
-                className="flex-1 bg-[#0FF1CE] text-black py-3 rounded-lg font-medium hover:bg-[#0FF1CE]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black py-3 rounded-xl font-bold hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isSaving ? (
                   <>
@@ -894,7 +898,7 @@ export default function KYCPage() {
                 </p>
                 <button
                   onClick={() => router.push('/dashboard')}
-                  className="bg-[#0FF1CE] text-black px-8 py-3 rounded-lg font-medium hover:bg-[#0FF1CE]/90 transition-colors"
+                  className="bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black px-8 py-3 rounded-xl font-bold hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300"
                 >
                   Back to Dashboard
                 </button>
@@ -913,7 +917,7 @@ export default function KYCPage() {
                     setCurrentStep(1);
                     setExistingSubmission(null);
                   }}
-                  className="bg-[#0FF1CE] text-black px-8 py-3 rounded-lg font-medium hover:bg-[#0FF1CE]/90 transition-colors"
+                  className="bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black px-8 py-3 rounded-xl font-bold hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300"
                 >
                   Start New Submission
                 </button>
@@ -932,7 +936,7 @@ export default function KYCPage() {
                 </p>
                 <button
                   onClick={() => router.push('/dashboard')}
-                  className="bg-[#2F2F2F] text-white px-8 py-3 rounded-lg font-medium hover:bg-[#2F2F2F]/80 transition-colors"
+                  className="bg-transparent border border-[#0FF1CE]/50 text-[#0FF1CE] px-8 py-3 rounded-xl font-bold hover:bg-[#0FF1CE]/10 transition-all duration-300"
                 >
                   Back to Dashboard
                 </button>

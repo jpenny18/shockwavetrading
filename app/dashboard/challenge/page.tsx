@@ -488,7 +488,7 @@ export default function ChallengePage() {
             }}
             onBlur={() => validateDiscountCode(discountCode)}
             placeholder="Enter discount code"
-            className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
+            className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
           />
           {isValidatingCode && (
             <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -499,7 +499,7 @@ export default function ChallengePage() {
         <button
           onClick={() => validateDiscountCode(discountCode)}
           disabled={isValidatingCode || !discountCode}
-          className="bg-[#0FF1CE] text-black px-6 py-3 rounded-lg font-medium hover:bg-[#0FF1CE]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black px-6 py-3 rounded-xl font-bold hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Apply
         </button>
@@ -552,10 +552,14 @@ export default function ChallengePage() {
   };
 
   return (
-    <div className="relative">
+    <div className="relative bg-gradient-to-br from-[#0D0D0D] via-[#0D0D0D] to-[#151515]">
       {/* Background Effects */}
       <div className="absolute top-0 left-0 w-full h-full bg-[#0FF1CE]/[0.02] background-noise"></div>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:w-3/4 h-full rounded-full bg-[#0FF1CE]/[0.03] blur-[150px] opacity-60"></div>
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse"></div>
+        <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse delay-1000"></div>
+      </div>
       <Particles />
 
       <div className="relative z-10">
@@ -577,11 +581,11 @@ export default function ChallengePage() {
           </div>
         </div>
 
-        <h1 className="text-xl font-bold text-white mb-6">No more hand holding and baby rules. Let's get you funded</h1>
+        <h1 className="text-xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent mb-6">No more hand holding and baby rules. Let's get you funded</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* First Card - Challenge Selection */}
-          <div className="lg:col-span-3 bg-[#0D0D0D]/80 backdrop-blur-sm rounded-2xl p-6 border border-[#2F2F2F]/50">
+          <div className="lg:col-span-3 bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl p-6 border border-[#2F2F2F]/50">
             {/* Challenge Type Selection */}
             <div className="mb-8">
               <h3 className="text-lg font-medium mb-4 text-white">Select Challenge Type</h3>
@@ -590,14 +594,14 @@ export default function ChallengePage() {
                   <button
                     key={type.id}
                     onClick={() => handleTypeSelect(type.id)}
-                    className={`relative group w-full rounded-xl overflow-hidden border transition-all duration-300 ${
+                    className={`relative group w-full rounded-xl overflow-hidden border-2 transition-all duration-300 ${
                       selectedType === type.id
-                        ? 'border-[#0FF1CE] shadow-[0_0_40px_rgba(15,241,206,0.2)]'
-                        : 'border-[#2F2F2F]/50 hover:border-[#0FF1CE]/30'
+                        ? 'border-[#0FF1CE] shadow-[0_0_20px_rgba(15,241,206,0.3)]'
+                        : 'border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50'
                     }`}
                   >
                     {/* Image section - top 70% */}
-                    <div className="relative w-full aspect-[16/10] overflow-hidden flex items-center justify-center bg-[#151515]">
+                    <div className="relative w-full aspect-[16/10] overflow-hidden flex items-center justify-center bg-gradient-to-b from-[#151515] to-[#0D0D0D]">
                       <div className="relative w-[105%] h-[105%]">
                         <Image
                           src={type.image}
@@ -632,10 +636,10 @@ export default function ChallengePage() {
                   <button
                     key={amount}
                     onClick={() => handleAmountSelect(amount)}
-                    className={`p-4 rounded-lg border ${
+                    className={`p-4 rounded-xl border-2 bg-gradient-to-b from-[#151515] to-[#0D0D0D] transition-all duration-300 ${
                       selectedAmount === amount
-                        ? 'border-[#0FF1CE] bg-[#0FF1CE]/10 text-white'
-                        : 'border-[#2F2F2F]/50 hover:border-[#0FF1CE]/30 text-gray-300'
+                        ? 'border-[#0FF1CE] shadow-[0_0_20px_rgba(15,241,206,0.3)] text-[#0FF1CE]'
+                        : 'border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50 text-gray-300'
                     }`}
                   >
                     {amount}
@@ -652,10 +656,10 @@ export default function ChallengePage() {
                   <button
                     key={platform}
                     onClick={() => handlePlatformSelect(platform)}
-                    className={`p-4 rounded-lg border min-w-[100px] ${
+                    className={`p-4 rounded-xl border-2 min-w-[100px] bg-gradient-to-b from-[#151515] to-[#0D0D0D] transition-all duration-300 ${
                       selectedPlatform === platform
-                        ? 'border-[#0FF1CE] bg-[#0FF1CE]/10 text-white'
-                        : 'border-[#2F2F2F]/50 hover:border-[#0FF1CE]/30 text-gray-300'
+                        ? 'border-[#0FF1CE] shadow-[0_0_20px_rgba(15,241,206,0.3)] text-[#0FF1CE]'
+                        : 'border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50 text-gray-300'
                     }`}
                   >
                     {platform}
@@ -668,7 +672,7 @@ export default function ChallengePage() {
             {selectedType && selectedAmount && selectedPlatform && (
               <>
                 {renderDiscountSection()}
-                <div className="p-4 bg-[#151515] rounded-lg">
+                <div className="p-4 bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 rounded-lg border border-[#0FF1CE]/20">
                   {renderPriceSection()}
                 </div>
               </>
@@ -676,7 +680,7 @@ export default function ChallengePage() {
           </div>
 
           {/* Second Card - Personal Information */}
-          <div className="lg:col-span-2 bg-[#0D0D0D]/80 backdrop-blur-sm rounded-2xl p-6 border border-[#2F2F2F]/50">
+          <div className="lg:col-span-2 bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl p-6 border border-[#2F2F2F]/50">
             <h3 className="text-lg font-medium mb-4 text-white">Your Information</h3>
             
             <div className="space-y-4">
@@ -687,7 +691,7 @@ export default function ChallengePage() {
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleInputChange}
-                  className={`w-full bg-[#151515] border ${formErrors.firstName ? 'border-red-500' : 'border-[#2F2F2F]'} rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50`}
+                  className={`w-full bg-[#151515]/50 backdrop-blur-sm border ${formErrors.firstName ? 'border-red-500' : 'border-[#2F2F2F]'} rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all`}
                 />
                 {formErrors.firstName && <p className="mt-1 text-sm text-red-500">{formErrors.firstName}</p>}
               </div>
@@ -699,7 +703,7 @@ export default function ChallengePage() {
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleInputChange}
-                  className={`w-full bg-[#151515] border ${formErrors.lastName ? 'border-red-500' : 'border-[#2F2F2F]'} rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50`}
+                  className={`w-full bg-[#151515]/50 backdrop-blur-sm border ${formErrors.lastName ? 'border-red-500' : 'border-[#2F2F2F]'} rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all`}
                 />
                 {formErrors.lastName && <p className="mt-1 text-sm text-red-500">{formErrors.lastName}</p>}
               </div>
@@ -711,7 +715,7 @@ export default function ChallengePage() {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className={`w-full bg-[#151515] border ${formErrors.email ? 'border-red-500' : 'border-[#2F2F2F]'} rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50`}
+                  className={`w-full bg-[#151515]/50 backdrop-blur-sm border ${formErrors.email ? 'border-red-500' : 'border-[#2F2F2F]'} rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all`}
                 />
                 {formErrors.email && <p className="mt-1 text-sm text-red-500">{formErrors.email}</p>}
               </div>
@@ -723,7 +727,7 @@ export default function ChallengePage() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className={`w-full bg-[#151515] border ${formErrors.phone ? 'border-red-500' : 'border-[#2F2F2F]'} rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50`}
+                  className={`w-full bg-[#151515]/50 backdrop-blur-sm border ${formErrors.phone ? 'border-red-500' : 'border-[#2F2F2F]'} rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all`}
                 />
                 {formErrors.phone && <p className="mt-1 text-sm text-red-500">{formErrors.phone}</p>}
               </div>
@@ -734,7 +738,7 @@ export default function ChallengePage() {
                   name="country"
                   value={formData.country}
                   onChange={handleInputChange}
-                  className={`w-full bg-[#151515] border ${formErrors.country ? 'border-red-500' : 'border-[#2F2F2F]'} rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50`}
+                  className={`w-full bg-[#151515]/50 backdrop-blur-sm border ${formErrors.country ? 'border-red-500' : 'border-[#2F2F2F]'} rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all`}
                 >
                   <option value="">Select a country</option>
                   {countries.map((country) => (
@@ -753,7 +757,7 @@ export default function ChallengePage() {
                   name="discordUsername"
                   value={formData.discordUsername}
                   onChange={handleInputChange}
-                  className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                  className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
                 />
               </div>
               
@@ -790,7 +794,7 @@ export default function ChallengePage() {
               
               <button
                 onClick={handleProceedToPayment}
-                className="w-full bg-[#0FF1CE] text-black font-bold py-3 rounded-lg hover:bg-[#0FF1CE]/90 transition-colors mt-6"
+                className="w-full bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black font-bold py-3 rounded-xl hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300 mt-6"
               >
                 Proceed to Payment
               </button>
@@ -800,7 +804,7 @@ export default function ChallengePage() {
 
         {/* Challenge Details Table */}
         {selectedType && selectedAmount && (
-          <div className="mt-12 bg-[#0D0D0D]/80 backdrop-blur-sm rounded-2xl p-6 md:p-8 border border-[#2F2F2F]/50">
+          <div className="mt-12 bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl p-6 md:p-8 border border-[#2F2F2F]/50">
             <h3 className="text-xl font-bold text-[#0FF1CE] mb-6 text-center">Challenge Details</h3>
             
             <div className={`${selectedType === 'Standard' ? 'max-w-5xl' : 'max-w-3xl'} mx-auto overflow-x-auto py-4 px-4 md:px-8`}>

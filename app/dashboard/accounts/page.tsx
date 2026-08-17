@@ -238,6 +238,8 @@ export default function MyAccountsPage() {
         {/* Background Effects */}
         <div className="absolute top-0 left-0 w-full h-full bg-[#0FF1CE]/[0.02] background-noise"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:w-3/4 h-full rounded-full bg-[#0FF1CE]/[0.03] blur-[150px] opacity-60"></div>
+        <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse"></div>
+        <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse delay-1000"></div>
         <Particles />
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -258,7 +260,7 @@ export default function MyAccountsPage() {
 
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-2xl font-bold text-white">My Trading Accounts</h1>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent">My Trading Accounts</h1>
               <p className="text-sm text-gray-400 mt-1">
                 {activeAccounts.length} of 5 active challenge accounts
               </p>
@@ -267,7 +269,7 @@ export default function MyAccountsPage() {
             {canAddMore && (
               <button 
                 onClick={handleStartChallenge}
-                className="bg-[#0FF1CE] text-black font-semibold py-2 px-4 rounded-lg hover:bg-[#0FF1CE]/90 transition-colors inline-flex items-center gap-2"
+                className="bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black font-semibold py-2 px-4 rounded-lg hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300 inline-flex items-center gap-2"
               >
                 <Plus size={20} />
                 Add Challenge
@@ -282,7 +284,7 @@ export default function MyAccountsPage() {
               return (
                 <div 
                   key={account.accountId}
-                  className={`bg-[#0D0D0D]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-6 ${getBorderStyle(account.status)} transition-all cursor-pointer ${isPlaceholder ? 'relative' : ''}`}
+                  className={`bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-6 ${getBorderStyle(account.status)} transition-all duration-300 cursor-pointer ${isPlaceholder ? 'relative' : ''}`}
                   onClick={() => handleViewAccount(account.accountId)}
                 >
                   {/* Placeholder Badge */}
@@ -319,7 +321,7 @@ export default function MyAccountsPage() {
                   {/* Quick Stats */}
                   {account.cachedMetrics && (
                     <div className="grid grid-cols-2 gap-3 mb-4">
-                      <div className="bg-[#151515] rounded-lg p-3">
+                      <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-lg border border-[#0FF1CE]/20 p-3">
                         <div className="flex items-center gap-2 text-gray-400 text-xs mb-1">
                           <DollarSign size={14} />
                           Balance
@@ -328,7 +330,7 @@ export default function MyAccountsPage() {
                           ${account.cachedMetrics.balance?.toLocaleString() || '-'}
                         </p>
                       </div>
-                      <div className="bg-[#151515] rounded-lg p-3">
+                      <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-lg border border-[#0FF1CE]/20 p-3">
                         <div className="flex items-center gap-2 text-gray-400 text-xs mb-1">
                           <BarChart size={14} />
                           Profit
@@ -358,10 +360,10 @@ export default function MyAccountsPage() {
             {/* Add New Challenge Card - Only show if less than 5 active */}
             {canAddMore && (
               <div 
-                className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-2xl border border-dashed border-[#2F2F2F] p-6 flex flex-col items-center justify-center cursor-pointer hover:border-[#0FF1CE]/30 transition-all min-h-[280px]"
+                className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-dashed border-[#2F2F2F] p-6 flex flex-col items-center justify-center cursor-pointer hover:border-[#0FF1CE]/50 transition-all duration-300 min-h-[280px]"
                 onClick={handleStartChallenge}
               >
-                <div className="w-12 h-12 rounded-full bg-[#0FF1CE]/10 flex items-center justify-center mb-4">
+                <div className="w-12 h-12 rounded-full bg-[#0FF1CE]/20 flex items-center justify-center mb-4">
                   <Plus className="text-[#0FF1CE]" size={24} />
                 </div>
                 <h3 className="text-white font-medium mb-2">Start New Challenge</h3>
@@ -403,6 +405,8 @@ export default function MyAccountsPage() {
       {/* Background Effects */}
       <div className="absolute top-0 left-0 w-full h-full bg-[#0FF1CE]/[0.02] background-noise"></div>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:w-3/4 h-full rounded-full bg-[#0FF1CE]/[0.03] blur-[150px] opacity-60"></div>
+      <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse"></div>
+      <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse delay-1000"></div>
       <Particles />
 
       {/* Maintenance Banner - Hidden */}
@@ -430,7 +434,7 @@ export default function MyAccountsPage() {
           {/* Placeholder cards to show blurred in background */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-2xl p-6 border border-[#2F2F2F]/50 h-64" />
+              <div key={i} className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl p-6 border border-[#2F2F2F]/50 h-64" />
             ))}
           </div>
         </div>
@@ -438,17 +442,17 @@ export default function MyAccountsPage() {
 
       {/* Locked content overlay */}
       <div className="absolute inset-0 flex items-center justify-center z-20">
-        <div className="bg-[#0D0D0D]/95 backdrop-blur-sm rounded-2xl p-8 border border-[#2F2F2F]/50 max-w-md w-full mx-4 text-center transform hover:scale-[1.02] transition-all duration-300">
-          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-[#0FF1CE]/10 flex items-center justify-center">
+        <div className="bg-gradient-to-br from-[#1A1A1A]/95 to-[#151515]/95 backdrop-blur-sm rounded-2xl p-8 border border-[#0FF1CE]/20 shadow-[0_0_20px_rgba(15,241,206,0.15)] max-w-md w-full mx-4 text-center transform hover:scale-[1.02] hover:border-[#0FF1CE]/50 transition-all duration-300">
+          <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-[#0FF1CE]/20 flex items-center justify-center">
             <Lock className="text-[#0FF1CE]" size={32} />
           </div>
-          <h2 className="text-2xl font-bold text-white mb-3">Account Metrics Locked</h2>
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent mb-3">Account Metrics Locked</h2>
           <p className="text-gray-400 mb-6">
             See your account metrics and performance analytics after purchasing a challenge. Start your journey to becoming a funded trader today.
           </p>
           <button 
             onClick={handleStartChallenge}
-            className="bg-[#0FF1CE] text-black font-bold py-3 px-6 rounded-lg hover:bg-[#0FF1CE]/90 transition-colors inline-flex items-center gap-2"
+            className="bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black font-bold py-3 px-6 rounded-xl hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300 inline-flex items-center gap-2"
           >
             Start New Challenge
             <Plus size={20} />

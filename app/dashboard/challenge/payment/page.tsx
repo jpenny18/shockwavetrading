@@ -101,7 +101,7 @@ const PriceDisplay = ({ originalPrice, finalPrice, discount }: {
   finalPrice: number;
   discount?: ChallengeData['discount'];
 }) => (
-  <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-2xl p-6 border border-[#2F2F2F]/50 mb-8">
+  <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl p-6 border border-[#2F2F2F]/50 mb-8">
     <h2 className="text-xl font-semibold mb-4 text-white">Order Summary</h2>
     <div className="space-y-2">
       <div className="flex justify-between items-center">
@@ -290,7 +290,7 @@ export default function PaymentPage() {
         <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
           {paymentError}
           <button
-            className="mt-4 px-4 py-2 bg-[#0FF1CE]/10 hover:bg-[#0FF1CE]/20 text-white rounded-lg"
+            className="mt-4 px-4 py-2 bg-transparent border border-[#0FF1CE]/50 text-[#0FF1CE] font-bold rounded-xl hover:bg-[#0FF1CE]/10 transition-all duration-300"
             onClick={createPaymentIntent}
           >
             Try Again
@@ -304,7 +304,7 @@ export default function PaymentPage() {
         <div className="p-6 text-center">
           <p className="text-white/70">Unable to initialize payment. Please try again.</p>
           <button
-            className="mt-4 px-4 py-2 bg-[#0FF1CE]/10 hover:bg-[#0FF1CE]/20 text-white rounded-lg"
+            className="mt-4 px-4 py-2 bg-transparent border border-[#0FF1CE]/50 text-[#0FF1CE] font-bold rounded-xl hover:bg-[#0FF1CE]/10 transition-all duration-300"
             onClick={createPaymentIntent}
           >
             Initialize Payment
@@ -325,7 +325,7 @@ export default function PaymentPage() {
   };
 
   return (
-    <div className="bg-gradient-to-b from-[#0D0D0D] via-[#121212] to-[#151515] text-white min-h-screen font-sans">
+    <div className="bg-gradient-to-br from-[#0D0D0D] via-[#0D0D0D] to-[#151515] text-white min-h-screen font-sans">
       {/* System Alert Banner */}
       <div className="relative z-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -359,14 +359,18 @@ export default function PaymentPage() {
       {/* Background Effects */}
       <div className="absolute top-0 left-0 w-full h-full bg-[#0FF1CE]/[0.02] background-noise"></div>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:w-3/4 h-full rounded-full bg-[#0FF1CE]/[0.03] blur-[150px] opacity-60"></div>
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse"></div>
+        <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse delay-1000"></div>
+      </div>
       <Particles />
 
       {/* Main Content */}
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h1 className="text-3xl font-bold text-white mb-8 text-center">Complete Your Payment</h1>
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent mb-8 text-center">Complete Your Payment</h1>
 
         {/* Payment Support Notice */}
-        <div className="mb-8 bg-[#1A1A1A] rounded-xl border border-[#0FF1CE]/30 overflow-hidden">
+        <div className="mb-8 bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-[#0FF1CE]/30 overflow-hidden">
           <div className="px-4 py-3 bg-[#0FF1CE]/10 border-b border-[#0FF1CE]/20">
             <h3 className="text-[#0FF1CE] font-medium">Having trouble with your payment?</h3>
           </div>
@@ -391,14 +395,14 @@ export default function PaymentPage() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Left Column - Payment Methods */}
           <div className="lg:col-span-3">
-            <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-2xl p-6 border border-[#2F2F2F]/50 mb-8">
+            <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl p-6 border border-[#2F2F2F]/50 mb-8">
               <h2 className="text-xl font-semibold mb-6 text-white">Payment Methods</h2>
 
               {/* Credit Card Payment Option */}
               <div className="mb-4">
               <button
                 onClick={() => handlePaymentSelect('card')}
-                  className="w-full bg-[#1A1A1A] hover:bg-[#212121] border border-[#2F2F2F]/50 rounded-xl p-4 transition duration-200"
+                  className="w-full bg-gradient-to-b from-[#151515] to-[#0D0D0D] border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50 rounded-xl p-4 transition-all duration-300"
                 >
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
@@ -415,7 +419,7 @@ export default function PaymentPage() {
               {isCardExpanded && (
                   <div className="mt-4 relative">
                     {isProcessingPayment && <PaymentProcessingOverlay />}
-                    <div className="bg-[#151515] rounded-xl p-5 border border-[#2F2F2F]/50">
+                    <div className="bg-gradient-to-b from-[#151515] to-[#0D0D0D] rounded-xl p-5 border border-[#2F2F2F]/50">
                       {renderCardPaymentSection()}
                   </div>
                 </div>
@@ -423,7 +427,7 @@ export default function PaymentPage() {
 
               {/* Trust Badges */}
               <div className="grid grid-cols-3 gap-4 mt-6">
-                  <div className="bg-[#151515] rounded-xl p-4 text-center border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50 transition-colors group">
+                  <div className="bg-gradient-to-b from-[#151515] to-[#0D0D0D] rounded-xl p-4 text-center border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50 transition-all duration-300 group">
                     <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#0FF1CE]/10 flex items-center justify-center group-hover:bg-[#0FF1CE]/20 transition-colors">
                       <Shield className="text-[#0FF1CE]" size={24} />
                     </div>
@@ -431,7 +435,7 @@ export default function PaymentPage() {
                     <div className="text-[0.5rem] text-gray-400 leading-relaxed">256-bit SSL encryption for maximum security</div>
                   </div>
                   
-                  <div className="bg-[#151515] rounded-xl p-4 text-center border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50 transition-colors group">
+                  <div className="bg-gradient-to-b from-[#151515] to-[#0D0D0D] rounded-xl p-4 text-center border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50 transition-all duration-300 group">
                     <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#0FF1CE]/10 flex items-center justify-center group-hover:bg-[#0FF1CE]/20 transition-colors">
                       <RefreshCcw className="text-[#0FF1CE]" size={24} />
                     </div>
@@ -439,7 +443,7 @@ export default function PaymentPage() {
                     <div className="text-[0.5rem] text-gray-400 leading-relaxed">Full refund after successfully completing the evaluation</div>
                   </div>
 
-                  <div className="bg-[#151515] rounded-xl p-4 text-center border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50 transition-colors group">
+                  <div className="bg-gradient-to-b from-[#151515] to-[#0D0D0D] rounded-xl p-4 text-center border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50 transition-all duration-300 group">
                     <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#0FF1CE]/10 flex items-center justify-center group-hover:bg-[#0FF1CE]/20 transition-colors">
                       <HeadphonesIcon className="text-[#0FF1CE]" size={24} />
                     </div>
@@ -454,7 +458,7 @@ export default function PaymentPage() {
                 <div>
                   <button
                     onClick={() => handlePaymentSelect('crypto')}
-                    className="w-full bg-[#1A1A1A] hover:bg-[#212121] border border-[#2F2F2F]/50 rounded-xl p-4 transition duration-200"
+                    className="w-full bg-gradient-to-b from-[#151515] to-[#0D0D0D] border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50 rounded-xl p-4 transition-all duration-300"
                   >
                     <div className="flex justify-between items-center">
                       <div className="flex items-center">
@@ -470,7 +474,7 @@ export default function PaymentPage() {
 
                   {isCryptoExpanded && (
                     <div className="mt-4">
-                      <div className="bg-[#151515] rounded-xl border border-[#2F2F2F]/50 relative">
+                      <div className="bg-gradient-to-b from-[#151515] to-[#0D0D0D] rounded-xl border border-[#2F2F2F]/50 relative">
                         {isProcessingPayment && <PaymentProcessingOverlay />}
                         <CryptoPayment
                           challengeData={challengeData}
@@ -515,7 +519,7 @@ export default function PaymentPage() {
 
           {/* Right Column - Order Summary */}
           <div className="lg:col-span-2">
-            <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-2xl p-6 border border-[#2F2F2F]/50 sticky top-8">
+            <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl p-6 border border-[#2F2F2F]/50 sticky top-8">
               <h2 className="text-xl font-semibold mb-6 text-white">Order Summary</h2>
               
               <div className="mb-6">

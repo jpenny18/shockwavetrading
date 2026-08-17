@@ -15,10 +15,9 @@ import {
   CheckCircle,
   XCircle,
   AlertCircle,
-  Calendar,
-  Server,
   Activity,
-  AlertTriangle
+  AlertTriangle,
+  ChevronDown
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -83,14 +82,14 @@ const MetricCard = ({ title, value, icon: Icon, format = 'number', prefix = '', 
   };
 
   return (
-    <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 hover:border-[#0FF1CE]/30 transition-all">
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
+    <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl border border-[#0FF1CE]/20 p-3 sm:p-4 hover:border-[#0FF1CE]/50 transition-all duration-300" style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex-1 min-w-0">
           <p className="text-gray-400 text-xs mb-1">{title}</p>
-          <p className="text-white text-lg font-semibold">{formatValue()}</p>
+          <p className="text-white text-base sm:text-lg font-semibold break-words">{formatValue()}</p>
         </div>
         {Icon && (
-          <div className="p-2 rounded-lg bg-[#0FF1CE]/10 text-[#0FF1CE]">
+          <div className="p-2 rounded-lg bg-[#0FF1CE]/10 text-[#0FF1CE] flex-shrink-0">
             <Icon size={16} />
           </div>
         )}
@@ -100,8 +99,13 @@ const MetricCard = ({ title, value, icon: Icon, format = 'number', prefix = '', 
 };
 
 // Trading Objectives Table Component
-const TradingObjectivesTable = ({ objectives, accountStatus }: { objectives: TradingObjectives; accountStatus?: string }) => {
+const TradingObjectivesTable = ({ objectives, accountStatus, riskEvents = [] }: {
+  objectives: TradingObjectives;
+  accountStatus?: string;
+  riskEvents?: RiskEvent[];
+}) => {
   const isFunded = accountStatus === 'funded';
+  const [riskOpen, setRiskOpen] = useState(false);
   
   const rows = [
     { 
@@ -135,70 +139,151 @@ const TradingObjectivesTable = ({ objectives, accountStatus }: { objectives: Tra
     }
   ];
 
+  const formatTarget = (row: typeof rows[number]) => row.format === 'percent' ? `${row.target}%` : row.target;
+  const formatCurrent = (row: typeof rows[number]) => row.format === 'percent' ? `${row.current.toFixed(2)}%` : row.current;
+
+  const hasRecentBreach = objectives.maxDrawdown.recentBreach || objectives.maxDailyDrawdown?.recentBreach;
+  const recentRiskEvents = riskEvents.filter(event => {
+    const eventTime = new Date(event.brokerTime);
+    const dayAgo = new Date();
+    dayAgo.setDate(dayAgo.getDate() - 1);
+    return eventTime > dayAgo;
+  });
+  const showRiskAccordion = hasRecentBreach || recentRiskEvents.length > 0;
+
   return (
-    <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6">
+    <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 sm:p-6">
       <h3 className="text-lg font-semibold text-white mb-4">Trading Objectives</h3>
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-[#2F2F2F]">
-              <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Objective</th>
-              <th className="text-center py-3 px-4 text-sm font-medium text-gray-400">Target</th>
-              <th className="text-center py-3 px-4 text-sm font-medium text-gray-400">Current</th>
-              <th className="text-center py-3 px-4 text-sm font-medium text-gray-400">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row, index) => (
-              <tr key={index} className="border-b border-[#2F2F2F]/50">
-                <td className="py-3 px-4 text-sm text-white">{row.label}</td>
-                <td className="py-3 px-4 text-sm text-center text-gray-300">
-                  {row.format === 'percent' ? `${row.target}%` : row.target}
-                </td>
-                <td className="py-3 px-4 text-sm text-center">
-                  <span className={row.passed ? 'text-green-400' : 'text-yellow-400'}>
-                    {row.format === 'percent' ? `${row.current.toFixed(2)}%` : row.current}
-                  </span>
-                </td>
-                <td className="py-3 px-4 text-sm text-center">
-                  {row.passed ? (
-                    <CheckCircle className="inline-block text-green-400" size={18} />
-                  ) : (
-                    <XCircle className="inline-block text-red-400" size={18} />
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+
+      <div className="divide-y divide-[#2F2F2F]/50">
+        {rows.map((row, index) => (
+          <div key={index} className="py-3 first:pt-0 last:pb-0">
+            <div className="flex items-start justify-between gap-3 mb-2">
+              <p className="text-sm text-gray-300 leading-snug">{row.label}</p>
+              {row.passed ? (
+                <CheckCircle className="flex-shrink-0 text-green-400" size={18} />
+              ) : (
+                <XCircle className="flex-shrink-0 text-red-400" size={18} />
+              )}
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <p className="text-[10px] uppercase tracking-wide text-gray-500 mb-0.5">Target</p>
+                <p className="text-sm text-gray-400">{formatTarget(row)}</p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-wide text-gray-500 mb-0.5">Current</p>
+                <p className={`text-sm ${row.passed ? 'text-green-400' : 'text-yellow-400'}`}>{formatCurrent(row)}</p>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
+
+      {showRiskAccordion && (
+        <div className="mt-4 pt-3 border-t border-[#2F2F2F]/50">
+          <button
+            type="button"
+            onClick={() => setRiskOpen(!riskOpen)}
+            className="w-full flex items-center justify-between gap-3 py-1"
+            aria-expanded={riskOpen}
+          >
+            <span className="flex items-center gap-2 text-red-400 font-semibold">
+              <AlertTriangle size={18} />
+              Risk Alert
+            </span>
+            <ChevronDown
+              size={18}
+              className={`text-red-400 transition-transform duration-300 ${riskOpen ? 'rotate-180' : ''}`}
+            />
+          </button>
+          <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
+            riskOpen ? 'max-h-96 opacity-100 mt-3' : 'max-h-0 opacity-0'
+          }`}>
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
+              {hasRecentBreach && (
+                <p className="text-gray-300 text-sm mb-2">
+                  Recent drawdown threshold breach detected. Please review your risk management.
+                </p>
+              )}
+              {recentRiskEvents.length > 0 && (
+                <div className="text-sm text-gray-300">
+                  <p className="mb-1">Recent risk events:</p>
+                  {recentRiskEvents.slice(0, 3).map((event, index) => (
+                    <p key={index} className="text-xs text-red-400">
+                      • {event.exceededThresholdType}: {event.relativeDrawdown.toFixed(2)}% at {new Date(event.brokerTime).toLocaleString()}
+                    </p>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
+const TradeRow = ({ trade }: { trade: TradeData }) => (
+  <div className="py-3 first:pt-0">
+    <div className="flex items-baseline justify-between gap-3">
+      <p className="text-sm font-medium text-white">{trade.symbol}</p>
+      <p className={`text-sm tabular-nums ${
+        trade.profit != null && trade.profit >= 0 ? 'text-green-400' : 'text-red-400'
+      }`}>
+        {trade.profit != null ? `$${trade.profit.toFixed(2)}` : '-'}
+      </p>
+    </div>
+    <div className="mt-1 flex items-center justify-between gap-3 text-xs text-gray-400">
+      <p className="truncate">
+        <span className={trade.type === 'buy' ? 'text-green-400' : 'text-red-400'}>
+          {trade.type?.toUpperCase() || 'N/A'}
+        </span>
+        <span className="text-gray-600"> · </span>
+        <span>{trade.volume != null ? trade.volume.toFixed(2) : '-'}</span>
+        <span className="text-gray-600"> · </span>
+        <span className="capitalize">{trade.state || 'unknown'}</span>
+      </p>
+      <p className="flex-shrink-0 text-gray-500">
+        {trade.openTime ? formatDistanceToNow(new Date(trade.openTime), { addSuffix: true }) : '-'}
+      </p>
+    </div>
+    <p className="mt-1 text-xs text-gray-500 tabular-nums">
+      {trade.openPrice != null ? trade.openPrice.toFixed(5) : '-'}
+      <span className="mx-1.5 text-gray-600">→</span>
+      {trade.closePrice != null ? trade.closePrice.toFixed(5) : '-'}
+    </p>
+  </div>
+);
+
 // Trading Journal Component with Pagination
 const TradingJournal = ({ trades }: { trades: TradeData[] }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [isOpen, setIsOpen] = useState(false);
   const tradesPerPage = 20;
+
+  const sortedTrades = [...trades].sort((a, b) => {
+    const aTime = a.openTime ? new Date(a.openTime).getTime() : 0;
+    const bTime = b.openTime ? new Date(b.openTime).getTime() : 0;
+    return bTime - aTime;
+  });
   
-  // Calculate pagination
-  const totalPages = Math.ceil(trades.length / tradesPerPage);
+  const totalPages = Math.ceil(sortedTrades.length / tradesPerPage);
   const startIndex = (currentPage - 1) * tradesPerPage;
   const endIndex = startIndex + tradesPerPage;
-  const currentTrades = trades.slice(startIndex, endIndex);
+  const currentTrades = sortedTrades.slice(startIndex, endIndex);
+  const previewDesktop = sortedTrades.slice(0, 2);
+  const previewMobile = sortedTrades.slice(0, 4);
   
-  // Generate page numbers to show
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
     
     if (totalPages <= maxPagesToShow) {
-      // Show all pages if total is less than max
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }
     } else {
-      // Show first, last, and pages around current
       if (currentPage <= 3) {
         for (let i = 1; i <= 4; i++) pages.push(i);
         pages.push('...');
@@ -220,81 +305,55 @@ const TradingJournal = ({ trades }: { trades: TradeData[] }) => {
   };
   
   return (
-    <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6">
-      <div className="flex items-center justify-between mb-4">
+    <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 sm:p-6">
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between gap-3 mb-4"
+        aria-expanded={isOpen}
+      >
         <h3 className="text-lg font-semibold text-white">Trading Journal</h3>
-        <span className="text-sm text-gray-400">
-          {trades.length} {trades.length === 1 ? 'Trade' : 'Trades'} Total
-        </span>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[800px]">
-          <thead>
-            <tr className="border-b border-[#2F2F2F]">
-              <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase">Symbol</th>
-              <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase">Type</th>
-              <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase">Volume</th>
-              <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase">Open Price</th>
-              <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase">Close Price</th>
-              <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase">Profit</th>
-              <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase">Open Time</th>
-              <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase">Status</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[#2F2F2F]/50">
-            {trades.length === 0 ? (
-              <tr>
-                <td colSpan={8} className="py-8 text-center text-gray-400">No trades found</td>
-              </tr>
-            ) : (
-              currentTrades.map((trade) => (
-                <tr key={trade.id} className="hover:bg-white/5 transition-colors">
-                  <td className="py-3 px-4 text-sm text-white">{trade.symbol}</td>
-                  <td className="py-3 px-4 text-sm">
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      trade.type === 'buy' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-                    }`}>
-                      {trade.type?.toUpperCase() || 'N/A'}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-300">{trade.volume != null ? trade.volume.toFixed(2) : '-'}</td>
-                  <td className="py-3 px-4 text-sm text-gray-300">{trade.openPrice != null ? trade.openPrice.toFixed(5) : '-'}</td>
-                  <td className="py-3 px-4 text-sm text-gray-300">
-                    {trade.closePrice != null ? trade.closePrice.toFixed(5) : '-'}
-                  </td>
-                  <td className="py-3 px-4 text-sm">
-                    <span className={trade.profit != null && trade.profit >= 0 ? 'text-green-400' : 'text-red-400'}>
-                      {trade.profit != null ? `$${trade.profit.toFixed(2)}` : '-'}
-                    </span>
-                  </td>
-                  <td className="py-3 px-4 text-sm text-gray-300">
-                    {trade.openTime ? formatDistanceToNow(new Date(trade.openTime), { addSuffix: true }) : '-'}
-                  </td>
-                  <td className="py-3 px-4 text-sm">
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      trade.state === 'opened' 
-                        ? 'bg-blue-500/20 text-blue-400' 
-                        : 'bg-gray-500/20 text-gray-400'
-                    }`}>
-                      {trade.state || 'unknown'}
-                    </span>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-      
-      {/* Pagination Controls */}
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-6 pt-4 border-t border-[#2F2F2F]/50">
-          <div className="text-sm text-gray-400">
-            Showing {startIndex + 1} to {Math.min(endIndex, trades.length)} of {trades.length} trades
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-gray-400">
+            {trades.length} {trades.length === 1 ? 'Trade' : 'Trades'} Total
+          </span>
+          <ChevronDown
+            size={20}
+            className={`text-[#0FF1CE] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+          />
+        </div>
+      </button>
+
+      {trades.length === 0 ? (
+        <p className="py-8 text-center text-gray-400 text-sm">No trades found</p>
+      ) : isOpen ? (
+        <div className="divide-y divide-[#2F2F2F]/50">
+          {currentTrades.map((trade) => (
+            <TradeRow key={trade.id} trade={trade} />
+          ))}
+        </div>
+      ) : (
+        <>
+          <div className="lg:hidden divide-y divide-[#2F2F2F]/50">
+            {previewMobile.map((trade) => (
+              <TradeRow key={trade.id} trade={trade} />
+            ))}
           </div>
+          <div className="hidden lg:block divide-y divide-[#2F2F2F]/50">
+            {previewDesktop.map((trade) => (
+              <TradeRow key={trade.id} trade={trade} />
+            ))}
+          </div>
+        </>
+      )}
+      
+      {isOpen && totalPages > 1 && (
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#2F2F2F]/50">
+          <p className="text-xs text-gray-500">
+            {startIndex + 1}–{Math.min(endIndex, trades.length)} of {trades.length}
+          </p>
           
           <div className="flex items-center gap-1">
-            {/* Previous button */}
             <button
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
@@ -303,7 +362,6 @@ const TradingJournal = ({ trades }: { trades: TradeData[] }) => {
               Previous
             </button>
             
-            {/* Page numbers */}
             <div className="flex items-center gap-1 mx-2">
               {getPageNumbers().map((page, index) => (
                 page === '...' ? (
@@ -314,8 +372,8 @@ const TradingJournal = ({ trades }: { trades: TradeData[] }) => {
                     onClick={() => setCurrentPage(page as number)}
                     className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
                       currentPage === page
-                        ? 'bg-[#0FF1CE] text-black'
-                        : 'text-gray-400 bg-[#151515] border border-[#2F2F2F] hover:bg-[#1A1A1A] hover:text-white'
+                        ? 'bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black shadow-[0_0_20px_rgba(15,241,206,0.3)]'
+                        : 'text-gray-400 bg-[#151515]/50 border border-[#2F2F2F] hover:bg-[#0FF1CE]/10 hover:text-[#0FF1CE]'
                     }`}
                   >
                     {page}
@@ -324,7 +382,6 @@ const TradingJournal = ({ trades }: { trades: TradeData[] }) => {
               ))}
             </div>
             
-            {/* Next button */}
             <button
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
@@ -335,50 +392,6 @@ const TradingJournal = ({ trades }: { trades: TradeData[] }) => {
           </div>
         </div>
       )}
-    </div>
-  );
-};
-
-// Risk Alert Component for user dashboard
-const RiskAlertBanner = ({ objectives, riskEvents }: { 
-  objectives: TradingObjectives; 
-  riskEvents: RiskEvent[] 
-}) => {
-  const hasRecentBreach = objectives.maxDrawdown.recentBreach || objectives.maxDailyDrawdown?.recentBreach;
-  const recentRiskEvents = riskEvents.filter(event => {
-    const eventTime = new Date(event.brokerTime);
-    const dayAgo = new Date();
-    dayAgo.setDate(dayAgo.getDate() - 1);
-    return eventTime > dayAgo;
-  });
-
-  if (!hasRecentBreach && recentRiskEvents.length === 0) {
-    return null;
-  }
-
-  return (
-    <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 mb-6">
-      <div className="flex items-start gap-3">
-        <AlertTriangle className="text-red-400 mt-0.5" size={20} />
-        <div>
-          <h3 className="text-red-400 font-semibold mb-1">Risk Alert</h3>
-          {hasRecentBreach && (
-            <p className="text-gray-300 text-sm mb-2">
-              Recent drawdown threshold breach detected. Please review your risk management.
-            </p>
-          )}
-          {recentRiskEvents.length > 0 && (
-            <div className="text-sm text-gray-300">
-              <p className="mb-1">Recent risk events:</p>
-              {recentRiskEvents.slice(0, 3).map((event, index) => (
-                <p key={index} className="text-xs text-red-400">
-                  • {event.exceededThresholdType}: {event.relativeDrawdown.toFixed(2)}% at {new Date(event.brokerTime).toLocaleString()}
-                </p>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
     </div>
   );
 };
@@ -398,6 +411,7 @@ export default function AccountDetailsPage() {
   const [accountStatus, setAccountStatus] = useState<string>('active');
   const [riskEvents, setRiskEvents] = useState<RiskEvent[]>([]);
   const [userAccount, setUserAccount] = useState<any>(null);
+  const [accountInfoOpen, setAccountInfoOpen] = useState(false);
 
   // Chart configuration
   const chartOptions = {
@@ -603,13 +617,13 @@ export default function AccountDetailsPage() {
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-red-500/30 p-8 max-w-md">
+        <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-red-500/30 p-8 max-w-md">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-white text-center mb-2">Error Loading Metrics</h2>
           <p className="text-gray-400 text-center mb-4">{error}</p>
           <button
             onClick={() => fetchMetrics()}
-            className="w-full bg-[#0FF1CE] text-black font-semibold py-2 px-4 rounded-lg hover:bg-[#0FF1CE]/90 transition-colors"
+            className="w-full bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black font-semibold py-2 px-4 rounded-lg hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300"
           >
             Try Again
           </button>
@@ -626,7 +640,7 @@ export default function AccountDetailsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white">Account Metrics</h1>
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent">Account Metrics</h1>
           {lastUpdate && (
             <p className="text-sm text-gray-400 mt-1">
               Last updated {formatDistanceToNow(lastUpdate, { addSuffix: true })}
@@ -678,13 +692,26 @@ export default function AccountDetailsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           {/* Trading Objectives - 60% width */}
           <div className="lg:col-span-3">
-            {objectives && <TradingObjectivesTable objectives={objectives} accountStatus={accountStatus} />}
+            {objectives && <TradingObjectivesTable objectives={objectives} accountStatus={accountStatus} riskEvents={riskEvents} />}
           </div>
 
           {/* Account Information - 40% width */}
           <div className="lg:col-span-2">
-            <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Account Information</h3>
+            <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 sm:p-6">
+              <button
+                type="button"
+                onClick={() => setAccountInfoOpen(!accountInfoOpen)}
+                className="flex lg:hidden w-full items-center justify-between gap-3"
+                aria-expanded={accountInfoOpen}
+              >
+                <h3 className="text-lg font-semibold text-white">Account Information</h3>
+                <ChevronDown
+                  size={20}
+                  className={`text-[#0FF1CE] transition-transform duration-300 ${accountInfoOpen ? 'rotate-180' : ''}`}
+                />
+              </button>
+              <h3 className="hidden lg:block text-lg font-semibold text-white mb-4">Account Information</h3>
+              <div className={`${accountInfoOpen ? 'block mt-4' : 'hidden'} lg:block lg:mt-0`}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-xs text-gray-400 mb-1">Status</p>
@@ -737,13 +764,16 @@ export default function AccountDetailsPage() {
                   <p className="text-sm text-white">{accountInfo?.server || '-'}</p>
                 </div>
               </div>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Row 2: Key Metrics Grid - 100% width */}
         <div>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 sm:p-6">
+            <h3 className="text-lg font-semibold text-white mb-4">Statistics</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 lg:gap-4">
             <MetricCard title="Balance" value={metrics?.balance || 0} icon={DollarSign} format="currency" />
             <MetricCard title="Equity" value={metrics?.equity || 0} icon={TrendingUp} format="currency" />
             <MetricCard title="Average Profit" value={metrics?.averageWin || 0} icon={TrendingUp} format="currency" />
@@ -755,11 +785,12 @@ export default function AccountDetailsPage() {
             <MetricCard title="Win Rate" value={winRate} icon={CheckCircle} format="percent" />
             <MetricCard title="Profit Factor" value={metrics?.profitFactor || 0} icon={TrendingUp} />
           </div>
+          </div>
         </div>
 
         {/* Row 3: Equity Growth Chart - 100% width */}
         <div>
-          <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6">
+          <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Equity Growth</h3>
             {chartData.length > 0 ? (
               <ApexChart
@@ -775,9 +806,6 @@ export default function AccountDetailsPage() {
             )}
           </div>
         </div>
-
-        {/* Risk Alert */}
-        {objectives && <RiskAlertBanner objectives={objectives} riskEvents={riskEvents} />}
 
         {/* Row 4: Trading Journal - 100% width */}
         <div>

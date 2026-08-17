@@ -64,7 +64,7 @@ const TransactionCard = ({ transaction }: { transaction: Transaction }) => {
   const MethodIcon = methodIcons[transaction.method];
   
   return (
-    <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 overflow-hidden">
+    <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50 transition-all duration-300 overflow-hidden">
       <div className="p-4 cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -147,10 +147,10 @@ const PaymentMethodCard = ({
 }) => (
   <div 
     onClick={onSelect}
-    className={`p-4 border rounded-lg cursor-pointer transition-all ${
+    className={`p-4 border rounded-xl cursor-pointer transition-all duration-300 ${
       isSelected 
-        ? 'border-[#0FF1CE] bg-[#0FF1CE]/5' 
-        : 'border-[#2F2F2F]/50 hover:border-[#0FF1CE]/30'
+        ? 'border-[#0FF1CE] bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 shadow-[0_0_20px_rgba(15,241,206,0.3)]' 
+        : 'border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50'
     }`}
   >
     <div className="flex items-start gap-3">
@@ -271,10 +271,12 @@ export default function PayoutsPage() {
   if (!withdrawalRequest) {
     return (
       <div className="relative min-h-screen">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <h1 className="text-3xl font-bold text-white mb-8">Payouts</h1>
+        <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse"></div>
+        <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse delay-1000"></div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent mb-8">Payouts</h1>
           
-          <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-8 max-w-md mx-auto text-center">
+          <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-8 max-w-md mx-auto text-center">
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-gray-400/10 flex items-center justify-center">
               <Lock className="text-gray-400" size={32} />
             </div>
@@ -286,7 +288,7 @@ export default function PayoutsPage() {
             <div className="space-y-3">
               <button
                 onClick={() => router.push('/dashboard/accounts')}
-                className="w-full bg-[#0FF1CE] text-black font-semibold py-3 rounded-lg hover:bg-[#0FF1CE]/90 transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black font-bold py-3 rounded-xl hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300 flex items-center justify-center gap-2"
               >
                 <Wallet size={18} />
                 View My Accounts
@@ -294,7 +296,7 @@ export default function PayoutsPage() {
               
               <button
                 onClick={() => router.push('/challenge')}
-                className="w-full bg-transparent border border-[#2F2F2F] text-white font-semibold py-3 rounded-lg hover:border-[#0FF1CE]/30 hover:bg-[#0FF1CE]/5 transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-transparent border border-[#0FF1CE]/50 text-[#0FF1CE] font-bold py-3 rounded-xl hover:bg-[#0FF1CE]/10 transition-all duration-300 flex items-center justify-center gap-2"
               >
                 <Plus size={18} />
                 Purchase Challenge
@@ -312,19 +314,21 @@ export default function PayoutsPage() {
       {/* Background Effects */}
       <div className="absolute top-0 left-0 w-full h-full bg-[#0FF1CE]/[0.02] background-noise"></div>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:w-3/4 h-full rounded-full bg-[#0FF1CE]/[0.03] blur-[150px] opacity-60"></div>
+      <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse"></div>
+      <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse delay-1000"></div>
       <Particles />
 
       {/* Content */}
       <div className="relative z-10">
-        <h1 className="text-2xl font-bold text-white mb-6">Payouts</h1>
+        <h1 className="text-2xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent mb-6">Payouts</h1>
 
         {/* Tabs */}
-        <div className="flex space-x-1 mb-6 bg-[#1A1A1A]/50 backdrop-blur-sm rounded-lg p-1 max-w-xs">
+        <div className="flex space-x-1 mb-6 bg-[#151515]/50 backdrop-blur-sm rounded-lg p-1 border border-[#2F2F2F]/50 max-w-xs">
           <button
             onClick={() => router.push('/dashboard/payouts')}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
               pathname === '/dashboard/payouts'
-                ? 'bg-[#0FF1CE] text-black'
+                ? 'bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black font-bold'
                 : 'text-gray-400 hover:text-white'
             }`}
           >
@@ -334,7 +338,7 @@ export default function PayoutsPage() {
             onClick={() => router.push('/dashboard/payouts/new')}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
               pathname === '/dashboard/payouts/new'
-                ? 'bg-[#0FF1CE] text-black'
+                ? 'bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black font-bold'
                 : 'text-gray-400 hover:text-white'
             }`}
           >
@@ -404,7 +408,7 @@ export default function PayoutsPage() {
           {/* Left Column - Withdrawal Info */}
           <div className="lg:col-span-2 space-y-6">
             {/* Amount Information */}
-            <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6">
+            <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl border border-[#0FF1CE]/20 p-6" style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
               <h2 className="text-xl font-semibold text-white mb-4">Withdrawal Details</h2>
               
               <div className="space-y-4">
@@ -425,11 +429,11 @@ export default function PayoutsPage() {
 
             {/* Payment Method Selection */}
             {withdrawalRequest.status === 'pending' && (
-              <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6">
+              <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-6">
                 <h2 className="text-xl font-semibold text-white mb-4">Payment Method</h2>
                 
                 <div className="space-y-3 mb-6">
-                  <label className="relative flex items-center p-4 bg-[#151515] rounded-lg border border-[#2F2F2F] cursor-pointer hover:border-[#0FF1CE]/30 transition-all">
+                  <label className="relative flex items-center p-4 bg-[#151515]/50 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 cursor-pointer hover:border-[#0FF1CE]/50 transition-all duration-300">
                     <input
                       type="radio"
                       name="paymentMethod"
@@ -488,7 +492,7 @@ export default function PayoutsPage() {
                       value={walletAddress}
                       onChange={(e) => setWalletAddress(e.target.value)}
                       placeholder="Enter your Solana address"
-                      className="w-full bg-[#151515] text-white px-4 py-3 rounded-lg border border-[#2F2F2F] focus:border-[#0FF1CE]/50 focus:outline-none"
+                      className="w-full bg-[#151515]/50 backdrop-blur-sm text-white px-4 py-3 rounded-lg border border-[#2F2F2F] focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
                       disabled={!!withdrawalRequest.submittedAt}
                     />
                     <p className="text-gray-400 text-xs mt-2">
@@ -517,7 +521,7 @@ export default function PayoutsPage() {
                     type="button"
                     onClick={handleSubmitDetails}
                     disabled={!paymentMethod || !walletAddress.trim() || submitting}
-                    className="w-full bg-[#0FF1CE] text-black font-semibold py-3 rounded-lg hover:bg-[#0FF1CE]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-6 flex items-center justify-center"
+                    className="w-full bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black font-bold py-3 rounded-xl hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed mt-6 flex items-center justify-center"
                   >
                     {submitting ? (
                       <>
@@ -534,7 +538,7 @@ export default function PayoutsPage() {
 
             {/* Submitted Details (Read-only) */}
             {withdrawalRequest.submittedAt && (
-              <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6">
+              <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-6">
                 <h2 className="text-xl font-semibold text-white mb-4">Submitted Details</h2>
                 
                 <div className="space-y-4">
@@ -564,7 +568,7 @@ export default function PayoutsPage() {
           {/* Right Column - Status & Info */}
           <div className="space-y-6">
             {/* Status Card */}
-            <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6">
+            <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-6">
               <h3 className="text-lg font-semibold text-white mb-4">Status</h3>
               
               <div className="space-y-3">
@@ -594,7 +598,7 @@ export default function PayoutsPage() {
             </div>
 
             {/* Important Notes */}
-            <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6">
+            <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-6">
               <h3 className="text-lg font-semibold text-white mb-4">Important Notes</h3>
               
               <ul className="space-y-2 text-sm text-gray-400">
@@ -618,7 +622,7 @@ export default function PayoutsPage() {
             </div>
 
             {/* Support */}
-            <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6">
+            <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-6">
               <h3 className="text-lg font-semibold text-white mb-4">Need Help?</h3>
               <p className="text-gray-400 text-sm mb-4">
                 If you have any questions about your withdrawal, please contact our support team.

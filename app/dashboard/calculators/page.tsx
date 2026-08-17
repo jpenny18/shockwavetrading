@@ -71,7 +71,7 @@ interface CalculatorCardProps {
 }
 
 const CalculatorCard = ({ icon, title, description, children, className = "" }: CalculatorCardProps) => (
-  <div className={`bg-gradient-to-br from-[#0D0D0D]/90 to-[#1A1A1A]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-4 sm:p-6 lg:p-8 hover:border-[#0FF1CE]/30 transition-all duration-300 ${className}`}>
+  <div className={`bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-4 sm:p-6 lg:p-8 hover:border-[#0FF1CE]/50 transition-all duration-300 ${className}`}>
     <div className="flex items-center gap-3 mb-4 sm:mb-6">
       <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-[#0FF1CE]/20 to-[#0FF1CE]/10 flex items-center justify-center border border-[#0FF1CE]/20">
         {icon}
@@ -111,7 +111,7 @@ const InputField = ({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-[#1A1A1A]/80 border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50 focus:ring-2 focus:ring-[#0FF1CE]/20 transition-all text-sm sm:text-base"
+        className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all text-sm sm:text-base"
       />
       {suffix && (
         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">
@@ -140,7 +140,7 @@ const SelectField = ({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full bg-[#1A1A1A]/80 border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50 focus:ring-2 focus:ring-[#0FF1CE]/20 transition-all text-sm sm:text-base"
+      className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all text-sm sm:text-base"
     >
       {options.map(option => (
         <option key={option.value} value={option.value} className="bg-[#1A1A1A] text-white">
@@ -162,7 +162,7 @@ const ResultField = ({
   className?: string;
   highlight?: boolean;
 }) => (
-  <div className={`bg-gradient-to-br from-[#1A1A1A]/60 to-[#0D0D0D]/60 rounded-xl p-4 border border-[#2F2F2F]/30 ${highlight ? 'border-[#0FF1CE]/40 bg-[#0FF1CE]/5' : ''} ${className}`}>
+  <div className={`bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl p-4 border border-[#0FF1CE]/20 ${highlight ? 'border-[#0FF1CE]/40 shadow-[0_0_20px_rgba(15,241,206,0.15)]' : ''} ${className}`} style={{ boxShadow: highlight ? undefined : '0 0 20px rgba(15, 241, 206, 0.1)' }}>
     <div className="text-gray-400 text-xs sm:text-sm mb-1 uppercase tracking-wide">{label}</div>
     <div className={`font-bold text-lg sm:text-xl ${highlight ? 'text-[#0FF1CE]' : 'text-white'}`}>{value}</div>
   </div>
@@ -184,7 +184,7 @@ const TabButton = ({
       className={`
         flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-300 text-sm sm:text-base font-medium
         ${isActive 
-          ? 'bg-gradient-to-r from-[#0FF1CE]/20 to-[#0FF1CE]/10 text-[#0FF1CE] border border-[#0FF1CE]/30' 
+          ? 'bg-[#0FF1CE]/15 border border-[#0FF1CE] text-[#0FF1CE] shadow-[0_0_12px_rgba(15,241,206,0.35)]' 
           : 'text-gray-400 hover:text-white hover:bg-[#1A1A1A]/50 border border-transparent'
         }
       `}
@@ -518,7 +518,7 @@ export default function CalculatorsPage() {
                 suffix="lots"
                 step="0.01"
               />
-              <div className="bg-[#1A1A1A]/50 rounded-xl p-4 border border-[#2F2F2F]/30">
+              <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl p-4 border border-[#2F2F2F]/50">
                 <div className="text-gray-400 text-xs mb-2">ASSET INFORMATION</div>
                 <div className="text-white text-sm space-y-1">
                   <div>Asset: <span className="text-[#0FF1CE]">{selectedAsset}</span></div>
@@ -605,13 +605,15 @@ export default function CalculatorsPage() {
       {/* Background Effects */}
       <div className="fixed inset-0 bg-[#0FF1CE]/[0.02] background-noise"></div>
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:w-3/4 h-full rounded-full bg-[#0FF1CE]/[0.03] blur-[150px] opacity-60"></div>
+      <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse"></div>
+      <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse delay-1000"></div>
       <Particles />
 
       {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Header */}
         <div className="mb-8 sm:mb-12">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3">Trading Calculators</h1>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent mb-3">Trading Calculators</h1>
           <p className="text-gray-400 text-sm sm:text-base lg:text-lg max-w-2xl">
             Professional-grade calculators with asset-specific calculations for precise risk management and position sizing.
           </p>
@@ -642,7 +644,7 @@ export default function CalculatorsPage() {
                 options={getAssetOptions()}
                 className="sm:col-span-1 lg:col-span-1"
               />
-              <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 rounded-xl p-4 border border-[#0FF1CE]/20">
+              <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl p-4 border border-[#0FF1CE]/20" style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
                 <div className="text-[#0FF1CE] text-xs font-medium mb-1">SELECTED ASSET</div>
                 <div className="text-white font-bold text-lg">{selectedAsset}</div>
                 <div className="text-gray-400 text-xs mt-1">
@@ -655,7 +657,7 @@ export default function CalculatorsPage() {
 
         {/* Tab Navigation */}
         <div className="mb-8">
-          <div className="flex flex-wrap gap-2 sm:gap-3 p-2 bg-[#0D0D0D]/80 rounded-xl border border-[#2F2F2F]/50">
+          <div className="flex flex-wrap gap-2 sm:gap-3 p-2 bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50">
             {CALCULATOR_TABS.map((tab) => (
               <TabButton
                 key={tab.id}

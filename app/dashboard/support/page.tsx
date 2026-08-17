@@ -10,16 +10,18 @@ export default function SupportPage() {
       {/* Background Effects */}
       <div className="absolute top-0 left-0 w-full h-full bg-[#0FF1CE]/[0.02] background-noise"></div>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:w-3/4 h-full rounded-full bg-[#0FF1CE]/[0.03] blur-[150px] opacity-60"></div>
+      <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse"></div>
+      <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse delay-1000"></div>
       <Particles />
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <h1 className="text-3xl font-bold text-white mb-8 text-center">Support Center</h1>
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent mb-8 text-center">Support Center</h1>
         
         <div className="grid gap-6">
           {/* Contact Support Card */}
-          <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-2xl p-8 border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/30 transition-all duration-300">
+          <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl p-8 border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50 transition-all duration-300">
             <div className="flex items-start gap-4 text-gray-300">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#0FF1CE]/20 to-[#0FF1CE]/10 flex items-center justify-center border border-[#0FF1CE]/20 flex-shrink-0">
+              <div className="w-12 h-12 rounded-full bg-[#0FF1CE]/20 flex items-center justify-center flex-shrink-0">
                 <Mail className="text-[#0FF1CE]" size={24} />
               </div>
               <div className="flex-1">
@@ -29,7 +31,7 @@ export default function SupportPage() {
                 </p>
                 <a 
                   href="mailto:support@shockwave-capital.com"
-                  className="text-[#0FF1CE] hover:underline text-lg font-medium inline-flex items-center gap-2 bg-[#0FF1CE]/10 px-4 py-2 rounded-lg border border-[#0FF1CE]/20 hover:bg-[#0FF1CE]/20 transition-all duration-200"
+                  className="text-black text-lg font-bold inline-flex items-center gap-2 bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] px-4 py-2 rounded-xl hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300"
                 >
                   <Mail size={16} />
                   support@shockwave-capital.com
@@ -67,27 +69,27 @@ export default function SupportPage() {
           </div>
 
           {/* Response Time Card */}
-          <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-2xl p-8 border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/30 transition-all duration-300">
+          <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl p-8 border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50 transition-all duration-300">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#0FF1CE]/20 to-[#0FF1CE]/10 flex items-center justify-center border border-[#0FF1CE]/20 flex-shrink-0">
+              <div className="w-12 h-12 rounded-full bg-[#0FF1CE]/20 flex items-center justify-center flex-shrink-0">
                 <Clock className="text-[#0FF1CE]" size={24} />
               </div>
               <div className="flex-1">
                 <h2 className="text-xl font-bold text-white mb-3">Expected Response Times</h2>
                 <div className="grid md:grid-cols-2 gap-4 text-gray-300">
-                  <div className="bg-[#1A1A1A]/50 rounded-lg p-4 border border-[#2F2F2F]/30">
+                  <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl p-4 border border-[#0FF1CE]/20">
                     <h3 className="font-semibold text-white mb-2">General Inquiries</h3>
                     <p className="text-[#0FF1CE] font-medium">24-48 hours</p>
                   </div>
-                  <div className="bg-[#1A1A1A]/50 rounded-lg p-4 border border-[#2F2F2F]/30">
+                  <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl p-4 border border-[#0FF1CE]/20">
                     <h3 className="font-semibold text-white mb-2">Account Issues</h3>
                     <p className="text-[#0FF1CE] font-medium">12-24 hours</p>
                   </div>
-                  <div className="bg-[#1A1A1A]/50 rounded-lg p-4 border border-[#2F2F2F]/30">
+                  <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl p-4 border border-[#0FF1CE]/20">
                     <h3 className="font-semibold text-white mb-2">Technical Support</h3>
                     <p className="text-[#0FF1CE] font-medium">24-48 hours</p>
                   </div>
-                  <div className="bg-[#1A1A1A]/50 rounded-lg p-4 border border-[#2F2F2F]/30">
+                  <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl p-4 border border-[#0FF1CE]/20">
                     <h3 className="font-semibold text-white mb-2">Urgent Matters</h3>
                     <p className="text-[#0FF1CE] font-medium">1-12 hours</p>
                   </div>

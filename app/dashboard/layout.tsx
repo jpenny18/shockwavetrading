@@ -18,7 +18,7 @@ import {
   Award
 } from 'lucide-react';
 import { auth, signOut } from '@/lib/firebase';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 const navItems = [
   { name: 'Dashboard', href: '/dashboard', icon: BarChart2 },
@@ -38,6 +38,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [initials, setInitials] = useState('');
@@ -72,9 +73,9 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-b from-[#0D0D0D] via-[#121212] to-[#151515]">
+    <div className="flex min-h-screen bg-gradient-to-br from-[#0D0D0D] via-[#0D0D0D] to-[#151515]">
       {/* Mobile Header */}
-      <header className="md:hidden fixed top-0 left-0 right-0 h-16 bg-[#121212]/80 backdrop-blur-sm border-b border-[#2F2F2F] z-50 px-4 flex items-center justify-between">
+      <header className="md:hidden fixed top-0 left-0 right-0 h-16 bg-[#121212]/90 backdrop-blur-md border-b border-[#2F2F2F]/50 z-50 px-4 flex items-center justify-between">
         <Image
           src="/logo.png"
           alt="Shockwave Capital"
@@ -101,7 +102,7 @@ export default function DashboardLayout({
       {/* Sidebar */}
       <aside
         className={`
-          fixed md:sticky top-0 md:top-0 left-0 h-screen w-64 bg-[#0D0D0D] z-50
+          fixed md:sticky top-0 md:top-0 left-0 h-screen w-64 bg-[#0D0D0D]/95 backdrop-blur-sm border-r border-[#2F2F2F]/50 z-50
           transform transition-transform duration-300 ease-in-out
           ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
           md:translate-x-0 md:flex md:flex-col
@@ -121,13 +122,20 @@ export default function DashboardLayout({
           <nav className="flex-1 space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
+              const isActive = item.href === '/dashboard'
+                ? pathname === '/dashboard'
+                : pathname?.startsWith(item.href);
               return (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="flex items-center gap-3 px-3 py-2 text-gray-400 hover:text-[#0FF1CE] rounded-lg hover:bg-[#0FF1CE]/10 transition-all group"
+                  className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-300 group ${
+                    isActive
+                      ? 'bg-[#0FF1CE]/10 text-[#0FF1CE] border border-[#0FF1CE]/20'
+                      : 'text-gray-400 border border-transparent hover:text-[#0FF1CE] hover:bg-[#0FF1CE]/10'
+                  }`}
                 >
-                  <Icon size={20} className="group-hover:text-[#0FF1CE]" />
+                  <Icon size={20} className={isActive ? 'text-[#0FF1CE]' : 'group-hover:text-[#0FF1CE]'} />
                   <span className="text-sm">{item.name}</span>
                 </Link>
               );
@@ -135,9 +143,9 @@ export default function DashboardLayout({
           </nav>
 
           {/* User Section */}
-          <div className="border-t border-[#2F2F2F] pt-4 mt-4">
+          <div className="border-t border-[#2F2F2F]/50 pt-4 mt-4">
             <div className="flex items-center gap-3 px-3 py-2">
-              <div className="w-8 h-8 rounded-full bg-[#0FF1CE]/20 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0FF1CE]/30 to-[#00D4FF]/20 border border-[#0FF1CE]/30 flex items-center justify-center">
                 <span className="text-[#0FF1CE] font-medium text-sm">{initials}</span>
               </div>
               <div className="flex-1 min-w-0">
@@ -166,7 +174,7 @@ export default function DashboardLayout({
 
       {/* Mobile Bottom Navigation */}
       <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 md:hidden z-50 transition-opacity duration-300 ${isSidebarOpen ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-        <div className="flex items-center gap-4 bg-[#121212]/90 backdrop-blur-sm border border-[#2F2F2F] rounded-full px-6 py-3">
+        <div className="flex items-center gap-4 bg-[#121212]/90 backdrop-blur-md border border-[#2F2F2F]/50 rounded-full px-6 py-3 shadow-[0_0_20px_rgba(15,241,206,0.15)]">
           <Link
             href="/dashboard/accounts"
             className="flex flex-col items-center text-gray-400 hover:text-[#0FF1CE] transition-all"

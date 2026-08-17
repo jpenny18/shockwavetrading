@@ -77,19 +77,23 @@ export default function SuccessPage() {
 
   if (!paymentData || !challengeData) {
     return (
-      <div className="relative">
+      <div className="relative bg-gradient-to-br from-[#0D0D0D] via-[#0D0D0D] to-[#151515]">
         {/* Background Effects */}
         <div className="absolute top-0 left-0 w-full h-full bg-[#0FF1CE]/[0.02] background-noise"></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:w-3/4 h-full rounded-full bg-[#0FF1CE]/[0.03] blur-[150px] opacity-60"></div>
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse"></div>
+          <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse delay-1000"></div>
+        </div>
         <Particles />
 
         <div className="relative z-10 py-10 px-4">
           <div className="max-w-3xl mx-auto text-center">
             <div className="mb-8">
-              <div className="mx-auto w-16 h-16 bg-[#0FF1CE]/10 rounded-full flex items-center justify-center mb-4">
+              <div className="mx-auto w-16 h-16 bg-[#0FF1CE]/20 rounded-full flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(15,241,206,0.4)]">
                 <CheckCircle className="w-8 h-8 text-[#0FF1CE]" />
               </div>
-              <h1 className="text-2xl font-semibold mb-2 text-white">Payment Successful</h1>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent mb-2">Payment Successful</h1>
               <p className="text-gray-400">
                 Your payment has been processed successfully.
               </p>
@@ -98,13 +102,13 @@ export default function SuccessPage() {
             <div className="space-y-4">
               <button
                 onClick={() => router.push('/dashboard')}
-                className="w-full bg-[#0FF1CE] text-black py-3 rounded-lg font-semibold hover:bg-[#0FF1CE]/90 transition-colors"
+                className="w-full bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black py-3 rounded-xl font-bold hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300"
               >
                 Go to Dashboard
               </button>
               <button
                 onClick={() => router.push('/challenge')}
-                className="w-full bg-transparent border border-[#0FF1CE] text-[#0FF1CE] py-3 rounded-lg font-semibold hover:bg-[#0FF1CE]/10 transition-colors"
+                className="w-full bg-transparent border border-[#0FF1CE]/50 text-[#0FF1CE] py-3 rounded-xl font-bold hover:bg-[#0FF1CE]/10 transition-all duration-300"
               >
                 Start Another Challenge
               </button>
@@ -123,19 +127,23 @@ export default function SuccessPage() {
   }
 
   return (
-    <div className="relative">
+    <div className="relative bg-gradient-to-br from-[#0D0D0D] via-[#0D0D0D] to-[#151515]">
       {/* Background Effects */}
       <div className="absolute top-0 left-0 w-full h-full bg-[#0FF1CE]/[0.02] background-noise"></div>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:w-3/4 h-full rounded-full bg-[#0FF1CE]/[0.03] blur-[150px] opacity-60"></div>
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse"></div>
+        <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse delay-1000"></div>
+      </div>
       <Particles />
 
       <div className="relative z-10">
         <div className="max-w-3xl mx-auto py-10 px-4">
           <div className="mb-8 text-center">
-            <div className="mx-auto w-16 h-16 bg-[#0FF1CE]/10 rounded-full flex items-center justify-center mb-4">
+            <div className="mx-auto w-16 h-16 bg-[#0FF1CE]/20 rounded-full flex items-center justify-center mb-4 shadow-[0_0_30px_rgba(15,241,206,0.4)]">
               <CheckCircle className="w-8 h-8 text-[#0FF1CE]" />
             </div>
-            <h1 className="text-2xl font-semibold mb-2 text-white">Your order has been received</h1>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent mb-2">Your order has been received</h1>
             <p className="text-gray-400 max-w-lg mx-auto">
               We will start processing your {challengeData.type} Challenge as soon as possible. 
               Your login credentials will be emailed to you shortly.
@@ -143,7 +151,7 @@ export default function SuccessPage() {
           </div>
           
           {/* Email confirmation notice */}
-          <div className="max-w-xl mx-auto bg-[#0FF1CE]/10 rounded-lg p-4 mb-6 flex items-start gap-3">
+          <div className="max-w-xl mx-auto bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 rounded-lg border border-[#0FF1CE]/20 p-4 mb-6 flex items-start gap-3">
             <Mail className="h-5 w-5 text-[#0FF1CE] mt-0.5 flex-shrink-0" />
             <div>
               <p className="text-white text-sm">
@@ -155,7 +163,7 @@ export default function SuccessPage() {
             </div>
           </div>
 
-          <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-[#2F2F2F]/50">
+          <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-[#2F2F2F]/50">
             <h2 className="text-xl font-medium mb-6 text-white">Order Details</h2>
             <div className="space-y-4">
               <div className="flex justify-between py-2 border-b border-[#2F2F2F]/50">
@@ -189,7 +197,7 @@ export default function SuccessPage() {
             </div>
           </div>
 
-          <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-[#2F2F2F]/50">
+          <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-[#2F2F2F]/50">
             <h2 className="text-xl font-medium mb-6 text-white">What's Next?</h2>
             <div className="space-y-6">
               <div className="flex gap-4">
@@ -232,13 +240,13 @@ export default function SuccessPage() {
           <div className="flex space-x-4 mb-6">
             <button
               onClick={() => router.push('/dashboard')}
-              className="flex-1 bg-[#0FF1CE] text-black py-3 rounded-lg font-semibold hover:bg-[#0FF1CE]/90 transition-colors"
+              className="flex-1 bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black py-3 rounded-xl font-bold hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300"
             >
               Go to Dashboard
             </button>
             <button
               onClick={() => router.push('/challenge')}
-              className="flex-1 bg-transparent border border-[#0FF1CE] text-[#0FF1CE] py-3 rounded-lg font-semibold hover:bg-[#0FF1CE]/10 transition-colors"
+              className="flex-1 bg-transparent border border-[#0FF1CE]/50 text-[#0FF1CE] py-3 rounded-xl font-bold hover:bg-[#0FF1CE]/10 transition-all duration-300"
             >
               Start Another Challenge
             </button>

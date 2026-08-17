@@ -384,7 +384,7 @@ const ModuleCard = ({ module, skillLevel }: ModuleCardProps) => {
   const IconComponent = module.icon;
 
   return (
-    <div className={`bg-gradient-to-br from-[#0D0D0D]/90 to-[#1A1A1A]/80 backdrop-blur-sm rounded-2xl border ${module.borderColor} p-6 hover:border-[#0FF1CE]/30 transition-all duration-300 group`}>
+    <div className={`bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-6 hover:border-[#0FF1CE]/50 transition-all duration-300 group`}>
       <div className="flex items-start gap-4 mb-4">
         <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${module.color} flex items-center justify-center border ${module.borderColor} group-hover:scale-110 transition-transform duration-300`}>
           <IconComponent className="w-6 h-6 text-white" />
@@ -411,7 +411,7 @@ const ModuleCard = ({ module, skillLevel }: ModuleCardProps) => {
 
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between p-3 bg-[#1A1A1A]/50 rounded-lg border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/30 transition-all duration-200 mb-4"
+        className="w-full flex items-center justify-between p-3 bg-[#151515]/50 backdrop-blur-sm rounded-lg border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50 transition-all duration-300 mb-4"
       >
         <span className="text-white font-medium">View Course Outline</span>
         <ChevronRight className={`w-4 h-4 text-[#0FF1CE] transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} />
@@ -431,11 +431,11 @@ const ModuleCard = ({ module, skillLevel }: ModuleCardProps) => {
       )}
 
       <div className="flex gap-3">
-        <button className="flex-1 bg-gradient-to-r from-[#0FF1CE]/20 to-[#0FF1CE]/10 border border-[#0FF1CE]/30 text-[#0FF1CE] px-4 py-3 rounded-lg font-medium hover:from-[#0FF1CE]/30 hover:to-[#0FF1CE]/20 transition-all duration-200 flex items-center justify-center gap-2">
+        <button className="flex-1 bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black px-4 py-3 rounded-lg font-bold hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300 flex items-center justify-center gap-2">
           <Play className="w-4 h-4" />
           Start Learning
         </button>
-        <button className="px-4 py-3 bg-[#1A1A1A]/60 border border-[#2F2F2F]/50 text-gray-400 rounded-lg hover:text-white hover:border-[#0FF1CE]/30 transition-all duration-200">
+        <button className="px-4 py-3 bg-transparent border border-[#0FF1CE]/50 text-[#0FF1CE] rounded-lg hover:bg-[#0FF1CE]/10 transition-all duration-300">
           <Download className="w-4 h-4" />
         </button>
       </div>
@@ -453,6 +453,8 @@ export default function EducationHub() {
       {/* Background Effects */}
       <div className="fixed inset-0 bg-[#0FF1CE]/[0.02] background-noise"></div>
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:w-3/4 h-full rounded-full bg-[#0FF1CE]/[0.03] blur-[150px] opacity-60"></div>
+      <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse"></div>
+      <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse delay-1000"></div>
       <Particles />
 
       {/* Content - Blurred when coming soon */}
@@ -463,7 +465,7 @@ export default function EducationHub() {
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#0FF1CE]/20 to-[#0FF1CE]/10 flex items-center justify-center border border-[#0FF1CE]/20">
               <BookOpen className="w-6 h-6 text-[#0FF1CE]" />
             </div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">Educational Hub</h1>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent">Educational Hub</h1>
           </div>
           <p className="text-gray-400 text-sm sm:text-base lg:text-lg max-w-3xl mx-auto leading-relaxed">
             Master trading with our comprehensive education program. From fundamentals to advanced strategies, 
@@ -479,7 +481,7 @@ export default function EducationHub() {
             { label: 'Learning Hours', value: '200+', icon: Clock },
             { label: 'Success Rate', value: '94%', icon: Star }
           ].map((stat, index) => (
-            <div key={index} className="bg-gradient-to-br from-[#0D0D0D]/90 to-[#1A1A1A]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 sm:p-6 text-center hover:border-[#0FF1CE]/30 transition-all duration-300">
+            <div key={index} className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 sm:p-6 text-center hover:border-[#0FF1CE]/50 transition-all duration-300">
               <div className="flex justify-center mb-3">
                 <stat.icon className="w-6 h-6 text-[#0FF1CE]" />
               </div>
@@ -491,7 +493,7 @@ export default function EducationHub() {
 
         {/* Skill Level Selector */}
         <div className="mb-8 sm:mb-12">
-          <h2 className="text-xl sm:text-2xl font-bold text-white mb-6 text-center">Choose Your Learning Path</h2>
+          <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent mb-6 text-center">Choose Your Learning Path</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
             {SKILL_LEVELS.map((level) => {
               const IconComponent = level.icon;
@@ -503,8 +505,8 @@ export default function EducationHub() {
                   onClick={() => setActiveLevel(level.id)}
                   className={`p-6 rounded-2xl border-2 transition-all duration-300 text-left group ${
                     isActive 
-                      ? 'border-[#0FF1CE] bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5' 
-                      : 'border-[#2F2F2F] bg-gradient-to-br from-[#0D0D0D]/90 to-[#1A1A1A]/80 hover:border-[#0FF1CE]/50'
+                      ? 'border-[#0FF1CE] bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 shadow-[0_0_20px_rgba(15,241,206,0.3)]' 
+                      : 'border-[#2F2F2F] bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm hover:border-[#0FF1CE]/50'
                   }`}
                 >
                   <div className="flex items-center gap-4 mb-3">
@@ -537,7 +539,7 @@ export default function EducationHub() {
         {/* Active Level Modules */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-white">
+            <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent">
               {SKILL_LEVELS.find(level => level.id === activeLevel)?.name} Modules
             </h2>
             <div className="text-gray-400 text-sm">
@@ -554,7 +556,7 @@ export default function EducationHub() {
 
         {/* Learning Resources */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-8">
-          <div className="bg-gradient-to-br from-[#0D0D0D]/90 to-[#1A1A1A]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-6 sm:p-8 hover:border-[#0FF1CE]/30 transition-all duration-300">
+          <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-6 sm:p-8 hover:border-[#0FF1CE]/50 transition-all duration-300">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#0FF1CE]/20 to-[#0FF1CE]/10 flex items-center justify-center border border-[#0FF1CE]/20">
                 <FileText className="w-6 h-6 text-[#0FF1CE]" />
@@ -577,7 +579,7 @@ export default function EducationHub() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-[#0D0D0D]/90 to-[#1A1A1A]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-6 sm:p-8 hover:border-[#0FF1CE]/30 transition-all duration-300">
+          <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-6 sm:p-8 hover:border-[#0FF1CE]/50 transition-all duration-300">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#0FF1CE]/20 to-[#0FF1CE]/10 flex items-center justify-center border border-[#0FF1CE]/20">
                 <Users className="w-6 h-6 text-[#0FF1CE]" />
@@ -602,9 +604,9 @@ export default function EducationHub() {
         </div>
 
         {/* Success Stories */}
-        <div className="bg-gradient-to-r from-[#0FF1CE]/10 to-[#0FF1CE]/5 border border-[#0FF1CE]/20 rounded-2xl p-6 sm:p-8 mb-8">
+        <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm border border-[#0FF1CE]/20 rounded-2xl p-6 sm:p-8 mb-8" style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
           <div className="text-center mb-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Student Success Stories</h2>
+            <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent mb-2">Student Success Stories</h2>
             <p className="text-gray-400">Real results from our education program</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -632,18 +634,18 @@ export default function EducationHub() {
 
         {/* Call to Action */}
         <div className="text-center">
-          <div className="bg-gradient-to-br from-[#0D0D0D]/90 to-[#1A1A1A]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-8 sm:p-12 hover:border-[#0FF1CE]/30 transition-all duration-300">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">Ready to Start Your Trading Journey?</h2>
+          <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-8 sm:p-12 hover:border-[#0FF1CE]/50 transition-all duration-300">
+            <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent mb-4">Ready to Start Your Trading Journey?</h2>
             <p className="text-gray-400 mb-8 max-w-2xl mx-auto leading-relaxed">
               Join thousands of successful traders who started with our comprehensive education program. 
               Begin with any skill level and progress at your own pace.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button className="px-8 py-4 bg-gradient-to-r from-[#0FF1CE] to-[#0FF1CE]/80 text-black font-bold rounded-lg hover:from-[#0FF1CE]/90 hover:to-[#0FF1CE]/70 transition-all duration-200 flex items-center gap-2">
+              <button className="px-8 py-4 bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black font-bold rounded-xl hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300 flex items-center gap-2">
                 <Play className="w-5 h-5" />
                 Start Learning Now
               </button>
-              <button className="px-8 py-4 bg-transparent border-2 border-[#0FF1CE] text-[#0FF1CE] font-bold rounded-lg hover:bg-[#0FF1CE]/10 transition-all duration-200">
+              <button className="px-8 py-4 bg-transparent border border-[#0FF1CE]/50 text-[#0FF1CE] font-bold rounded-xl hover:bg-[#0FF1CE]/10 transition-all duration-300">
                 Download Curriculum
               </button>
             </div>
@@ -657,7 +659,7 @@ export default function EducationHub() {
           <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[#0FF1CE]/20 to-[#0FF1CE]/10 flex items-center justify-center border border-[#0FF1CE]/30">
             <Lock className="w-10 h-10 text-[#0FF1CE]" />
           </div>
-          <h2 className="text-3xl font-bold text-white mb-4">Educational Hub</h2>
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent mb-4">Educational Hub</h2>
           <h3 className="text-xl font-semibold text-[#0FF1CE] mb-4">Coming Soon</h3>
           <p className="text-gray-400 leading-relaxed mb-6">
             We're building something amazing! Our comprehensive educational platform with expert-designed modules, 

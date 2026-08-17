@@ -320,16 +320,18 @@ export default function SettingsPage() {
       {/* Background Effects */}
       <div className="absolute top-0 left-0 w-full h-full bg-[#0FF1CE]/[0.02] background-noise"></div>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:w-3/4 h-full rounded-full bg-[#0FF1CE]/[0.03] blur-[150px] opacity-60"></div>
+      <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse"></div>
+      <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse delay-1000"></div>
       <Particles />
 
       {/* Content */}
       <div className="relative z-10">
-        <h1 className="text-2xl font-bold text-white mb-6">Settings</h1>
+        <h1 className="text-2xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent mb-6">Settings</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-4 space-y-2">
+            <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-4 space-y-2">
               {settingsTabs.map(tab => (
                 <SettingsTabButton
                   key={tab.id}
@@ -340,7 +342,7 @@ export default function SettingsPage() {
               ))}
               
               <div className="pt-4 mt-4 border-t border-[#2F2F2F]/50">
-                <button className="flex items-center gap-3 p-3 rounded-lg w-full text-red-500 hover:bg-red-500/10 transition-colors">
+                <button className="flex items-center gap-3 p-3 bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 rounded-xl transition-all w-full">
                   <LogOut size={20} />
                   <span>Logout</span>
                 </button>
@@ -349,7 +351,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Main content */}
-          <div className="lg:col-span-3 bg-[#0D0D0D]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-6">
+          <div className="lg:col-span-3 bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-6">
             {/* Success Message */}
             {successMessage && (
               <div className="mb-6 p-4 bg-green-500/20 border border-green-500/50 rounded-lg flex items-center gap-2 text-green-500">
@@ -414,7 +416,7 @@ export default function SettingsPage() {
                           type="text"
                           value={profile.firstName}
                           onChange={(e) => setProfile({ ...profile, firstName: e.target.value })}
-                          className="w-full bg-[#1A1A1A] border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                          className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
                         />
                         {formErrors.firstName && (
                           <p className="mt-1 text-sm text-red-500">{formErrors.firstName}</p>
@@ -426,7 +428,7 @@ export default function SettingsPage() {
                           type="text"
                           value={profile.lastName}
                           onChange={(e) => setProfile({ ...profile, lastName: e.target.value })}
-                          className="w-full bg-[#1A1A1A] border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                          className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
                         />
                         {formErrors.lastName && (
                           <p className="mt-1 text-sm text-red-500">{formErrors.lastName}</p>
@@ -444,7 +446,7 @@ export default function SettingsPage() {
                           type="text"
                           value={profile.username}
                           onChange={(e) => setProfile({ ...profile, username: e.target.value })}
-                          className="w-full bg-[#1A1A1A] border border-[#2F2F2F] rounded-lg pl-10 px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                          className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg pl-10 px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
                           placeholder="Your display name for leaderboard"
                         />
                       </div>
@@ -463,7 +465,7 @@ export default function SettingsPage() {
                           type="email"
                           value={profile.email}
                           disabled
-                          className="w-full bg-[#1A1A1A] border border-[#2F2F2F] rounded-lg pl-10 px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50 opacity-50"
+                          className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg pl-10 px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all opacity-50"
                         />
                       </div>
                     </div>
@@ -478,7 +480,7 @@ export default function SettingsPage() {
                           type="tel"
                           value={profile.phone}
                           onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                          className="w-full bg-[#1A1A1A] border border-[#2F2F2F] rounded-lg pl-10 px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                          className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg pl-10 px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
                         />
                       </div>
                       {formErrors.phone && (
@@ -495,7 +497,7 @@ export default function SettingsPage() {
                         <select 
                           value={profile.country}
                           onChange={(e) => setProfile({ ...profile, country: e.target.value })}
-                          className="w-full bg-[#1A1A1A] border border-[#2F2F2F] rounded-lg pl-10 px-4 py-2.5 text-white appearance-none focus:outline-none focus:border-[#0FF1CE]/50"
+                          className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg pl-10 px-4 py-2.5 text-white appearance-none focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
                         >
                           <option value="">Select a country</option>
                           <option value="US">United States</option>
@@ -517,7 +519,7 @@ export default function SettingsPage() {
                   <button 
                     onClick={handleProfileUpdate}
                     disabled={saving}
-                    className="px-6 py-2.5 bg-[#0FF1CE] text-black font-semibold rounded-lg hover:bg-[#0FF1CE]/90 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-6 py-2.5 bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black font-bold rounded-xl hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {saving ? (
                       <>
@@ -541,7 +543,7 @@ export default function SettingsPage() {
                 <h2 className="text-lg font-bold text-white mb-6">Security Settings</h2>
                 
                 {/* Password Change Section */}
-                <div className="mb-8 p-6 bg-[#151515] rounded-xl border border-[#2F2F2F]">
+                <div className="mb-8 p-6 bg-gradient-to-b from-[#151515] to-[#0D0D0D] rounded-xl border border-[#2F2F2F]/50">
                   <h3 className="text-white font-medium mb-4 flex items-center gap-2">
                     <Lock size={18} />
                     <span>Change Password</span>
@@ -557,7 +559,7 @@ export default function SettingsPage() {
                           type={showCurrentPassword ? 'text' : 'password'}
                           value={passwordForm.currentPassword}
                           onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                          className="w-full bg-[#1A1A1A] border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                          className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
                         />
                         <button
                           type="button"
@@ -581,7 +583,7 @@ export default function SettingsPage() {
                           type={showNewPassword ? 'text' : 'password'}
                           value={passwordForm.newPassword}
                           onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                          className="w-full bg-[#1A1A1A] border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                          className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
                         />
                         <button
                           type="button"
@@ -604,7 +606,7 @@ export default function SettingsPage() {
                         type="password"
                         value={passwordForm.confirmPassword}
                         onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                        className="w-full bg-[#1A1A1A] border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                        className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
                       />
                       {formErrors.confirmPassword && (
                         <p className="mt-1 text-sm text-red-500">{formErrors.confirmPassword}</p>
@@ -614,7 +616,7 @@ export default function SettingsPage() {
                     <button
                       onClick={handlePasswordChange}
                       disabled={saving}
-                      className="px-6 py-2.5 bg-[#0FF1CE] text-black font-semibold rounded-lg hover:bg-[#0FF1CE]/90 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-6 py-2.5 bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black font-bold rounded-xl hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {saving ? (
                         <>
@@ -632,7 +634,7 @@ export default function SettingsPage() {
                   </div>
                   
                 {/* Two-Factor Authentication Section */}
-                <div className="p-6 bg-[#151515] rounded-xl border border-[#2F2F2F]">
+                <div className="p-6 bg-gradient-to-b from-[#151515] to-[#0D0D0D] rounded-xl border border-[#2F2F2F]/50">
                   <div className="flex items-start justify-between">
                         <div>
                       <h3 className="text-white font-medium mb-2 flex items-center gap-2">
@@ -643,7 +645,7 @@ export default function SettingsPage() {
                         Add an extra layer of security to your account by enabling two-factor authentication.
                       </p>
                     </div>
-                    <button className="px-4 py-2 bg-[#0FF1CE]/10 text-[#0FF1CE] rounded-lg hover:bg-[#0FF1CE]/20 transition-colors">
+                    <button className="px-4 py-2 bg-transparent border border-[#0FF1CE]/50 text-[#0FF1CE] font-bold rounded-xl hover:bg-[#0FF1CE]/10 transition-all duration-300">
                       Enable
                     </button>
                   </div>
@@ -715,7 +717,7 @@ export default function SettingsPage() {
                   </div>
                   
                   <div className="pt-4">
-                    <button className="px-6 py-2.5 bg-[#0FF1CE] text-black font-semibold rounded-lg hover:bg-[#0FF1CE]/90 transition-colors flex items-center gap-2">
+                    <button className="px-6 py-2.5 bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black font-bold rounded-xl hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300 flex items-center gap-2">
                       <Save size={18} />
                       <span>Save Preferences</span>
                     </button>
@@ -737,7 +739,7 @@ export default function SettingsPage() {
                       <label className={`
                         relative cursor-pointer
                         border border-[#2F2F2F] rounded-lg p-4 transition-colors
-                        ${themePreference === 'dark' ? 'border-[#0FF1CE]' : 'hover:border-[#0FF1CE]/30'}
+                        ${themePreference === 'dark' ? 'border-[#0FF1CE] shadow-[0_0_20px_rgba(15,241,206,0.3)]' : 'hover:border-[#0FF1CE]/50'}
                       `}>
                         <input
                           type="radio"
@@ -763,7 +765,7 @@ export default function SettingsPage() {
                       <label className={`
                         relative cursor-pointer
                         border border-[#2F2F2F] rounded-lg p-4 transition-colors
-                        ${themePreference === 'light' ? 'border-[#0FF1CE]' : 'hover:border-[#0FF1CE]/30'}
+                        ${themePreference === 'light' ? 'border-[#0FF1CE] shadow-[0_0_20px_rgba(15,241,206,0.3)]' : 'hover:border-[#0FF1CE]/50'}
                       `}>
                         <input
                           type="radio"
@@ -789,7 +791,7 @@ export default function SettingsPage() {
                       <label className={`
                         relative cursor-pointer
                         border border-[#2F2F2F] rounded-lg p-4 transition-colors
-                        ${themePreference === 'system' ? 'border-[#0FF1CE]' : 'hover:border-[#0FF1CE]/30'}
+                        ${themePreference === 'system' ? 'border-[#0FF1CE] shadow-[0_0_20px_rgba(15,241,206,0.3)]' : 'hover:border-[#0FF1CE]/50'}
                       `}>
                         <input
                           type="radio"
@@ -817,7 +819,7 @@ export default function SettingsPage() {
                   {/* Language Selection */}
                   <div>
                     <h3 className="text-white font-medium mb-4">Language</h3>
-                    <select className="w-full md:w-1/3 bg-[#1A1A1A] border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white appearance-none focus:outline-none focus:border-[#0FF1CE]/50">
+                    <select className="w-full md:w-1/3 bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white appearance-none focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all">
                       <option>English (US)</option>
                       <option>English (UK)</option>
                       <option>Spanish</option>
@@ -828,7 +830,7 @@ export default function SettingsPage() {
                   </div>
                   
                   <div className="pt-4">
-                    <button className="px-6 py-2.5 bg-[#0FF1CE] text-black font-semibold rounded-lg hover:bg-[#0FF1CE]/90 transition-colors flex items-center gap-2">
+                    <button className="px-6 py-2.5 bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black font-bold rounded-xl hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300 flex items-center gap-2">
                       <Save size={18} />
                       <span>Save Preferences</span>
                     </button>
