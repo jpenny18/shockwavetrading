@@ -33,6 +33,43 @@ const CRYPTO_ADDRESSES: CryptoAddress = {
   USDC: '8ShmNrRPeN1KaCixPhPWPQTvZJn9a8s7oqsCdhoJgeJj'  // Replace with your actual USDC address (Solana)
 };
 
+const toPositiveNumber = (value: unknown): number => {
+  const parsed = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+};
+
+const roundUpToDecimals = (value: number, decimals: number): number => {
+  const factor = 10 ** decimals;
+  return Math.ceil((value - Number.EPSILON) * factor) / factor;
+};
+
+const convertUsdToCrypto = (usdAmount: number, priceUsd: number, decimals: number): number => {
+  if (!usdAmount || !priceUsd) return 0;
+  return roundUpToDecimals(usdAmount / priceUsd, decimals);
+};
+
+const formatUsd = (amount: number): string =>
+  amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+const formatCryptoAmount = (amount: number, symbol: keyof CryptoPrice): string => {
+  if (symbol === 'USDT' || symbol === 'USDC') return amount.toFixed(2);
+  return amount.toFixed(8);
+};
+
+const ethToWeiString = (ethAmount: number): string => {
+  const [whole, fraction = ''] = ethAmount.toFixed(8).split('.');
+  return BigInt(whole + fraction.padEnd(18, '0').slice(0, 18)).toString();
+};
+
+const getQrValue = (symbol: keyof CryptoPrice, amount: number, address: string): string => {
+  if (symbol === 'USDT') return `tron:${address}?amount=${amount.toFixed(2)}`;
+  if (symbol === 'USDC') {
+    return `solana:${address}?amount=${(amount / 1000).toFixed(2)}&spl-token=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`;
+  }
+  if (symbol === 'BTC') return `bitcoin:${address}?amount=${amount.toFixed(8)}`;
+  return `ethereum:${address}?value=${ethToWeiString(amount)}`;
+};
+
 export default function CryptoPayment({ challengeData, successRedirectPath, onProcessingStateChange, cryptoPrices }: CryptoPaymentProps) {
   const router = useRouter();
   const [selectedCrypto, setSelectedCrypto] = useState<'BTC' | 'ETH' | 'USDT' | 'USDC'>('BTC');
@@ -51,12 +88,15 @@ export default function CryptoPayment({ challengeData, successRedirectPath, onPr
 
   // Calculate crypto amounts when prices or challenge data changes
   useEffect(() => {
-    const usdAmount = challengeData.price;
+    const usdAmount = toPositiveNumber(challengeData.price);
+    const btcPrice = toPositiveNumber(cryptoPrices.BTC);
+    const ethPrice = toPositiveNumber(cryptoPrices.ETH);
+
     setCryptoAmount({
-      BTC: usdAmount / cryptoPrices.BTC,
-      ETH: usdAmount / cryptoPrices.ETH,
-      USDT: usdAmount,
-      USDC: usdAmount
+      BTC: convertUsdToCrypto(usdAmount, btcPrice, 8),
+      ETH: convertUsdToCrypto(usdAmount, ethPrice, 8),
+      USDT: Number(usdAmount.toFixed(2)),
+      USDC: Number(usdAmount.toFixed(2))
     });
   }, [challengeData.price, cryptoPrices]);
 
@@ -80,6 +120,13 @@ export default function CryptoPayment({ challengeData, successRedirectPath, onPr
       return;
     }
 
+    const liveRate = toPositiveNumber(cryptoPrices[selectedCrypto]);
+    const liveAmount = toPositiveNumber(cryptoAmount[selectedCrypto]);
+    if ((selectedCrypto === 'BTC' || selectedCrypto === 'ETH') && (!liveRate || !liveAmount)) {
+      setError('Live crypto prices are still loading. Please wait a moment and try again.');
+      return;
+    }
+
     setIsLoading(true);
     onProcessingStateChange(true);
 
@@ -93,7 +140,7 @@ export default function CryptoPayment({ challengeData, successRedirectPath, onPr
           challengeData,
           cryptoDetails: {
             type: selectedCrypto,
-            amount: cryptoAmount[selectedCrypto],
+            amount: Number(formatCryptoAmount(cryptoAmount[selectedCrypto], selectedCrypto)),
             address: CRYPTO_ADDRESSES[selectedCrypto],
             verificationPhrase: verificationPhrase.join(' '),
             usdAmount: challengeData.price
@@ -118,7 +165,7 @@ export default function CryptoPayment({ challengeData, successRedirectPath, onPr
             id: orderId,
             status: 'PENDING',
             cryptoType: selectedCrypto,
-            cryptoAmount: cryptoAmount[selectedCrypto].toString(),
+            cryptoAmount: formatCryptoAmount(cryptoAmount[selectedCrypto], selectedCrypto),
             cryptoAddress: CRYPTO_ADDRESSES[selectedCrypto],
             usdAmount: challengeData.price,
             verificationPhrase: verificationPhrase.join(' '),
@@ -142,13 +189,22 @@ export default function CryptoPayment({ challengeData, successRedirectPath, onPr
         console.error('Error sending order emails:', emailError);
       }
 
-      router.push('/challenge/cryptopending');
+      router.push(successRedirectPath);
     } catch (error) {
       setError('Failed to submit order. Please try again.');
       setIsLoading(false);
       onProcessingStateChange(false);
     }
   };
+
+  const selectedRate = toPositiveNumber(cryptoPrices[selectedCrypto]);
+  const selectedAmount = toPositiveNumber(cryptoAmount[selectedCrypto]);
+  const pricesReady = selectedCrypto === 'USDT' || selectedCrypto === 'USDC'
+    ? true
+    : selectedRate > 0 && selectedAmount > 0;
+  const quotedUsd = selectedCrypto === 'USDT' || selectedCrypto === 'USDC'
+    ? selectedAmount
+    : Number((selectedAmount * selectedRate).toFixed(2));
 
   return (
     <div className="p-6 space-y-6">
@@ -186,7 +242,9 @@ export default function CryptoPayment({ challengeData, successRedirectPath, onPr
       <div className="bg-[#151515] rounded-xl p-4 border border-[#2F2F2F]/50">
         <div className="text-center mb-4">
           <div className="text-lg font-medium">
-            1 {selectedCrypto} = ${cryptoPrices[selectedCrypto].toLocaleString()}
+            {pricesReady
+              ? `1 ${selectedCrypto} = $${formatUsd(selectedRate)}`
+              : 'Fetching live price...'}
           </div>
         </div>
         
@@ -212,24 +270,18 @@ export default function CryptoPayment({ challengeData, successRedirectPath, onPr
           <div className="text-center mb-4">
             <div className="text-sm text-gray-400 mb-1">Send exactly</div>
             <div className="text-2xl font-bold text-[#0FF1CE]">
-              {cryptoAmount[selectedCrypto].toFixed(selectedCrypto === 'USDC' || selectedCrypto === 'USDT' ? 2 : 8)} {selectedCrypto}
+              {pricesReady
+                ? `${formatCryptoAmount(selectedAmount, selectedCrypto)} ${selectedCrypto}`
+                : '—'}
             </div>
             <div className="text-sm text-gray-400 mt-1">
-              ≈ ${challengeData.price.toFixed(2)}
+              ≈ ${formatUsd(quotedUsd || toPositiveNumber(challengeData.price))}
             </div>
           </div>
 
           <div className="flex justify-center mb-4">
             <QRCodeSVG
-              value={
-                selectedCrypto === 'USDT' 
-                  ? `tron:${CRYPTO_ADDRESSES[selectedCrypto]}?amount=${cryptoAmount[selectedCrypto].toFixed(2)}`
-                  : selectedCrypto === 'USDC'
-                  ? `solana:${CRYPTO_ADDRESSES[selectedCrypto]}?amount=${(cryptoAmount[selectedCrypto] / 1000).toFixed(2)}&spl-token=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v`
-                  : selectedCrypto === 'BTC'
-                  ? `bitcoin:${CRYPTO_ADDRESSES[selectedCrypto]}?amount=${cryptoAmount[selectedCrypto].toFixed(8)}`
-                  : `ethereum:${CRYPTO_ADDRESSES[selectedCrypto]}?value=${(cryptoAmount[selectedCrypto] * 1e18).toFixed(0)}`
-              }
+              value={getQrValue(selectedCrypto, selectedAmount, CRYPTO_ADDRESSES[selectedCrypto])}
               size={200}
               level="H"
               className="p-2 bg-white rounded-xl"
@@ -272,7 +324,7 @@ export default function CryptoPayment({ challengeData, successRedirectPath, onPr
 
         <button
           onClick={handleSubmit}
-          disabled={isLoading || userPhrase.toLowerCase() !== verificationPhrase.join(' ').toLowerCase()}
+          disabled={isLoading || !pricesReady || userPhrase.toLowerCase() !== verificationPhrase.join(' ').toLowerCase()}
           className="w-full bg-[#0FF1CE] hover:bg-[#0FF1CE]/90 disabled:bg-[#0FF1CE]/50 disabled:cursor-not-allowed text-black font-medium py-4 rounded-xl transition-colors"
         >
           {isLoading ? (
