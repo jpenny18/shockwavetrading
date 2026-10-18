@@ -324,7 +324,7 @@ const calculatePrice = (type: ChallengeType, amount: string): number => {
         case 10000: return 99;
         case 25000: return 199;
         case 50000: return 319;
-        case 100000: return 399;
+        case 100000: return 499;
         case 200000: return 999;
         default: return 0;
       }
@@ -1097,7 +1097,7 @@ export default function ChallengePage() {
           <span className="text-gray-400">Base Price:</span>
           <span className="text-white font-semibold">
             {selectedAmount === '$100,000' && (
-              <span className="text-gray-500 line-through mr-2">$499.00</span>
+              <span className="text-gray-500 line-through mr-2">$624.00</span>
             )}
             ${basePrice.toFixed(2)}
           </span>
@@ -1480,7 +1480,7 @@ export default function ChallengePage() {
                         {selectedType && (
                           <div className="text-xs mt-1 font-medium">
                             {amount === '$100,000' && (
-                              <span className="text-gray-500 line-through mr-1">$499</span>
+                              <span className="text-gray-500 line-through mr-1">$624</span>
                             )}
                             <span className={selectedAmount === amount ? 'text-[#0FF1CE]' : 'text-gray-400'}>
                               ${calculatePrice(selectedType, amount)}

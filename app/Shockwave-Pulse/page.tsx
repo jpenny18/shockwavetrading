@@ -91,7 +91,7 @@ export default function ShockwavePulsePage() {
           setIsSettingUsername(true);
         }
       } else {
-        router.push('/auth');
+        router.push('/access');
       }
       setIsLoading(false);
     });
@@ -181,7 +181,7 @@ export default function ShockwavePulsePage() {
     
     if (!auth.currentUser) {
       console.log("No auth user, redirecting to auth");
-      router.push('/auth');
+      router.push('/access');
       return;
     }
     
@@ -205,7 +205,7 @@ export default function ShockwavePulsePage() {
       
       if (!auth.currentUser) {
         alert('You must be logged in to create a poll.');
-        router.push('/auth');
+        router.push('/access');
         return;
       }
       

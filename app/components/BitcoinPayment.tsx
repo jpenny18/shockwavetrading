@@ -19,6 +19,7 @@ interface BitcoinPaymentProps {
       discordUsername?: string;
     };
     price: number;
+    userId?: string | null;
   };
   successRedirectPath: string;
   onProcessingStateChange?: (isProcessing: boolean) => void;
@@ -52,7 +53,7 @@ const BitcoinPayment: React.FC<BitcoinPaymentProps> = ({
 
       // Create a new order in Firebase first to get an order ID
       const newOrderId = await createOrder({
-        userId: null, // Will be linked to user account if available
+        userId: challengeData.userId || null,
         customerEmail: challengeData.formData.email,
         firstName: challengeData.formData.firstName,
         lastName: challengeData.formData.lastName,

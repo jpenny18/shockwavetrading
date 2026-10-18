@@ -1,13 +1,11 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { auth } from '@/lib/firebase';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Particles from './components/Particles';
 import Header from './components/Header';
 import Link from 'next/link';
 import PricingTable from './components/PricingTable';
-import { ChevronRight, ChevronDown } from 'lucide-react';
+import { ChevronRight, ChevronDown, X, Copy, Check } from 'lucide-react';
 
 // VIP Card Component with Accordion
 const VipCard = () => {
@@ -179,77 +177,136 @@ const VipCard = () => {
 // Promotional Modal - 2FOR1 Deal
 const PromotionalModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const [copied, setCopied] = useState(false);
+  const [rendered, setRendered] = useState(false);
+  const [visible, setVisible] = useState(false);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isOpen) {
+      setRendered(true);
+      const frame = requestAnimationFrame(() => {
+        requestAnimationFrame(() => setVisible(true));
+      });
+      return () => cancelAnimationFrame(frame);
+    }
 
-  const handleCopyCode = () => {
-    navigator.clipboard.writeText('2FOR1');
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setVisible(false);
+    const timeout = setTimeout(() => setRendered(false), 340);
+    return () => clearTimeout(timeout);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!rendered) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onCloseRef.current();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    closeRef.current?.focus();
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [rendered]);
+
+  if (!rendered) return null;
+
+  const handleCopyCode = async () => {
+    try {
+      await navigator.clipboard.writeText('2FOR1');
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm overflow-y-auto">
-      <div className="min-h-full flex items-start md:items-center justify-center p-4 pt-8 md:pt-12 pb-8 md:pb-12">
-        <div className="relative w-full max-w-lg mx-auto" style={{ transform: 'scale(0.95)' }}>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-3 sm:p-6">
+      <button
+        type="button"
+        aria-label="Close offer"
+        className={`absolute inset-0 bg-black/55 backdrop-blur-md transition-opacity duration-300 ease-out motion-reduce:transition-none ${visible ? 'opacity-100' : 'opacity-0'}`}
+        onClick={onClose}
+      />
+
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="promo-modal-title"
+        className={`promo-glass relative z-10 w-full max-w-[420px] rounded-[28px] px-5 pt-5 pb-5 sm:px-6 sm:pt-6 sm:pb-6 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
+          visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-6 sm:translate-y-3 scale-[0.96]'
+        }`}
+      >
+        <div className="pointer-events-none absolute inset-x-8 -top-10 h-24 rounded-full bg-[#0FF1CE]/25 blur-3xl" />
+
+        <div className="relative flex items-center justify-between mb-5">
+          <span className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[11px] font-bold tracking-[0.16em] text-[#0FF1CE]">
+            LIMITED OFFER
+          </span>
           <button
+            ref={closeRef}
+            type="button"
             onClick={onClose}
-            className="absolute -top-2 -right-2 z-10 w-10 h-10 bg-white text-black rounded-full flex items-center justify-center font-bold hover:scale-110 transition-transform shadow-lg text-2xl"
-            aria-label="Close modal"
+            aria-label="Close"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white transition-colors hover:bg-white/20"
           >
-            ×
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="relative text-center">
+          <h2 id="promo-modal-title" className="text-[2rem] sm:text-5xl font-extrabold leading-[0.95] tracking-tight text-white">
+            Buy 1,
+            <br />
+            Get 1 Free
+          </h2>
+          <p className="mt-3 text-sm sm:text-base text-white/70">
+            Same challenge. Second account free.
+          </p>
+
+          <button
+            type="button"
+            onClick={handleCopyCode}
+            className="mt-6 flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3.5 transition-colors hover:bg-white/[0.1]"
+          >
+            <span className="text-2xl font-extrabold tracking-[0.28em] text-[#0FF1CE]">2FOR1</span>
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0FF1CE]/15 text-[#0FF1CE]">
+              {copied ? <Check size={16} /> : <Copy size={16} />}
+            </span>
           </button>
 
-          <div className="relative bg-gradient-to-br from-[#0D0D0D] via-[#121212] to-[#0D0D0D] border-2 border-[#0FF1CE]/30 rounded-3xl overflow-hidden shadow-2xl p-8">
-            <div className="absolute top-0 right-0 bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-black px-6 py-2 rounded-bl-2xl font-bold text-sm shadow-lg">
-              LIMITED OFFER
-            </div>
-
-            <div className="text-center pt-6">
-              <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-2">
-                Buy 1, Get 1 Free
-              </h2>
-              <div className="bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-transparent bg-clip-text text-2xl md:text-3xl font-bold mb-8">
-                Two Challenges. One Price.
-              </div>
-
-              <div className="space-y-3 mb-6 text-left max-w-md mx-auto">
-                <div className="flex items-start gap-3 bg-[#1A1A1A]/50 p-4 rounded-lg border border-[#0FF1CE]/20">
-                  <div className="text-[#0FF1CE] text-2xl mt-1 font-bold">•</div>
-                  <div>
-                    <div className="text-white font-bold text-lg">Two of the Same Account</div>
-                    <div className="text-gray-400 text-sm">Buy any challenge and we activate a second identical account at no extra cost</div>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 bg-[#1A1A1A]/50 p-4 rounded-lg border border-[#0FF1CE]/20">
-                  <div className="text-[#0FF1CE] text-2xl mt-1 font-bold">•</div>
-                  <div>
-                    <div className="text-white font-bold text-lg">Same Size, Same Type</div>
-                    <div className="text-gray-400 text-sm">The free account matches the challenge you purchase</div>
-                  </div>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleCopyCode}
-                className="w-full mb-6 bg-[#0FF1CE]/10 border border-[#0FF1CE]/40 rounded-xl px-4 py-4 hover:bg-[#0FF1CE]/15 transition-colors"
-              >
-                <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Promo Code</div>
-                <div className="text-[#0FF1CE] font-extrabold text-3xl tracking-widest">2FOR1</div>
-                <div className="text-gray-400 text-xs mt-1">{copied ? 'Copied' : 'Click to copy'}</div>
-              </button>
-
-              <Link href="/challenge" onClick={onClose}>
-                <button className="w-full bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-black font-bold py-4 px-8 rounded-xl hover:scale-105 transition-all duration-300 shadow-[0_0_20px_rgba(15,241,206,0.4)] hover:shadow-[0_0_30px_rgba(15,241,206,0.6)] text-lg">
-                  CLAIM 2FOR1 OFFER
-                </button>
-              </Link>
-            </div>
-          </div>
+          <Link href="/challenge" onClick={onClose} className="mt-3 block">
+            <span className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0FF1CE] py-3.5 text-base font-bold text-black shadow-[0_8px_30px_rgba(15,241,206,0.28)] transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98]">
+              Claim offer
+              <ChevronRight size={18} />
+            </span>
+          </Link>
         </div>
       </div>
+
+      <style jsx>{`
+        .promo-glass {
+          background: linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04) 28%, rgba(10, 12, 14, 0.55));
+          border: 1px solid rgba(255, 255, 255, 0.16);
+          box-shadow:
+            0 24px 80px rgba(0, 0, 0, 0.45),
+            inset 0 1px 0 rgba(255, 255, 255, 0.28);
+          backdrop-filter: blur(28px) saturate(1.5);
+          -webkit-backdrop-filter: blur(28px) saturate(1.5);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .promo-glass {
+            transition: none !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };
@@ -382,39 +439,120 @@ const ShockwaveSundayModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: (
   */
 };
 
+type PayoutStory = {
+  kind: 'video' | 'image';
+  src: string;
+  title: string;
+  payout: string;
+  name: string;
+  place: string;
+  account: string;
+};
+
+const DESKTOP_PAYOUTS: PayoutStory[] = [
+  {
+    kind: 'video',
+    src: 'https://www.youtube.com/embed/C2_8YzvnamQ?si=nQlC1MMt-h7OYIDB',
+    title: 'Trader Payout Interview 1',
+    payout: '$2,100',
+    name: 'Andrew S',
+    place: 'United Kingdom',
+    account: '$50,000'
+  },
+  {
+    kind: 'image',
+    src: '/certificates/bento-certificate-1.png',
+    title: 'Payout Certificate 1',
+    payout: '$4,442',
+    name: 'James',
+    place: 'Australia',
+    account: '$100,000'
+  },
+  {
+    kind: 'image',
+    src: '/certificates/bento-certificate-2.png',
+    title: 'Payout Certificate 2',
+    payout: '$8,935',
+    name: 'Marcus',
+    place: 'Canada',
+    account: '$200,000'
+  },
+  {
+    kind: 'video',
+    src: 'https://www.youtube.com/embed/CZrKX44a5JY?si=6Ztd5N5wZHO4ch4f',
+    title: 'Trader Payout Interview 2',
+    payout: '$1,815',
+    name: 'Nikola',
+    place: 'Serbia',
+    account: '$100,000'
+  }
+];
+
+const MOBILE_PAYOUTS: PayoutStory[] = [
+  DESKTOP_PAYOUTS[0],
+  { ...DESKTOP_PAYOUTS[1], src: '/certificates/mobile-certificate-1.png', title: 'Mobile Payout Certificate 1' },
+  DESKTOP_PAYOUTS[3],
+  { ...DESKTOP_PAYOUTS[2], src: '/certificates/mobile-certificate-2.png', title: 'Mobile Payout Certificate 2' },
+  DESKTOP_PAYOUTS[0],
+  { ...DESKTOP_PAYOUTS[1], src: '/certificates/mobile-certificate-3.png', title: 'Mobile Payout Certificate 3' },
+  DESKTOP_PAYOUTS[3],
+  { ...DESKTOP_PAYOUTS[2], src: '/certificates/mobile-certificate-4.png', title: 'Mobile Payout Certificate 4' }
+];
+
+function PayoutCard({ item }: { item: PayoutStory }) {
+  const [imageFailed, setImageFailed] = useState(false);
+
+  return (
+    <article className="overflow-hidden rounded-[22px] border border-white/10 bg-white/[0.04] backdrop-blur-xl shadow-[0_18px_50px_rgba(0,0,0,0.35)]">
+      <div className="relative aspect-video bg-[#111]">
+        {item.kind === 'video' ? (
+          <iframe
+            src={item.src}
+            title={item.title}
+            className="h-full w-full"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        ) : imageFailed ? (
+          <div className="flex h-full items-center justify-center text-sm font-semibold text-[#0FF1CE]">
+            {item.payout}
+          </div>
+        ) : (
+          <Image
+            src={item.src}
+            alt={item.title}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 256px, 25vw"
+            onError={() => setImageFailed(true)}
+          />
+        )}
+      </div>
+      <div className="flex items-center justify-between gap-3 px-4 py-3">
+        <div className="min-w-0">
+          <div className="truncate text-sm font-semibold text-white">{item.name}</div>
+          <div className="truncate text-xs text-white/50">{item.place}</div>
+        </div>
+        <div className="text-right">
+          <div className="text-sm font-bold text-[#0FF1CE]">{item.payout}</div>
+          <div className="text-[11px] text-white/40">{item.account}</div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
 export default function ShockwaveLandingPage() {
-    const router = useRouter();
-    const [loading, setLoading] = useState(true);
     const [showPromoModal, setShowPromoModal] = useState(false);
     
     useEffect(() => {
-      const unsubscribe = auth.onAuthStateChanged((user) => {
-        if (!user && !loading) {
-          router.push('/access');
-        }
-        setLoading(false);
-      });
-  
-      return () => unsubscribe();
-    }, [router, loading]);
+      const timer = setTimeout(() => {
+        setShowPromoModal(true);
+      }, 5000);
 
-    useEffect(() => {
-      if (!loading) {
-        const timer = setTimeout(() => {
-          setShowPromoModal(true);
-        }, 1500);
-
-        return () => clearTimeout(timer);
-      }
-    }, [loading]);
-    
-    if (loading) {
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-[#0D0D0D]">
-          <div className="w-8 h-8 border-4 border-[#0FF1CE] border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      );
-    }
+      return () => clearTimeout(timer);
+    }, []);
 
     return (
       <div className="bg-black text-white min-h-screen font-sans">
@@ -450,21 +588,17 @@ export default function ShockwaveLandingPage() {
                 We sponsor your<br />trading journey
               </h1>
 
-              {/* Floating Stats Cards */}
+              {/* Stats Cards */}
               <div className="grid grid-cols-3 gap-2 md:flex md:flex-row md:justify-center md:items-center md:gap-8 px-2 md:px-0 mb-8">
                 {[
-                  { value: "15%", label: "Max Drawdown", delay: "0s" },
-                  { value: "8%", label: "Daily Drawdown", delay: "0.1s" },
-                  { value: "1:200", label: "Leverage", delay: "0.2s" }
-                ].map(({ value, label, delay }) => (
+                  { value: "15%", label: "Max Drawdown" },
+                  { value: "8%", label: "Daily Drawdown" },
+                  { value: "1:200", label: "Leverage" }
+                ].map(({ value, label }) => (
                   <div
                     key={label}
-                    className="group relative w-full bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl p-3 md:p-4 md:w-44 hover:scale-105 transition-all duration-300 animate-float"
-                    style={{
-                      animation: `float 3s ease-in-out infinite`,
-                      animationDelay: delay,
-                      boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)'
-                    }}
+                    className="group relative w-full bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl p-3 md:p-4 md:w-44"
+                    style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}
                   >
                     <div className="text-xl md:text-3xl font-bold text-[#0FF1CE] mb-1">{value}</div>
                     <div className="text-xs md:text-sm text-gray-400">{label}</div>
@@ -490,7 +624,7 @@ export default function ShockwaveLandingPage() {
                 className={`
                   absolute 
                   inset-[-200%] 
-                  animate-[borderGlowSpin_3.75s_linear_infinite]
+                  animate-[borderGlowSpin_7.5s_linear_infinite]
                   md:inset-0 
                   md:w-full 
                   md:h-full
@@ -520,448 +654,55 @@ export default function ShockwaveLandingPage() {
         </section>
   
         {/* Live Payout Interviews Section */}
-        <section className="py-16 md:py-20 px-6 bg-black relative overflow-hidden">
-          <div className="absolute top-1/2 left-1/4 w-1/2 h-[300px] bg-[#0FF1CE]/[0.02] blur-[120px] rounded-full"></div>
-          <div className="relative z-10">
-            <div className="text-center mb-12 md:mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold text-[#0FF1CE] mb-4">Live Payout Interviews</h2>
-              <p className="text-gray-300 text-base md:text-xl max-w-3xl mx-auto">
-                Watch real traders receive their payouts live.
+        <section className="relative overflow-hidden bg-black px-6 py-16 md:py-24">
+          <div className="pointer-events-none absolute left-1/2 top-0 h-64 w-[70%] -translate-x-1/2 rounded-full bg-[#0FF1CE]/10 blur-[120px]" />
+          <div className="relative mx-auto max-w-6xl">
+            <div className="mx-auto mb-10 max-w-2xl text-center md:mb-14">
+              <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.22em] text-[#0FF1CE]">Payouts</p>
+              <h2 className="text-3xl font-semibold tracking-tight text-white md:text-5xl">Traders. On camera.</h2>
+              <p className="mt-3 text-sm text-white/60 md:text-base">
+                Live interviews and verified certificates. Pass, trade, request a payout.
               </p>
-            </div>
-
-            {/* Desktop: 50/50 Layout | Mobile: Stacked */}
-            <div className="max-w-7xl mx-auto">
-              <div className="flex flex-col md:flex-row items-start gap-8 md:gap-12">
-                
-                {/* Left Side: Video/Certificate Cards (Mobile: Infinite Scroll) */}
-                <div className="w-full md:w-1/2 order-1 md:order-1">
-                  
-                  {/* Desktop: 2x2 Bento Grid */}
-                  <div className="hidden md:grid md:grid-cols-2 gap-4">
-                    {/* Video 1 - Top Left */}
-                    <div className="group relative bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-4 hover:scale-[1.02] transition-all duration-300"
-                      style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
-                      <div className="relative aspect-video rounded-xl overflow-hidden bg-[#181818] mb-3">
-                        <iframe
-                          src="https://www.youtube.com/embed/C2_8YzvnamQ?si=nQlC1MMt-h7OYIDB"
-                          title="Trader Payout Interview 1"
-                          className="w-full h-full"
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        ></iframe>
-                        <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#0FF1CE]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                      </div>
-                      <div className="text-center">
-                        <h3 className="text-[#0FF1CE] font-bold text-sm mb-1">$2,100 Payout</h3>
-                        <p className="text-gray-400 text-xs">Andrew S | UK</p>
-                        <div className="flex justify-center items-center gap-2 mt-2 text-xs text-gray-500">
-                          <span>$50,000</span>
-                          <span>•</span>
-                          <span>15 mins</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Certificate 1 - Top Right */}
-                    <div className="group relative bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-4 hover:scale-[1.02] transition-all duration-300"
-                      style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
-                      <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#181818] mb-3">
-                        {/* Certificate image */}
-                        <Image
-                          src="/certificates/bento-certificate-1.png"
-                          alt="Payout Certificate 1"
-                          fill
-                          className="object-cover rounded-xl"
-                          sizes="(max-width: 768px) 50vw, 25vw"
-                          onError={(e) => {
-                            // Fallback to placeholder if image doesn't exist
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                            const parent = target.parentElement;
-                            if (parent) {
-                              parent.innerHTML = `
-                                <div class="w-full h-full flex items-center justify-center">
-                                  <div class="text-center">
-                                    <div class="text-[#0FF1CE] text-sm font-bold mb-1">Certificate #1</div>
-                                    <div class="text-gray-400 text-xs">Upload bento-certificate-1.png</div>
-                                    <div class="text-gray-500 text-xs mt-1">to /public/certificates/</div>
-                                  </div>
-                                </div>
-                              `;
-                            }
-                          }}
-                        />
-                        <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#0FF1CE]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-[#0FF1CE] font-bold text-xs mb-1">$4,442 Payout</div>
-                        <p className="text-gray-400 text-xs">James | Australia</p>
-                        <div className="flex justify-center items-center gap-2 mt-2 text-xs text-gray-500">
-                          <span>$100,000</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Certificate 2 - Bottom Left */}
-                    <div className="group relative bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-4 hover:scale-[1.02] transition-all duration-300"
-                      style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
-                      <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[#181818] mb-3">
-                        {/* Certificate image */}
-                        <Image
-                          src="/certificates/bento-certificate-2.png"
-                          alt="Payout Certificate 2"
-                          fill
-                          className="object-cover rounded-xl"
-                          sizes="(max-width: 768px) 50vw, 25vw"
-                          onError={(e) => {
-                            // Fallback to placeholder if image doesn't exist
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                            const parent = target.parentElement;
-                            if (parent) {
-                              parent.innerHTML = `
-                                <div class="w-full h-full flex items-center justify-center">
-                                  <div class="text-center">
-                                    <div class="text-[#0FF1CE] text-sm font-bold mb-1">Certificate #2</div>
-                                    <div class="text-gray-400 text-xs">Upload bento-certificate-2.png</div>
-                                    <div class="text-gray-500 text-xs mt-1">to /public/certificates/</div>
-                                  </div>
-                                </div>
-                              `;
-                            }
-                          }}
-                        />
-                        <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#0FF1CE]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      </div>
-                      <div className="text-center">
-                        <h3 className="text-[#0FF1CE] font-bold text-sm mb-1">$8,935 Payout</h3>
-                        <p className="text-gray-400 text-xs">Marcus | Canada</p>
-                        <div className="flex justify-center items-center gap-2 mt-2 text-xs text-gray-500">
-                          <span>$200,000</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Video 2 - Bottom Right */}
-                    <div className="group relative bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-4 hover:scale-[1.02] transition-all duration-300"
-                      style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
-                      <div className="relative aspect-video rounded-xl overflow-hidden bg-[#181818] mb-3">
-                        <iframe
-                          src="https://www.youtube.com/embed/CZrKX44a5JY?si=6Ztd5N5wZHO4ch4f"
-                          title="Trader Payout Interview 2"
-                          className="w-full h-full"
-                          frameBorder="0"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        ></iframe>
-                        <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#0FF1CE]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-                      </div>
-                      <div className="text-center">
-                        <h3 className="text-[#0FF1CE] font-bold text-sm mb-1">$1,815 Payout</h3>
-                        <p className="text-gray-400 text-xs">Nikola | Serbia</p>
-                        <div className="flex justify-center items-center gap-2 mt-2 text-xs text-gray-500">
-                          <span>$100,000</span>
-                          <span>•</span>
-                          <span>20 mins</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Mobile: Infinite Scroll */}
-                  <div className="md:hidden relative overflow-hidden -mx-6">
-                    {/* Gradient overlays */}
-                    <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-black to-transparent z-10"></div>
-                    <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-black to-transparent z-10"></div>
-               
-                    
-                    {/* Scrolling Track */}
-                    <div className="flex animate-infinite-scroll-mobile" style={{ width: '800%' }}>
-                      {/* First Set: Andrew, Certificate, Nikola, Certificate */}
-                      <div className="flex">
-                        {/* Andrew Video */}
-                        <div className="flex-shrink-0 mx-2 w-64">
-                          <div className="group relative bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-4 hover:scale-[1.02] transition-all duration-300"
-                            style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
-                            <div className="relative aspect-video rounded-xl overflow-hidden bg-[#181818] mb-3">
-                              <iframe
-                                src="https://www.youtube.com/embed/C2_8YzvnamQ?si=nQlC1MMt-h7OYIDB"
-                                title="Trader Payout Interview 1"
-                                className="w-full h-full"
-                                frameBorder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                              ></iframe>
-                            </div>
-                            <div className="text-center">
-                              <h3 className="text-[#0FF1CE] font-bold text-sm mb-1">$2,100 Payout</h3>
-                              <p className="text-gray-400 text-xs">Andrew S | UK</p>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Certificate 1 */}
-                        <div className="flex-shrink-0 mx-2 w-64">
-                          <div className="group relative bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-4 hover:scale-[1.02] transition-all duration-300"
-                            style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
-                            <div className="relative aspect-video rounded-xl overflow-hidden bg-[#181818] mb-3">
-                              <Image
-                                src="/certificates/mobile-certificate-1.png"
-                                alt="Mobile Payout Certificate 1"
-                                fill
-                                className="object-cover rounded-xl"
-                                sizes="256px"
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  target.style.display = 'none';
-                                  const parent = target.parentElement;
-                                  if (parent) {
-                                    parent.innerHTML = `
-                                      <div class="w-full h-full flex items-center justify-center">
-                                        <div class="text-center">
-                                          <div class="text-[#0FF1CE] text-sm font-bold mb-1">Certificate #1</div>
-                                          <div class="text-gray-400 text-xs">Upload mobile-certificate-1.png</div>
-                                        </div>
-                                      </div>
-                                    `;
-                                  }
-                                }}
-                              />
-                            </div>
-                            <div className="text-center">
-                              <div className="text-[#0FF1CE] font-bold text-xs mb-1">$4,442 Payout</div>
-                              <p className="text-gray-400 text-xs">James | Australia</p>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Nikola Video */}
-                        <div className="flex-shrink-0 mx-2 w-64">
-                          <div className="group relative bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-4 hover:scale-[1.02] transition-all duration-300"
-                            style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
-                            <div className="relative aspect-video rounded-xl overflow-hidden bg-[#181818] mb-3">
-                              <iframe
-                                src="https://www.youtube.com/embed/CZrKX44a5JY?si=6Ztd5N5wZHO4ch4f"
-                                title="Trader Payout Interview 2"
-                                className="w-full h-full"
-                                frameBorder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                              ></iframe>
-                            </div>
-                            <div className="text-center">
-                              <h3 className="text-[#0FF1CE] font-bold text-sm mb-1">$1,815 Payout</h3>
-                              <p className="text-gray-400 text-xs">Nikola | Serbia</p>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Certificate 2 */}
-                        <div className="flex-shrink-0 mx-2 w-64">
-                          <div className="group relative bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-4 hover:scale-[1.02] transition-all duration-300"
-                            style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
-                            <div className="relative aspect-video rounded-xl overflow-hidden bg-[#181818] mb-3">
-                              <Image
-                                src="/certificates/mobile-certificate-2.png"
-                                alt="Mobile Payout Certificate 2"
-                                fill
-                                className="object-cover rounded-xl"
-                                sizes="256px"
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  target.style.display = 'none';
-                                  const parent = target.parentElement;
-                                  if (parent) {
-                                    parent.innerHTML = `
-                                      <div class="w-full h-full flex items-center justify-center">
-                                        <div class="text-center">
-                                          <div class="text-[#0FF1CE] text-sm font-bold mb-1">Certificate #2</div>
-                                          <div class="text-gray-400 text-xs">Upload mobile-certificate-2.png</div>
-                                        </div>
-                                      </div>
-                                    `;
-                                  }
-                                }}
-                              />
-                            </div>
-                            <div className="text-center">
-                              <div className="text-[#0FF1CE] font-bold text-xs mb-1">$8,935 Payout</div>
-                              <p className="text-gray-400 text-xs">Marcus | Canada</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Duplicate Set for Seamless Loop */}
-                      <div className="flex">
-                        {/* Andrew Video */}
-                        <div className="flex-shrink-0 mx-2 w-64">
-                          <div className="group relative bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-4 hover:scale-[1.02] transition-all duration-300"
-                            style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
-                            <div className="relative aspect-video rounded-xl overflow-hidden bg-[#181818] mb-3">
-                              <iframe
-                                src="https://www.youtube.com/embed/C2_8YzvnamQ?si=nQlC1MMt-h7OYIDB"
-                                title="Trader Payout Interview 1"
-                                className="w-full h-full"
-                                frameBorder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                              ></iframe>
-                            </div>
-                            <div className="text-center">
-                              <h3 className="text-[#0FF1CE] font-bold text-sm mb-1">$2,100 Payout</h3>
-                              <p className="text-gray-400 text-xs">Andrew S | UK</p>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Certificate 3 */}
-                        <div className="flex-shrink-0 mx-2 w-64">
-                          <div className="group relative bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-4 hover:scale-[1.02] transition-all duration-300"
-                            style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
-                            <div className="relative aspect-video rounded-xl overflow-hidden bg-[#181818] mb-3">
-                              <Image
-                                src="/certificates/mobile-certificate-3.png"
-                                alt="Mobile Payout Certificate 3"
-                                fill
-                                className="object-cover rounded-xl"
-                                sizes="256px"
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  target.style.display = 'none';
-                                  const parent = target.parentElement;
-                                  if (parent) {
-                                    parent.innerHTML = `
-                                      <div class="w-full h-full flex items-center justify-center">
-                                        <div class="text-center">
-                                          <div class="text-[#0FF1CE] text-sm font-bold mb-1">Certificate #3</div>
-                                          <div class="text-gray-400 text-xs">Upload mobile-certificate-3.png</div>
-                                        </div>
-                                      </div>
-                                    `;
-                                  }
-                                }}
-                              />
-                            </div>
-                            <div className="text-center">
-                              <div className="text-[#0FF1CE] font-bold text-xs mb-1">$4,442 Payout</div>
-                              <p className="text-gray-400 text-xs">James | Australia</p>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Nikola Video */}
-                        <div className="flex-shrink-0 mx-2 w-64">
-                          <div className="group relative bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-4 hover:scale-[1.02] transition-all duration-300"
-                            style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
-                            <div className="relative aspect-video rounded-xl overflow-hidden bg-[#181818] mb-3">
-                              <iframe
-                                src="https://www.youtube.com/embed/CZrKX44a5JY?si=6Ztd5N5wZHO4ch4f"
-                                title="Trader Payout Interview 2"
-                                className="w-full h-full"
-                                frameBorder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowFullScreen
-                              ></iframe>
-                            </div>
-                            <div className="text-center">
-                              <h3 className="text-[#0FF1CE] font-bold text-sm mb-1">$1,815 Payout</h3>
-                              <p className="text-gray-400 text-xs">Nikola | Serbia</p>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Certificate 4 */}
-                        <div className="flex-shrink-0 mx-2 w-64">
-                          <div className="group relative bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-4 hover:scale-[1.02] transition-all duration-300"
-                            style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
-                            <div className="relative aspect-video rounded-xl overflow-hidden bg-[#181818] mb-3">
-                              <Image
-                                src="/certificates/mobile-certificate-4.png"
-                                alt="Mobile Payout Certificate 4"
-                                fill
-                                className="object-cover rounded-xl"
-                                sizes="256px"
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  target.style.display = 'none';
-                                  const parent = target.parentElement;
-                                  if (parent) {
-                                    parent.innerHTML = `
-                                      <div class="w-full h-full flex items-center justify-center">
-                                        <div class="text-center">
-                                          <div class="text-[#0FF1CE] text-sm font-bold mb-1">Certificate #4</div>
-                                          <div class="text-gray-400 text-xs">Upload mobile-certificate-4.png</div>
-                                        </div>
-                                      </div>
-                                    `;
-                                  }
-                                }}
-                              />
-                            </div>
-                            <div className="text-center">
-                              <div className="text-[#0FF1CE] font-bold text-xs mb-1">$8,935 Payout</div>
-                              <p className="text-gray-400 text-xs">Marcus | Canada</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right Side: Content Text (Mobile: Shows second) */}
-                <div className="w-full md:w-1/2 order-2 md:order-2 md:px-8 lg:px-12">
-                  <h3 className="text-xl md:text-2xl font-bold text-[#0FF1CE] mb-4 md:mb-6">
-                    Unleash Your Trading Potential
-                  </h3>
-                  
-                  <div className="space-y-3 md:space-y-4 text-gray-300 text-sm leading-relaxed">
-                    <p>
-                      Shockwave Capital developed a revolutionary <span className="text-[#0FF1CE] font-semibold">High-Octane Evaluation Process</span> for elite traders, consisting of our Shockwave Challenge and Verification - specifically engineered to discover true trading excellence.
-                    </p>
-                    
-                    <p>
-                      While other prop firms suffocate traders with restrictive rules and microscopic drawdowns, we've seen the industry's limitations and refuse to follow suit. Upon completing our Evaluation Process, traders gain access to <span className="text-[#0FF1CE] font-semibold">simulated funded accounts up to $500,000</span> with industry-leading conditions.
-                    </p>
-                    
-                    <p>
-                      Despite operating in a simulated environment, Shockwave traders can earn <span className="text-[#0FF1CE] font-semibold">up to 100% of their simulated profits</span> without risking personal capital. Our top performers unlock our Live Copy Trading Program, where consistent traders can have their trades copied 1:1 and scale to <span className="text-[#0FF1CE] font-semibold">$5 million in simulated capital</span>.
-                    </p>
-                    
-                    <p className="text-[#0FF1CE] font-semibold">
-                      The journey to becoming a Shockwave trader isn't for everyone - but for those ready to break free from industry limitations, we provide the tools, conditions, and opportunity to trade without restraints.
-                    </p>
-                  </div>
-
-                  <div className="mt-6 md:mt-8 flex flex-wrap gap-3 md:gap-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 md:w-3 md:h-3 bg-[#0FF1CE] rounded-full"></div>
-                      <span className="text-xs md:text-sm text-gray-400">15% Max Drawdown</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 md:w-3 md:h-3 bg-[#0FF1CE] rounded-full"></div>
-                      <span className="text-xs md:text-sm text-gray-400">1:200 Leverage</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 md:w-3 md:h-3 bg-[#0FF1CE] rounded-full"></div>
-                      <span className="text-xs md:text-sm text-gray-400">14-Day Payouts</span>
-                    </div>
-                  </div>
-                </div>
-
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+                {['15% max drawdown', '1:200 leverage', '14-day payouts'].map((item) => (
+                  <span
+                    key={item}
+                    className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-xs font-medium text-white/80 backdrop-blur-xl"
+                  >
+                    {item}
+                  </span>
+                ))}
               </div>
             </div>
 
-            {/* CTA Section */}
-            <div className="mx-auto mt-12 md:mt-16 text-center">
+            <div className="hidden gap-4 md:grid md:grid-cols-2 xl:grid-cols-4">
+              {DESKTOP_PAYOUTS.map((item) => (
+                <PayoutCard key={`${item.name}-${item.payout}`} item={item} />
+              ))}
+            </div>
+
+            <div className="relative -mx-6 overflow-hidden md:hidden">
+              <div className="pointer-events-none absolute bottom-0 left-0 top-0 z-10 w-8 bg-gradient-to-r from-black to-transparent" />
+              <div className="pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-8 bg-gradient-to-l from-black to-transparent" />
+              <div className="flex animate-infinite-scroll-mobile" style={{ width: 'max-content' }}>
+                {[0, 1].map((setIndex) => (
+                  <div className="flex" key={setIndex}>
+                    {MOBILE_PAYOUTS.map((item, index) => (
+                      <div key={`${setIndex}-${index}`} className="mx-2 w-64 flex-shrink-0">
+                        <PayoutCard item={item} />
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-10 text-center md:mt-14">
               <button
                 onClick={() => window.location.href = '/challenge'}
-                className="px-8 py-4 bg-gradient-to-r from-[#0FF1CE] to-[#0AA89E] text-black text-lg md:text-xl font-bold rounded-xl hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-[#0FF1CE]/25"
+                className="rounded-full bg-[#0FF1CE] px-8 py-3.5 text-base font-bold text-black shadow-[0_10px_30px_rgba(15,241,206,0.25)] transition-transform duration-300 hover:scale-[1.02]"
               >
-                GET FUNDED NOW
+                Get funded
               </button>
             </div>
           </div>

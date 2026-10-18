@@ -205,7 +205,7 @@ export default function EarlyAccessPage() {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user && !loading) {
-        router.push('/');
+        router.push('/dashboard');
       }
       setLoading(false);
     });
@@ -263,7 +263,7 @@ export default function EarlyAccessPage() {
         // Sign in with Firebase
         await signInUser(formData.email, formData.password);
         // If successful, redirect to main page
-        router.push('/');
+        router.push('/dashboard');
       } else {
         // For registration form
         // Validation
@@ -305,7 +305,7 @@ export default function EarlyAccessPage() {
         });
 
         // If successful, redirect to main page
-        router.push('/');
+        router.push('/dashboard');
       }
     } catch (error: any) {
       console.error('Authentication error:', error);

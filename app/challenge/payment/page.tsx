@@ -31,6 +31,7 @@ interface ChallengeData {
   };
   price: number;
   addOns?: string[];
+  userId?: string | null;
   discount?: {
     id: string;
     code: string;

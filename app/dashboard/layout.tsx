@@ -55,8 +55,7 @@ export default function DashboardLayout({
           setInitials(user.email?.[0].toUpperCase() || '');
         }
       } else {
-        // If no user, redirect to landing page
-        router.push('/');
+        router.push('/access');
       }
     });
 

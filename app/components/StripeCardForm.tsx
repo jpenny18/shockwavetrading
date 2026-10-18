@@ -61,6 +61,7 @@ interface CardFormProps {
       discordUsername?: string;
     };
     price: number;
+    userId?: string | null;
   };
   successRedirectPath: string;
   onProcessingStateChange?: (isProcessing: boolean) => void;
@@ -191,7 +192,7 @@ const CardForm: React.FC<CardFormProps> = ({
     try {
       // Create order in Firebase
       const orderId = await createOrder({
-        userId: null,
+        userId: challengeData.userId || null,
           customerEmail: challengeData.formData.email,
           firstName: challengeData.formData.firstName,
           lastName: challengeData.formData.lastName,

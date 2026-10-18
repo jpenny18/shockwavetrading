@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Particles from '../components/Particles';
 import Image from 'next/image';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db, createOrder, Timestamp } from '@/lib/firebase';
+import { db, auth, registerUser, signInUser, getUser, updateUser, getCurrentUser } from '@/lib/firebase';
 import { Check, Zap, Shield, TrendingUp, ChevronRight, AlertCircle, CreditCard, CalendarOff, Percent, Tag, Gift, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 
@@ -277,6 +277,8 @@ interface FormErrors {
   email?: string;
   phone?: string;
   country?: string;
+  password?: string;
+  confirmPassword?: string;
   type?: string;
   amount?: string;
   platform?: string;
@@ -413,6 +415,10 @@ export default function ChallengePage() {
     discordUsername: ''
   });
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [accountUser, setAccountUser] = useState<{ uid: string; email: string | null } | null>(null);
+  const [isLinkingAccount, setIsLinkingAccount] = useState(false);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [discountCode, setDiscountCode] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState<DiscountCode | null>(null);
@@ -426,13 +432,16 @@ export default function ChallengePage() {
   const step5Ref = useRef<HTMLDivElement>(null);
   const stepRefs = [null, step1Ref, step2Ref, step3Ref, step4Ref, step5Ref] as const;
 
+  const hasAccountAccess = Boolean(accountUser || (password.length >= 6 && password === confirmPassword));
+
   const isInfoComplete = Boolean(
     formData.firstName &&
     formData.lastName &&
     formData.email &&
     formData.phone &&
     formData.country &&
-    termsAccepted
+    termsAccepted &&
+    hasAccountAccess
   );
 
   const isInfoStarted = Boolean(
@@ -480,6 +489,37 @@ export default function ChallengePage() {
     return 'upcoming';
   };
   
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (!user) {
+        setAccountUser(null);
+        return;
+      }
+
+      setAccountUser({ uid: user.uid, email: user.email });
+
+      try {
+        const profile = await getUser(user.uid);
+        const nameParts = (user.displayName || '').split(' ').filter(Boolean);
+        setFormData((prev) => ({
+          ...prev,
+          email: user.email || prev.email,
+          firstName: prev.firstName || profile?.firstName || nameParts[0] || '',
+          lastName: prev.lastName || profile?.lastName || nameParts.slice(1).join(' ') || '',
+          phone: prev.phone || profile?.phone || '',
+          country: prev.country || profile?.country || ''
+        }));
+      } catch (error) {
+        console.error('Could not load account profile:', error);
+        if (user.email) {
+          setFormData((prev) => ({ ...prev, email: user.email || prev.email }));
+        }
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   // Check for preselected values from pricing table
   useEffect(() => {
     const preselectedType = sessionStorage.getItem('preselectedChallengeType');
@@ -626,7 +666,91 @@ export default function ChallengePage() {
     return calculateDiscountedPrice(priceWithAddOns, appliedDiscount);
   };
 
-  const handleProceedToPayment = () => {
+  const ensureAccount = async (): Promise<{ uid: string; email: string } | null> => {
+    const signedIn = accountUser
+      ? accountUser
+      : await (async () => {
+          const user = await getCurrentUser();
+          if (!user) return null;
+          const linked = { uid: user.uid, email: user.email };
+          setAccountUser(linked);
+          return linked;
+        })();
+
+    if (signedIn) {
+      try {
+        await updateUser(signedIn.uid, {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          phone: formData.phone,
+          country: formData.country,
+          displayName: `${formData.firstName} ${formData.lastName}`.trim()
+        });
+      } catch (error) {
+        console.error('Could not refresh profile before checkout:', error);
+      }
+      return { uid: signedIn.uid, email: signedIn.email || formData.email };
+    }
+
+    if (password.length < 6) {
+      setFormErrors((prev) => ({ ...prev, password: 'Password must be at least 6 characters' }));
+      return null;
+    }
+    if (password !== confirmPassword) {
+      setFormErrors((prev) => ({ ...prev, confirmPassword: 'Passwords do not match' }));
+      return null;
+    }
+
+    try {
+      const credential = await registerUser(formData.email, password, {
+        displayName: `${formData.firstName} ${formData.lastName}`.trim(),
+        firstName: formData.firstName,
+        lastName: formData.lastName
+      });
+      try {
+        await updateUser(credential.user.uid, {
+          phone: formData.phone,
+          country: formData.country
+        });
+      } catch (error) {
+        console.error('Could not save profile details:', error);
+      }
+      const linked = { uid: credential.user.uid, email: credential.user.email || formData.email };
+      setAccountUser(linked);
+      return linked;
+    } catch (error: any) {
+      if (error?.code === 'auth/email-already-in-use') {
+        try {
+          const credential = await signInUser(formData.email, password);
+          const linked = { uid: credential.user.uid, email: credential.user.email || formData.email };
+          setAccountUser(linked);
+          return linked;
+        } catch (signInError: any) {
+          const activeUser = auth.currentUser;
+          const wrongPassword = ['auth/wrong-password', 'auth/invalid-credential', 'auth/user-not-found', 'auth/invalid-email'].includes(signInError?.code);
+          if (!wrongPassword && activeUser && activeUser.email?.toLowerCase() === formData.email.toLowerCase()) {
+            const linked = { uid: activeUser.uid, email: activeUser.email };
+            setAccountUser(linked);
+            return linked;
+          }
+          setFormErrors((prev) => ({
+            ...prev,
+            email: 'This email already has an account.',
+            password: 'Enter the password for that account to continue.'
+          }));
+          return null;
+        }
+      }
+
+      setFormErrors((prev) => ({
+        ...prev,
+        password: 'Could not create your account. Please try again.'
+      }));
+      return null;
+    }
+  };
+
+  const handleProceedToPayment = async () => {
     if (!isFormValid()) {
       // Show validation errors
       const errors: FormErrors = {};
@@ -639,10 +763,17 @@ export default function ChallengePage() {
       if (!selectedAmount) errors.amount = 'Please select an amount';
       if (!selectedPlatform) errors.platform = 'Please select a platform';
       if (!termsAccepted) errors.terms = 'Please accept the terms and conditions';
+      if (!accountUser && password.length < 6) errors.password = 'Password must be at least 6 characters';
+      if (!accountUser && password !== confirmPassword) errors.confirmPassword = 'Passwords do not match';
       
       setFormErrors(errors);
       return;
     }
+
+    setIsLinkingAccount(true);
+    try {
+      const account = await ensureAccount();
+      if (!account) return;
     
     // Store form data in session storage
     sessionStorage.setItem('challengeData', JSON.stringify({
@@ -650,10 +781,11 @@ export default function ChallengePage() {
       amount: selectedAmount,
       platform: selectedPlatform,
       addOns: selectedAddOns,
+      userId: account.uid,
       formData: {
         firstName: formData.firstName,
         lastName: formData.lastName,
-        email: formData.email,
+        email: account.email,
         phone: formData.phone,
         country: formData.country,
         discordUsername: formData.discordUsername || ''
@@ -668,6 +800,9 @@ export default function ChallengePage() {
     }));
     
     router.push('/challenge/payment');
+    } finally {
+      setIsLinkingAccount(false);
+    }
   };
 
   // Credit card payment links mapping
@@ -729,15 +864,22 @@ export default function ChallengePage() {
       if (!selectedAmount) errors.amount = 'Please select an amount';
       if (!selectedPlatform) errors.platform = 'Please select a platform';
       if (!termsAccepted) errors.terms = 'Please accept the terms and conditions';
+      if (!accountUser && password.length < 6) errors.password = 'Password must be at least 6 characters';
+      if (!accountUser && password !== confirmPassword) errors.confirmPassword = 'Passwords do not match';
       
       setFormErrors(errors);
       return;
     }
     
+    setIsLinkingAccount(true);
     try {
+      const account = await ensureAccount();
+      if (!account) return;
+
       // Create order data for card-orders collection
       const orderData = {
-        customerEmail: formData.email,
+        userId: account.uid,
+        customerEmail: account.email,
         firstName: formData.firstName,
         lastName: formData.lastName,
         phone: formData.phone,
@@ -793,6 +935,8 @@ export default function ChallengePage() {
     } catch (error) {
       console.error('Error creating order:', error);
       alert('Failed to process order. Please try again.');
+    } finally {
+      setIsLinkingAccount(false);
     }
   };
 
@@ -806,7 +950,9 @@ export default function ChallengePage() {
       formData.email &&
       formData.phone &&
       formData.country &&
-      termsAccepted
+      termsAccepted &&
+      hasAccountAccess &&
+      !isLinkingAccount
     );
   };
 
@@ -1631,12 +1777,16 @@ export default function ChallengePage() {
                 <input
                   type="email"
                   name="email"
-                  value={formData.email}
+                  value={accountUser?.email || formData.email}
                   onChange={handleInputChange}
-                className={`w-full bg-[#151515]/50 backdrop-blur-sm border ${formErrors.email ? 'border-red-500' : 'border-[#2F2F2F]'} rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all`}
+                  readOnly={Boolean(accountUser)}
+                className={`w-full bg-[#151515]/50 backdrop-blur-sm border ${formErrors.email ? 'border-red-500' : 'border-[#2F2F2F]'} rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all ${accountUser ? 'opacity-80' : ''}`}
                 placeholder="Email"
                 />
               {formErrors.email && <p className="mt-1 text-sm text-red-400 flex items-center gap-1"><AlertCircle size={14} />{formErrors.email}</p>}
+              {accountUser && (
+                <p className="mt-1 text-xs text-[#0FF1CE]">This purchase will be added to your account.</p>
+              )}
               </div>
               
               <div>
@@ -1684,6 +1834,38 @@ export default function ChallengePage() {
                 placeholder="Discord Username"
                 />
             </div>
+
+            {!accountUser && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Create Password</label>
+                  <input
+                    type="password"
+                    name="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="new-password"
+                    className={`w-full bg-[#151515]/50 backdrop-blur-sm border ${formErrors.password ? 'border-red-500' : 'border-[#2F2F2F]'} rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all`}
+                    placeholder="Create a password"
+                  />
+                  {formErrors.password && <p className="mt-1 text-sm text-red-400 flex items-center gap-1"><AlertCircle size={14} />{formErrors.password}</p>}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-400 mb-2">Confirm Password</label>
+                  <input
+                    type="password"
+                    name="confirmPassword"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    autoComplete="new-password"
+                    className={`w-full bg-[#151515]/50 backdrop-blur-sm border ${formErrors.confirmPassword ? 'border-red-500' : 'border-[#2F2F2F]'} rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all`}
+                    placeholder="Confirm password"
+                  />
+                  {formErrors.confirmPassword && <p className="mt-1 text-sm text-red-400 flex items-center gap-1"><AlertCircle size={14} />{formErrors.confirmPassword}</p>}
+                  <p className="mt-1 text-xs text-gray-500">Create an account so this purchase is saved to your client portal.</p>
+                </div>
+              </>
+            )}
               </div>
               
           <div className="mt-8 max-w-4xl mx-auto">
@@ -1752,7 +1934,7 @@ export default function ChallengePage() {
                 }`}
               >
                 <div className="relative flex items-center justify-center gap-2">
-                  <span>Continue To Payment</span>
+                  <span>{isLinkingAccount ? 'Saving your account...' : 'Continue To Payment'}</span>
                   <ChevronRight size={20} className={isFormValid() ? 'group-hover:translate-x-1 transition-transform' : ''} />
                 </div>
               </button>

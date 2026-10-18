@@ -63,7 +63,7 @@ export default function KYCPage() {
     try {
       const user = auth.currentUser;
       if (!user) {
-        router.push('/auth');
+        router.push('/access');
         return;
       }
 

@@ -65,7 +65,7 @@ export default function Header() {
           {/* Actions */}
           <div className="flex items-center gap-3">
             {/* Client Area Button */}
-            <Link href="/auth">
+            <Link href="/access">
               <button className="group relative overflow-hidden bg-gradient-to-r from-[#0FF1CE]/10 to-[#00D9FF]/10 backdrop-blur-sm border border-[#0FF1CE]/30 text-[#0FF1CE] px-4 py-2 md:px-6 md:py-2.5 text-sm md:text-base rounded-xl font-semibold hover:border-[#0FF1CE]/60 hover:from-[#0FF1CE]/20 hover:to-[#00D9FF]/20 hover:shadow-[0_0_20px_rgba(15,241,206,0.25)] hover:scale-[1.03] active:scale-[0.97] transition-all duration-300">
                 <span className="relative z-10">Client Area</span>
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-[#0FF1CE]/0 to-[#00D9FF]/0 group-hover:from-[#0FF1CE]/10 group-hover:to-[#00D9FF]/10 transition-all duration-300"></div>

@@ -31,6 +31,7 @@ interface PaymentProcessorProps {
       discordUsername?: string;
     };
     price: number;
+    userId?: string | null;
   };
   successRedirectPath: string;
   onProcessingStateChange?: (isProcessing: boolean) => void;
@@ -242,7 +243,7 @@ export const usePaymentProcessor = (
       if (paymentIntent && paymentIntent.status === 'succeeded') {
         // Store order in Firebase
         await createOrder({
-          userId: null, // Will be linked to user account if available
+          userId: challengeData.userId || null,
           customerEmail: challengeData.formData.email,
           firstName: challengeData.formData.firstName,
           lastName: challengeData.formData.lastName,

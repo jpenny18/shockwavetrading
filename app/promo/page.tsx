@@ -351,15 +351,16 @@ export default function PromoPage() {
 
         <div className="relative max-w-4xl mx-auto">
           <h1 className="text-5xl sm:text-6xl md:text-[64px] lg:text-[72px] font-extrabold text-white leading-[0.95] tracking-tight mb-5 md:mb-6">
-            GET FUNDED IN
+            HIGHEST DRAWDOWN
             <br />
             <span
               className="bg-gradient-to-b from-[#D8FFF8] via-[#0FF1CE] to-[#0BB89F] text-transparent bg-clip-text"
               style={{ filter: 'drop-shadow(0 0 28px rgba(15,241,206,0.45))' }}
             >
-              ONE TRADE.
+              CFD PROPFIRM
             </span>
           </h1>
+     
      
 
           <p className="text-[#0FF1CE] text-[11px] sm:text-xs md:text-sm font-bold uppercase mb-4">
@@ -385,11 +386,6 @@ export default function PromoPage() {
           <p className="text-gray-400 text-xs sm:text-sm md:text-lg mb-6 md:mb-10">
             Pass in a single trade. Get funded. Request payouts on demand.
           </p>
-     
-
-          <div className="relative max-w-3xl mx-auto mb-8 md:mb-10">
-            <PromoVsl />
-          </div>
 
           <button
             type="button"

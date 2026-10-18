@@ -664,6 +664,16 @@ export default function PricingTable() {
     }
   }, [currentPlan, availableAccounts, selectedAccount]);
 
+  React.useEffect(() => {
+    const chip = document.getElementById(`account-size-${selectedAccount}`);
+    const scroller = chip?.parentElement;
+    if (!chip || !scroller || chip.offsetParent === null) return;
+    scroller.scrollTo({
+      left: chip.offsetLeft - scroller.clientWidth / 2 + chip.clientWidth / 2,
+      behavior: 'smooth'
+    });
+  }, [selectedAccount, currentPlan]);
+
   // Handle body overflow when modal is open
   React.useEffect(() => {
     if (showModal) {
@@ -745,48 +755,27 @@ export default function PricingTable() {
       </div>
 
       {/* Mobile Plan Selection */}
-      <div className="lg:hidden mb-8">
-        <div className="flex justify-center gap-2 px-4">
-          <button
-            onClick={() => setCurrentPlan('standard')}
-            className={`px-3 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${
-              currentPlan === 'standard' 
-                ? 'bg-[#0FF1CE] text-black' 
-                : 'bg-transparent text-white/80 border border-white/20'
-            }`}
-          >
-            Standard
-          </button>
-          <button
-            onClick={() => setCurrentPlan('onestep')}
-            className={`px-3 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${
-              currentPlan === 'onestep' 
-                ? 'bg-[#0FF1CE] text-black' 
-                : 'bg-transparent text-white/80 border border-white/20'
-            }`}
-          >
-            1-Step
-          </button>
-          <button
-            onClick={() => setCurrentPlan('instant')}
-            className={`px-3 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${
-              currentPlan === 'instant' 
-                ? 'bg-[#0FF1CE] text-black' 
-                : 'bg-transparent text-white/80 border border-white/20'
-            }`}
-          >
-            Instant
-          </button>
-          <button
-            onClick={() => setCurrentPlan('gauntlet')}
-            className={`px-3 py-2 rounded-lg text-sm font-bold transition-all duration-300 ${
-              currentPlan === 'gauntlet' 
-                ? 'bg-[#0FF1CE] text-black' 
-                : 'bg-transparent text-white/80 border border-white/20'
-            }`}
-          >
-            Gauntlet
-          </button>
+      <div className="lg:hidden mb-6">
+        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+          {([
+            ['standard', 'Standard'],
+            ['onestep', '1-Step'],
+            ['instant', 'Instant'],
+            ['gauntlet', 'Gauntlet']
+          ] as const).map(([plan, label]) => (
+            <button
+              key={plan}
+              type="button"
+              onClick={() => setCurrentPlan(plan)}
+              className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+                currentPlan === plan
+                  ? 'bg-[#0FF1CE] text-black'
+                  : 'border border-white/10 bg-white/[0.04] text-white/80'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -891,86 +880,83 @@ export default function PricingTable() {
         </div>
       </div>
 
-      {/* Mobile Account Size Selection */}
-      <div className="lg:hidden pt-4 px-4">
-        <div className="flex space-x-3 justify-center flex-wrap gap-2">
-          {availableAccounts.map(account => (
-            <button
-              key={account}
-              onClick={() => setSelectedAccount(account)}
-              className={`account-size-btn flex h-12 w-12 flex-shrink-0 cursor-pointer items-center justify-center rounded-full text-white font-semibold text-xs transition-all duration-300 ${
-                account === selectedAccount ? 'selected' : ''
-              }`}
-            >
-              <span>${account >= 1000 ? account / 1000 + 'K' : account}</span>
-            </button>
-          ))}
+      {/* Mobile: one selected account, FTMO-style */}
+      <div className="lg:hidden px-4">
+        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+          {availableAccounts.map((account) => {
+            const isSelected = account === selectedAccount;
+            return (
+              <button
+                key={account}
+                id={`account-size-${account}`}
+                type="button"
+                onClick={() => setSelectedAccount(account)}
+                className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
+                  isSelected
+                    ? 'bg-[#0FF1CE] text-black'
+                    : 'border border-white/10 bg-white/[0.04] text-white/80'
+                }`}
+              >
+                ${account >= 1000 ? `${account / 1000}K` : account}
+              </button>
+            );
+          })}
         </div>
-      </div>
 
-      {/* Mobile Cards */}
-      <div className="lg:hidden px-4 mt-8">
         {availableAccounts.includes(selectedAccount) && (
-          <>
-            <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-6 mb-6 glow-effect">
-              <div className="text-center">
-                <h3 className="text-2xl font-bold text-[#0FF1CE] mb-2">
-                  ${selectedAccount.toLocaleString()}
-                </h3>
-                <p className="text-gray-300 mb-4">{data.name}</p>
-                <button
-                  onClick={() => {
-                    // Update session storage with correct account before navigation
-                    sessionStorage.setItem('preselectedBalance', selectedAccount.toString());
-                    handlePurchase(`${data.name} $${selectedAccount.toLocaleString()}`, data.prices[selectedAccount]);
-                  }}
-                  className="w-full group"
-                >
-                  <div className="relative overflow-hidden rounded-lg bg-gradient-to-r from-[#0FF1CE] to-[#0AA89E] p-[2px] transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-[#0FF1CE]/25">
-                    <div className="flex flex-col items-center rounded-lg bg-gradient-to-br from-[#0FF1CE] to-[#0AA89E] px-6 py-3 transition-all duration-300">
-                      <span className="text-lg font-bold text-black">Get Plan</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-black font-bold">${data.prices[selectedAccount].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                      </div>
-                    </div>
-                  </div>
-                </button>
-              </div>
+          <div className="mt-4 overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.04] backdrop-blur-xl">
+            <div className="border-b border-white/10 px-5 pb-4 pt-5 text-center">
+              <p className="text-xs font-medium text-white/50">{data.name}</p>
+              <h3 className="mt-1 text-3xl font-semibold tracking-tight text-white">
+                ${selectedAccount.toLocaleString()}
+              </h3>
             </div>
 
-            {data.features.map((feature, index) => {
-              const value = feature.values[selectedAccount] || '-';
-              const isCheckmark = value === '✓';
-              return (
-                <div
-                  key={index}
-                  className="bg-gradient-to-br from-[#0FF1CE]/5 to-transparent backdrop-blur-sm rounded-xl p-4 mb-3 border border-[#0FF1CE]/20"
-                >
-                  <div className="grid grid-cols-2 gap-4 items-center">
-                    <div className="flex items-start relative">
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-white text-sm break-words">{feature.name}</p>
-                        {feature.subtitle && (
-                          <p className="text-xs text-white/75 break-words">{feature.subtitle}</p>
-                        )}
+            <div className="divide-y divide-white/10">
+              {data.features.map((feature, index) => {
+                const value = feature.values[selectedAccount] || '-';
+                const isCheckmark = value === '✓';
+                return (
+                  <div key={index} className="flex items-center justify-between gap-4 px-5 py-3.5">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm text-white/85">{feature.name}</p>
+                        <div
+                          className="info-icon flex-shrink-0"
+                          onClick={() => setShowModal(feature.tooltip)}
+                        >
+                          i
+                        </div>
                       </div>
-                      <div
-                        className="info-icon ml-2 flex-shrink-0"
-                        onClick={() => setShowModal(feature.tooltip)}
-                      >
-                        i
-                      </div>
+                      {feature.subtitle ? (
+                        <p className="text-xs text-white/45">{feature.subtitle}</p>
+                      ) : null}
                     </div>
-                    <div className="text-right">
-                      <p className={`feature-value text-sm font-bold break-words ${isCheckmark ? 'checkmark-icon' : 'text-white'}`}>
-                        {value}
-                      </p>
-                    </div>
+                    <p className={`shrink-0 text-right text-sm font-semibold ${isCheckmark ? 'text-[#0FF1CE]' : 'text-white'}`}>
+                      {value}
+                    </p>
                   </div>
-                </div>
-              );
-            })}
-          </>
+                );
+              })}
+            </div>
+
+            <div className="border-t border-white/10 p-4">
+              <div className="mb-3 text-center text-2xl font-bold text-[#0FF1CE]">
+                ${data.prices[selectedAccount].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  sessionStorage.setItem('preselectedBalance', selectedAccount.toString());
+                  handlePurchase(`${data.name} $${selectedAccount.toLocaleString()}`, data.prices[selectedAccount]);
+                }}
+                className="w-full rounded-2xl bg-[#0FF1CE] py-3.5 text-base font-bold text-black transition-transform duration-300 hover:scale-[1.01]"
+              >
+                Start now
+              </button>
+              <p className="mt-3 text-center text-[11px] text-white/40">One-time activation fee</p>
+            </div>
+          </div>
         )}
       </div>
 
