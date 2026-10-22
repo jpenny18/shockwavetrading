@@ -89,7 +89,7 @@ const PriceDisplay = ({ originalPrice, finalPrice, discount }: {
   finalPrice: number;
   discount?: ChallengeData['discount'];
 }) => (
-  <div className="mb-6 p-4 bg-[#151515] rounded-lg">
+  <div className="mb-6 rounded-[18px] border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl">
     <div className="flex justify-between items-center">
       <div>
         <div className="text-gray-400">Total Amount</div>
@@ -239,7 +239,7 @@ export default function PaymentPage() {
 
   if (!challengeData) {
     return (
-      <div className="bg-gradient-to-b from-[#0D0D0D] via-[#121212] to-[#151515] text-white min-h-screen font-sans">
+      <div className="min-h-screen bg-black font-sans text-white">
         <Particles />
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="flex justify-center items-center min-h-[60vh]">
@@ -318,7 +318,7 @@ export default function PaymentPage() {
   };
 
   return (
-    <div className="bg-gradient-to-b from-[#0D0D0D] via-[#121212] to-[#151515] text-white min-h-screen font-sans">
+    <div className="min-h-screen bg-black font-sans text-white">
       
       
 
@@ -329,12 +329,13 @@ export default function PaymentPage() {
 
       {/* Main Content */}
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h1 className="text-3xl font-bold text-white mb-8 text-center">Complete Your Payment</h1>
+        <p className="mb-3 text-center text-[11px] font-bold uppercase tracking-[0.22em] text-[#0FF1CE]">Checkout</p>
+        <h1 className="mb-8 text-center text-3xl font-semibold tracking-tight text-white md:text-5xl">Complete Your Payment</h1>
 
         {/* Payment Support Notice */}
-        <div className="mb-8 bg-[#1A1A1A] rounded-xl border border-[#0FF1CE]/30 overflow-hidden">
-          <div className="px-4 py-3 bg-[#0FF1CE]/10 border-b border-[#0FF1CE]/20">
-            <h3 className="text-[#0FF1CE] font-medium">Having trouble with your payment?</h3>
+        <div className="mb-8 overflow-hidden rounded-[22px] border border-white/10 bg-white/[0.04] backdrop-blur-xl">
+          <div className="border-b border-white/10 px-4 py-3">
+            <h3 className="font-medium text-white">Having trouble with your payment?</h3>
           </div>
           <div className="p-4 flex items-start gap-3">
             <Mail className="text-[#0FF1CE] w-5 h-5 mt-0.5 flex-shrink-0" />
@@ -353,14 +354,14 @@ export default function PaymentPage() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Left Column - Payment Methods */}
           <div className="lg:col-span-3">
-            <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-2xl p-6 border border-[#2F2F2F]/50 mb-8">
-              <h2 className="text-xl font-semibold mb-6">Payment Methods</h2>
+            <div className="mb-8 rounded-[22px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
+              <h2 className="mb-6 text-xl font-semibold tracking-tight">Payment Methods</h2>
 
               {/* Crypto Payment Option */}
               <div className="mb-4">
                 <button
                   onClick={() => handlePaymentSelect('crypto')}
-                  className="w-full bg-[#1A1A1A] hover:bg-[#212121] border border-[#2F2F2F]/50 rounded-xl p-4 transition duration-200"
+                  className="w-full rounded-[18px] border border-white/10 bg-black/30 p-4 transition-colors duration-200 hover:bg-white/[0.06]"
                 >
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
@@ -376,7 +377,7 @@ export default function PaymentPage() {
 
                 {isCryptoExpanded && (
                   <div className="mt-4">
-                    <div className="bg-[#151515] rounded-xl border border-[#2F2F2F]/50 relative">
+                    <div className="relative overflow-hidden rounded-[18px] border border-white/10 bg-black/30">
                       {isProcessingPayment && <PaymentProcessingOverlay />}
                       <CryptoPayment
                         challengeData={challengeData}
@@ -391,7 +392,7 @@ export default function PaymentPage() {
 
               {/* Trust Badges */}
               <div className="grid grid-cols-3 gap-4 mt-6">
-                <div className="bg-[#151515] rounded-xl p-4 text-center border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50 transition-colors group">
+                <div className="rounded-[18px] border border-white/10 bg-black/30 p-4 text-center">
                   <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#0FF1CE]/10 flex items-center justify-center group-hover:bg-[#0FF1CE]/20 transition-colors">
                     <Shield className="text-[#0FF1CE]" size={24} />
                   </div>
@@ -399,7 +400,7 @@ export default function PaymentPage() {
                   <div className="text-[0.5rem] text-gray-400 leading-relaxed">256-bit SSL encryption for maximum security</div>
                 </div>
                 
-                <div className="bg-[#151515] rounded-xl p-4 text-center border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50 transition-colors group">
+                <div className="rounded-[18px] border border-white/10 bg-black/30 p-4 text-center">
                   <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#0FF1CE]/10 flex items-center justify-center group-hover:bg-[#0FF1CE]/20 transition-colors">
                     <RefreshCcw className="text-[#0FF1CE]" size={24} />
                   </div>
@@ -407,7 +408,7 @@ export default function PaymentPage() {
                   <div className="text-[0.5rem] text-gray-400 leading-relaxed">Full refund after successfully completing the evaluation</div>
                 </div>
 
-                <div className="bg-[#151515] rounded-xl p-4 text-center border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50 transition-colors group">
+                <div className="rounded-[18px] border border-white/10 bg-black/30 p-4 text-center">
                   <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#0FF1CE]/10 flex items-center justify-center group-hover:bg-[#0FF1CE]/20 transition-colors">
                     <HeadphonesIcon className="text-[#0FF1CE]" size={24} />
                   </div>
@@ -418,7 +419,7 @@ export default function PaymentPage() {
 
               {/* Credit Card Payment Option - Hidden */}
               <div className="hidden">
-                <div className="w-full bg-[#1A1A1A] border border-[#2F2F2F]/50 rounded-xl p-4">
+                <div className="w-full bg-[#1A1A1A] border border-white/10 rounded-xl p-4">
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
                       <CreditCard className="text-gray-400 mr-3" size={20} />
@@ -440,10 +441,10 @@ export default function PaymentPage() {
                 <h3 className="text-orange-400 font-bold">Important Disclaimer</h3>
               </div>
               <p className="text-sm text-gray-300 mb-3">
-                Shockwave Capital offers access to a simulated trading environment for the sole purpose of evaluating trading skill and discipline. All trading activity occurs on demo accounts using real-time market data. No actual capital is deposited, invested, or traded on behalf of users.
+                Shockwave Capital provides funded trading accounts for traders who pass an evaluation. Trading uses live market conditions. Payouts follow the program rules.
               </p>
               <p className="text-sm text-gray-300 mb-3">
-                References to "funding," "capital," "payouts," or "profit splits" pertain exclusively to performance-based simulations and do not imply the transfer or management of real funds.
+                Payouts can be requested on demand when you have no open positions and have not breached the funded account. A breached funded account cannot receive a payout.
               </p>
               <p className="text-sm text-gray-300 mb-3">
                 Participation in Shockwave Capital's programs is strictly for educational and evaluative purposes and does not constitute financial advice, investment services, or brokerage activity.
@@ -452,7 +453,7 @@ export default function PaymentPage() {
               <ul className="text-sm text-gray-300 list-disc pl-5 mb-3 space-y-1">
                 <li>You are not participating in real-money or live trading.</li>
                 <li>You understand this platform is not a broker-dealer, investment advisor, or asset management firm.</li>
-                <li>Any rewards, incentives, or performance-based milestones are tied to simulated results and subject to our internal review and compliance criteria.</li>
+                <li>Payouts are subject to the program rules, including the $50 minimum after Shockwave's performance split, and are sent as USDC on ERC-20 or USDT on Tron or Solana.</li>
                 <li>You accept these terms and agree to our full Terms of Use and Privacy Policy.</li>
               </ul>
               <p className="text-sm text-orange-400 font-semibold">
@@ -463,8 +464,8 @@ export default function PaymentPage() {
 
           {/* Right Column - Order Summary */}
           <div className="lg:col-span-2">
-            <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-2xl p-6 border border-[#2F2F2F]/50 sticky top-8">
-              <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
+            <div className="sticky top-8 rounded-[22px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
+              <h2 className="mb-6 text-xl font-semibold tracking-tight">Order Summary</h2>
               
               <div className="mb-6">
                 <div className="flex justify-between mb-2">
@@ -481,7 +482,7 @@ export default function PaymentPage() {
                 </div>
                 {challengeData.addOns && challengeData.addOns.length > 0 && (
                   <>
-                    <div className="border-t border-[#2F2F2F]/30 mt-3 pt-3">
+                    <div className="border-t border-white/10 mt-3 pt-3">
                       <div className="text-white/70 text-sm mb-2">Add-ons:</div>
                       {challengeData.addOns.map((addOnId) => (
                         <div key={addOnId} className="flex justify-between mb-1">
@@ -494,7 +495,7 @@ export default function PaymentPage() {
                 )}
               </div>
               
-              <div className="border-t border-[#2F2F2F]/50 pt-4 mb-6">
+              <div className="border-t border-white/10 pt-4 mb-6">
                 <div className="flex justify-between mb-2">
                   <span className="text-white/70">Subtotal:</span>
                   <span className="font-medium">${challengeData.price.toFixed(2)}</span>

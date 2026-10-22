@@ -29,20 +29,18 @@ interface ChallengeData {
 }
 
 const tooltipData: TooltipData = {
-  "profit-share": "Your percentage of profits earned during the verification phase. This is your reward for successful trading performance.",
-  "challenge-target": "The profit percentage you need to achieve in Phase 1 to advance to the verification phase.",
-  "verification-target": "The profit percentage required in Phase 2 to qualify for the funded account.",
-  "daily-loss": "Maximum amount you can lose in a single trading day. Exceeding this limit will result in account termination.",
-  "overall-loss": "Maximum total loss allowed throughout the entire challenge. This is your absolute risk limit.",
-  "leverage": "The maximum leverage ratio available for your trades. Higher leverage means greater potential profits and risks.",
-  "news-trading": "Permission to trade during high-impact news events. Many prop firms restrict this due to increased volatility.",
-  "profit-split": "Your share of profits once you become a funded trader. This percentage increases with consistent performance.",
-  "trading-days": "Minimum number of days you must trade to complete each phase. Ensures consistent trading activity.",
-  "payout-eligibility": "Waiting period before your first withdrawal becomes available after reaching the funded phase.",
-  "funded-activation-fee": "One-time activation fee paid when you successfully pass the challenge and want to activate your funded account.",
-  "one-free-retry": "One free retry if you breach the drawdown limits or reach the time limit. This DOES NOT reset the 30 calendar day period it ONLY resets the account balance.",
-  "pay-when-pass": "Pay only $99 to try the challenge, then pay the activation fee only when you successfully pass.",
-  "no-restrictions": "No trading rules, no time restrictions, no news trading limits - trade however you want."
+  "profit-target-standard": "Phase 1 is a 10% profit target. Phase 2 is a 5% profit target. Hit both to qualify for the funded account.",
+  "profit-target-onestep": "One profit target. Hit it in a single phase to qualify for the funded account.",
+  "profit-target-instant": "Hit the profit target during the instant challenge to qualify for a payout.",
+  "profit-target-gauntlet": "Hit the profit target to pass. The activation fee is charged only after you pass.",
+  "daily-loss": "The most the account can lose in one trading day. Passing this limit breaches the account.",
+  "daily-loss-instant": "Instant accounts have no daily loss limit. The overall loss limit still applies.",
+  "overall-loss": "The most the account can lose in total. Passing this limit breaches the account.",
+  "leverage": "The highest leverage available on this account.",
+  "profit-split": "Your share of profits on the funded account, up to 95%.",
+  "profit-split-instant": "Your share of profits on an Instant account is 70%.",
+  "refundable-fee": "The full challenge fee is refunded with your first payout, unless the challenge was bought at a discount.",
+  "pay-when-pass": "Start for $19.99. The activation fee shown here is charged only after you pass.",
 };
 
 const challengeData: ChallengeData = {
@@ -176,13 +174,13 @@ const challengeData: ChallengeData = {
         subtitle: "",
         tooltip: "trading-days",
         values: {
-          5000: "5 Days",
-          10000: "5 Days",
-          25000: "5 Days",
-          50000: "5 Days",
-          100000: "5 Days",
-          200000: "5 Days",
-          500000: "5 Days"
+          5000: "None",
+          10000: "None",
+          25000: "None",
+          50000: "None",
+          100000: "None",
+          200000: "None",
+          500000: "None"
         }
       },
       {
@@ -190,13 +188,13 @@ const challengeData: ChallengeData = {
         subtitle: "",
         tooltip: "payout-eligibility",
         values: {
-          5000: "21 Days",
-          10000: "21 Days",
-          25000: "21 Days",
-          50000: "21 Days",
-          100000: "21 Days",
-          200000: "21 Days",
-          500000: "21 Days"
+          5000: "On-demand",
+          10000: "On-demand",
+          25000: "On-demand",
+          50000: "On-demand",
+          100000: "On-demand",
+          200000: "On-demand",
+          500000: "On-demand"
         }
       },
       {
@@ -331,13 +329,13 @@ const challengeData: ChallengeData = {
         subtitle: "",
         tooltip: "trading-days",
         values: {
-          5000: "5 Days",
-          10000: "5 Days",
-          25000: "5 Days",
-          50000: "5 Days",
-          100000: "5 Days",
-          200000: "5 Days",
-          500000: "5 Days"
+          5000: "None",
+          10000: "None",
+          25000: "None",
+          50000: "None",
+          100000: "None",
+          200000: "None",
+          500000: "None"
         }
       },
       {
@@ -345,13 +343,13 @@ const challengeData: ChallengeData = {
         subtitle: "",
         tooltip: "payout-eligibility",
         values: {
-          5000: "5 Days",
-          10000: "5 Days",
-          25000: "5 Days",
-          50000: "5 Days",
-          100000: "5 Days",
-          200000: "5 Days",
-          500000: "5 Days"
+          5000: "On-demand",
+          10000: "On-demand",
+          25000: "On-demand",
+          50000: "On-demand",
+          100000: "On-demand",
+          200000: "On-demand",
+          500000: "On-demand"
         }
       }
     ]
@@ -458,13 +456,13 @@ const challengeData: ChallengeData = {
         subtitle: "",
         tooltip: "trading-days",
         values: { 
-          5000: "5 Days",
-          10000: "5 Days", 
-          25000: "5 Days", 
-          50000: "5 Days", 
-          100000: "5 Days",
-          200000: "5 Days",
-          500000: "5 Days"
+          5000: "None",
+          10000: "None", 
+          25000: "None", 
+          50000: "None", 
+          100000: "None",
+          200000: "None",
+          500000: "None"
         }
       },
       {
@@ -472,13 +470,13 @@ const challengeData: ChallengeData = {
         subtitle: "",
         tooltip: "payout-eligibility",
         values: { 
-          5000: "6 Days",
-          10000: "6 Days", 
-          25000: "6 Days", 
-          50000: "6 Days", 
-          100000: "6 Days",
-          200000: "6 Days",
-          500000: "6 Days"
+          5000: "On-demand",
+          10000: "On-demand", 
+          25000: "On-demand", 
+          50000: "On-demand", 
+          100000: "On-demand",
+          200000: "On-demand",
+          500000: "On-demand"
         }
       },
       {
@@ -621,11 +619,11 @@ const challengeData: ChallengeData = {
         subtitle: "",
         tooltip: "payout-eligibility",
         values: {
-          10000: "14 Days",
-          25000: "14 Days",
-          50000: "14 Days",
-          100000: "14 Days",
-          200000: "14 Days"
+          10000: "On-demand",
+          25000: "On-demand",
+          50000: "On-demand",
+          100000: "On-demand",
+          200000: "On-demand"
         }
       }
     ]
@@ -636,9 +634,9 @@ export default function PricingTable() {
   const router = useRouter();
   const [currentPlan, setCurrentPlan] = useState<'standard' | 'onestep' | 'instant' | 'gauntlet'>('standard');
   const [selectedAccount, setSelectedAccount] = useState(100000);
-  const [showModal, setShowModal] = useState<string | null>(null);
+  const [infoModal, setInfoModal] = useState<{ title: string; body: string } | null>(null);
 
-  const handlePurchase = (plan: string, price: number) => {
+  const handlePurchase = (plan: string, price: number, balance: number) => {
     // Set the preselected challenge type and navigate to challenge page
     let challengeType = 'Standard';
     if (plan.includes('Instant')) {
@@ -650,7 +648,7 @@ export default function PricingTable() {
     }
     
     sessionStorage.setItem('preselectedChallengeType', challengeType);
-    sessionStorage.setItem('preselectedBalance', selectedAccount.toString());
+    sessionStorage.setItem('preselectedBalance', balance.toString());
     router.push('/challenge');
   };
 
@@ -664,6 +662,11 @@ export default function PricingTable() {
     }
   }, [currentPlan, availableAccounts, selectedAccount]);
 
+  const cardScrollerRef = React.useRef<HTMLDivElement>(null);
+  const programmaticCardScroll = React.useRef(false);
+  const selectedAccountRef = React.useRef(selectedAccount);
+  selectedAccountRef.current = selectedAccount;
+
   React.useEffect(() => {
     const chip = document.getElementById(`account-size-${selectedAccount}`);
     const scroller = chip?.parentElement;
@@ -674,18 +677,244 @@ export default function PricingTable() {
     });
   }, [selectedAccount, currentPlan]);
 
-  // Handle body overflow when modal is open
+  React.useLayoutEffect(() => {
+    const scroller = cardScrollerRef.current;
+    if (!scroller) return;
+    let cancelled = false;
+
+    const alignSelectedCard = () => {
+      if (cancelled || scroller.offsetParent === null) return;
+      const card = document.getElementById(`pricing-card-${selectedAccount}`);
+      if (!card || card.getBoundingClientRect().width === 0) return;
+      const padding = 16;
+      const delta = card.getBoundingClientRect().left - (scroller.getBoundingClientRect().left + padding);
+      if (Math.abs(delta) < 6) return;
+
+      programmaticCardScroll.current = true;
+      scroller.scrollLeft += delta;
+      window.requestAnimationFrame(() => {
+        programmaticCardScroll.current = false;
+      });
+    };
+
+    alignSelectedCard();
+    const observer = new ResizeObserver(alignSelectedCard);
+    observer.observe(scroller);
+    const retry = window.setTimeout(alignSelectedCard, 80);
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+      window.clearTimeout(retry);
+    };
+  }, [selectedAccount, currentPlan]);
+
   React.useEffect(() => {
-    if (showModal) {
-      document.body.style.overflow = 'hidden';
-    } else {
+    const scroller = cardScrollerRef.current;
+    if (!scroller) return;
+
+    const syncSelection = () => {
+      if (programmaticCardScroll.current || scroller.offsetParent === null) return;
+      const edge = scroller.getBoundingClientRect().left + 16;
+      let best = selectedAccountRef.current;
+      let bestDistance = Infinity;
+      availableAccounts.forEach((account) => {
+        const card = document.getElementById(`pricing-card-${account}`);
+        if (!card) return;
+        const distance = Math.abs(card.getBoundingClientRect().left - edge);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          best = account;
+        }
+      });
+      if (best !== selectedAccountRef.current) {
+        setSelectedAccount(best);
+      }
+    };
+
+    scroller.addEventListener('scrollend', syncSelection);
+    return () => scroller.removeEventListener('scrollend', syncSelection);
+  }, [availableAccounts, currentPlan]);
+
+  React.useEffect(() => {
+    if (!infoModal) {
       document.body.style.overflow = 'unset';
+      return;
     }
-    
+    document.body.style.overflow = 'hidden';
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setInfoModal(null);
+    };
+    window.addEventListener('keydown', onKey);
     return () => {
       document.body.style.overflow = 'unset';
+      window.removeEventListener('keydown', onKey);
     };
-  }, [showModal]);
+  }, [infoModal]);
+
+  const featureByName = (name: string) => data.features.find((feature) => feature.name === name);
+
+  const openInfo = (title: string, key: string) => {
+    setInfoModal({ title, body: tooltipData[key] || '' });
+  };
+
+  const renderInfoButton = (title: string, key: string) => (
+    <button
+      type="button"
+      aria-label={`About ${title}`}
+      onClick={() => openInfo(title, key)}
+      className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.06] text-[11px] font-semibold text-white/70 transition-colors hover:border-[#0FF1CE]/50 hover:text-[#0FF1CE]"
+    >
+      i
+    </button>
+  );
+
+  const renderAccountCard = (account: number) => {
+    const priceLabel = data.prices[account].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const phaseOne = currentPlan === 'standard' ? featureByName('Challenge Profit Target')?.values[account] : undefined;
+    const phaseTwo = currentPlan === 'standard' ? featureByName('Verification Profit Target')?.values[account] : undefined;
+    const profitTarget = featureByName('Profit Target')?.values[account];
+    const dailyLoss = featureByName('Maximum Daily Loss')?.values[account];
+    const maxLoss = featureByName('Maximum Overall Loss')?.values[account];
+    const leverage = featureByName('Leverage')?.values[account];
+    const profitSplit = currentPlan === 'instant' ? '70%' : (featureByName('Profit Split')?.values[account] || '-');
+    const refundable = currentPlan === 'gauntlet'
+      ? featureByName('Pay When You Pass')?.values[account]?.replace(' activation', '')
+      : (featureByName('Refundabe Fee')?.values[account] || `$${priceLabel}`);
+
+    const rows: { name: string; tooltip: string; value?: string; phases?: { label: string; value: string }[] }[] = [
+      currentPlan === 'standard'
+        ? {
+            name: 'Profit Target',
+            tooltip: 'profit-target-standard',
+            phases: [
+              { label: 'Phase 1', value: phaseOne || '-' },
+              { label: 'Phase 2', value: phaseTwo || '-' },
+            ],
+          }
+        : {
+            name: 'Profit Target',
+            tooltip: currentPlan === 'instant'
+              ? 'profit-target-instant'
+              : currentPlan === 'gauntlet'
+                ? 'profit-target-gauntlet'
+                : 'profit-target-onestep',
+            value: profitTarget || '-',
+          },
+      {
+        name: 'Max Daily Loss',
+        tooltip: currentPlan === 'instant' ? 'daily-loss-instant' : 'daily-loss',
+        value: !dailyLoss || dailyLoss === '✗' ? 'None' : dailyLoss,
+      },
+      { name: 'Max Loss', tooltip: 'overall-loss', value: maxLoss || '-' },
+      { name: 'Leverage', tooltip: 'leverage', value: leverage || '-' },
+      {
+        name: 'Profit Split',
+        tooltip: currentPlan === 'instant' ? 'profit-split-instant' : 'profit-split',
+        value: profitSplit,
+      },
+      currentPlan === 'gauntlet'
+        ? { name: 'Activation Fee', tooltip: 'pay-when-pass', value: refundable || '-' }
+        : { name: 'Refundable Fee', tooltip: 'refundable-fee', value: refundable || '-' },
+    ];
+
+    const perks = [
+      'No consistency rule',
+      'News trading allowed',
+      'On-demand payouts, including weekends',
+      'No minimum trading days or profitable days',
+      'No position size limits',
+      currentPlan === 'gauntlet'
+        ? 'Activation fee is charged only when you pass'
+        : 'Full challenge fee refunded with your first payout, unless the challenge was discounted',
+      ...(currentPlan === 'instant' ? ['One free retry if you breach or reach the time limit'] : []),
+    ];
+
+    return (
+      <div className="overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.04] backdrop-blur-xl">
+        <div className="px-4 pb-4 pt-5 text-center md:px-5">
+          <p className="text-xs font-medium text-white/50">{data.name}</p>
+          <h3 className="mt-1 text-2xl font-semibold tracking-tight text-white md:text-3xl">
+            ${account.toLocaleString()}
+          </h3>
+          <p className="mt-2 text-2xl font-semibold tracking-tight text-[#0FF1CE]">${priceLabel}</p>
+          <p className="mt-1 text-[11px] text-white/40">{currentPlan === 'gauntlet' ? 'Entry fee' : 'One-time fee'}</p>
+        </div>
+
+        <div className="grid grid-cols-[minmax(0,1fr)_1.25rem_max-content] items-center gap-x-3 gap-y-1 px-4 py-2 md:px-5">
+          {rows.map((row) => (
+            <React.Fragment key={row.name}>
+              <div className="flex min-w-0 items-center self-stretch py-2">
+                <p className="text-sm leading-snug text-white/85">{row.name}</p>
+              </div>
+              <div className="flex items-center justify-center self-stretch py-2">
+                {renderInfoButton(row.name, row.tooltip)}
+              </div>
+              <div className="flex items-center justify-end self-stretch py-2 text-right">
+                {row.phases ? (
+                  <div className="flex items-start gap-3">
+                    <div className="flex flex-col items-end">
+                      {row.phases.map((phase) => (
+                        <div key={phase.label} className="py-px text-[10px] font-semibold uppercase leading-4 tracking-[0.12em] text-white/40">
+                          {phase.label}
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex flex-col items-end">
+                      {row.phases.map((phase) => {
+                        const percent = phase.value.match(/^(\d+%)/)?.[1] || phase.value;
+                        return (
+                          <div key={`${phase.label}-value`} className="py-px text-xs font-semibold uppercase leading-4 tabular-nums text-white">
+                            {percent}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : (
+                  <p className="whitespace-nowrap text-sm font-semibold tabular-nums text-white">{row.value}</p>
+                )}
+              </div>
+            </React.Fragment>
+          ))}
+        </div>
+
+        <details className="group">
+          <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 text-sm font-medium text-white/80 md:px-5 [&::-webkit-details-marker]:hidden">
+            Included with every account
+            <span className="text-white/40 transition-transform duration-300 group-open:rotate-180">⌄</span>
+          </summary>
+          <ul className="space-y-2 px-4 pb-4 md:px-5">
+            {perks.map((perk) => (
+              <li key={perk} className="flex items-start gap-2 text-sm text-white/70">
+                <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#0FF1CE] text-[10px] font-bold text-black">✓</span>
+                <span>{perk}</span>
+              </li>
+            ))}
+          </ul>
+        </details>
+
+        <div className="p-4">
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedAccount(account);
+              handlePurchase(`${data.name} $${account.toLocaleString()}`, data.prices[account], account);
+            }}
+            className="w-full rounded-2xl bg-[#0FF1CE] py-3.5 text-base font-bold text-black shadow-[0_8px_30px_rgba(15,241,206,0.22)] transition-transform duration-300 hover:scale-[1.01]"
+          >
+            Start now
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  const highlights: Record<typeof currentPlan, string[]> = {
+    standard: ['15% max drawdown', 'On-demand payouts', 'No min days'],
+    onestep: ['Single phase', 'On-demand payouts', 'No min days'],
+    instant: ['No daily loss limit', 'On-demand payouts', 'No min days'],
+    gauntlet: ['$19.99 to start', 'On-demand payouts', 'No min days'],
+  };
 
   return (
     <div className="relative z-10">
@@ -702,61 +931,9 @@ export default function PricingTable() {
         </h2>
       </div>
 
-      {/* Plan Type Selection - Desktop */}
-      <div className="hidden lg:block container max-w-6xl mx-auto pt-10 mb-8">
-        <div className="flex justify-center text-white">
-          <div className="flex items-center justify-between rounded-full border border-white/30 bg-black/60 backdrop-blur-sm px-2 sm:px-3 py-2 sm:py-3 glow-effect">
-            <button
-              type="button"
-              onClick={() => setCurrentPlan('standard')}
-              className={`flex items-center justify-center rounded-full text-[13px] px-4 sm:px-6 py-2 sm:py-3 sm:text-base font-bold transition-all duration-300 gap-2 ${
-                currentPlan === 'standard' 
-                  ? 'bg-[#0FF1CE] text-black border border-[#0FF1CE]' 
-                  : 'bg-transparent text-white/80 border border-white/20 hover:bg-[#0FF1CE]/10 hover:text-[#0FF1CE] hover:border-[#0FF1CE]/50'
-              }`}
-            >
-              Shockwave Standard
-            </button>
-            <button
-              type="button"
-              onClick={() => setCurrentPlan('onestep')}
-              className={`flex items-center justify-center rounded-full text-[13px] px-4 sm:px-6 py-2 sm:py-3 sm:text-base font-bold transition-all duration-300 gap-2 ${
-                currentPlan === 'onestep' 
-                  ? 'bg-[#0FF1CE] text-black border border-[#0FF1CE]' 
-                  : 'bg-transparent text-white/80 border border-white/20 hover:bg-[#0FF1CE]/10 hover:text-[#0FF1CE] hover:border-[#0FF1CE]/50'
-              }`}
-            >
-              Shockwave 1-Step
-            </button>
-            <button
-              type="button"
-              onClick={() => setCurrentPlan('instant')}
-              className={`flex items-center justify-center rounded-full text-[13px] px-4 sm:px-6 py-2 sm:py-3 sm:text-base font-bold transition-all duration-300 gap-2 ${
-                currentPlan === 'instant' 
-                  ? 'bg-[#0FF1CE] text-black border border-[#0FF1CE]' 
-                  : 'bg-transparent text-white/80 border border-white/20 hover:bg-[#0FF1CE]/10 hover:text-[#0FF1CE] hover:border-[#0FF1CE]/50'
-              }`}
-            >
-              Shockwave Instant
-            </button>
-            <button
-              type="button"
-              onClick={() => setCurrentPlan('gauntlet')}
-              className={`flex items-center justify-center rounded-full text-[13px] px-4 sm:px-6 py-2 sm:py-3 sm:text-base font-bold transition-all duration-300 gap-2 ${
-                currentPlan === 'gauntlet' 
-                  ? 'bg-[#0FF1CE] text-black border border-[#0FF1CE]' 
-                  : 'bg-transparent text-white/80 border border-white/20 hover:bg-[#0FF1CE]/10 hover:text-[#0FF1CE] hover:border-[#0FF1CE]/50'
-              }`}
-            >
-              Gauntlet
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Plan Selection */}
-      <div className="lg:hidden mb-6">
-        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+      {/* Plan, size, and details — same card on mobile and desktop */}
+      <div className="px-4">
+        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 lg:mx-auto lg:max-w-3xl lg:justify-center lg:overflow-visible lg:px-0">
           {([
             ['standard', 'Standard'],
             ['onestep', '1-Step'],
@@ -777,112 +954,18 @@ export default function PricingTable() {
             </button>
           ))}
         </div>
-      </div>
 
-      {/* Main Pricing Table - Desktop */}
-      <div className="hidden lg:block max-w-[1400px] mx-auto px-4 overflow-x-auto pt-4">
-        <div className="flex gap-0 min-w-fit">
-          {/* Left Column - Feature Labels */}
-          <div className="flex-shrink-0 w-40 pt-[80px]">
-            {data.features.map((feature, idx) => (
-              <div 
-                key={idx} 
-                className="h-[44px] flex items-center gap-2 px-2"
-              >
-                <span className="text-white text-[11px] font-medium">{feature.name}</span>
-                <div
-                  className="info-icon-small"
-                  onClick={() => setShowModal(feature.tooltip)}
-                >
-                  i
-                </div>
-              </div>
-            ))}
-            <div className="mt-2 px-2">
-              <p className="text-gray-500 text-[10px]">Activation payments are one-time payments</p>
+        <div className="mx-auto mt-4 grid max-w-3xl grid-cols-3 divide-x divide-white/10 rounded-2xl border border-white/10 bg-white/[0.04] py-3 sm:flex sm:items-center sm:justify-center sm:divide-x-0 sm:px-2">
+          {highlights[currentPlan].map((item, index) => (
+            <div key={item} className="flex h-full min-w-0 flex-col items-center justify-start gap-1.5 px-2 text-center sm:h-auto sm:flex-row sm:justify-center sm:gap-2 sm:px-0">
+              {index > 0 ? <span className="hidden h-4 w-px shrink-0 bg-white/15 sm:block" /> : null}
+              <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#0FF1CE] text-[11px] font-bold text-black">✓</span>
+              <span className="text-[11px] font-medium leading-tight text-white sm:px-1 sm:text-sm">{item}</span>
             </div>
-          </div>
-
-          {/* Account Cards */}
-          <div className="flex gap-1.5 flex-1 justify-center">
-            {availableAccounts.map((account, cardIndex) => {
-              const isBestValue = cardIndex === 2; // 100K is typically best value
-              
-              return (
-                <div 
-                  key={account} 
-                  className={`flex-shrink-0 w-[140px] relative ${isBestValue ? 'z-10' : ''}`}
-                >
-                  {/* Best Value Badge */}
-                  {isBestValue && (
-                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 z-20">
-                      <div className="bg-[#0FF1CE] text-black text-[9px] font-bold px-2.5 py-0.5 rounded-full whitespace-nowrap">
-                        Best value
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className={`rounded-lg overflow-hidden ${
-                    isBestValue 
-                      ? 'bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm border-2 border-[#0FF1CE]/50' 
-                      : 'bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm border-2 border-[#0FF1CE]/30'
-                  }`}>
-                    {/* Account Size Header */}
-                    <div className={`p-3 text-center ${isBestValue ? 'pt-4' : ''}`}>
-                      <div className="text-gray-400 text-[9px] font-medium mb-0.5">Account</div>
-                      <div className="text-white text-lg font-bold">
-                        ${account >= 1000 ? `${account / 1000}K` : account}
-                      </div>
-                    </div>
-
-                    {/* Feature Values */}
-                    <div className="flex flex-col">
-                      {data.features.map((feature, idx) => {
-                        const value = feature.values[account] || '-';
-                        const isCheckmark = value === '✓';
-                        
-                        return (
-                          <div 
-                            key={idx} 
-                            className="h-[44px] flex items-center justify-center px-1.5 border-t border-[#0FF1CE]/20"
-                          >
-                            {isCheckmark ? (
-                              <span className="text-[#0FF1CE] text-[11px] font-medium">{value}</span>
-                            ) : (
-                              <span className="text-white text-[11px] font-medium">{value}</span>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    {/* Pricing */}
-                    <div className="p-3 pt-2 border-t border-[#0FF1CE]/20">
-                      <div className="flex flex-col items-center justify-center gap-0.5 mb-2">
-                        <span className="text-[#0FF1CE] text-lg font-bold">${data.prices[account].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                      </div>
-                      
-                      <button
-                        onClick={() => {
-                          sessionStorage.setItem('preselectedBalance', account.toString());
-                          handlePurchase(`${data.name} $${account.toLocaleString()}`, data.prices[account]);
-                        }}
-                        className="w-full bg-[#0FF1CE] hover:bg-[#0AA89E] text-black font-bold py-1.5 px-2 rounded-md transition-all duration-300 hover:scale-105 text-xs"
-                      >
-                        Start now
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          ))}
         </div>
-      </div>
 
-      {/* Mobile: one selected account, FTMO-style */}
-      <div className="lg:hidden px-4">
-        <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+        <div className="-mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pb-1 lg:mx-auto lg:max-w-3xl lg:justify-center lg:overflow-visible lg:px-0">
           {availableAccounts.map((account) => {
             const isSelected = account === selectedAccount;
             return (
@@ -903,59 +986,20 @@ export default function PricingTable() {
           })}
         </div>
 
+        <div
+          ref={cardScrollerRef}
+          className="-mx-4 mt-4 flex snap-x snap-mandatory scroll-pl-4 gap-3 overflow-x-auto px-4 pb-2 hide-scrollbar md:hidden"
+        >
+          {availableAccounts.map((account) => (
+            <div key={account} id={`pricing-card-${account}`} className="w-[calc(100vw-7.5rem)] shrink-0 snap-start">
+              {renderAccountCard(account)}
+            </div>
+          ))}
+        </div>
+
         {availableAccounts.includes(selectedAccount) && (
-          <div className="mt-4 overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.04] backdrop-blur-xl">
-            <div className="border-b border-white/10 px-5 pb-4 pt-5 text-center">
-              <p className="text-xs font-medium text-white/50">{data.name}</p>
-              <h3 className="mt-1 text-3xl font-semibold tracking-tight text-white">
-                ${selectedAccount.toLocaleString()}
-              </h3>
-            </div>
-
-            <div className="divide-y divide-white/10">
-              {data.features.map((feature, index) => {
-                const value = feature.values[selectedAccount] || '-';
-                const isCheckmark = value === '✓';
-                return (
-                  <div key={index} className="flex items-center justify-between gap-4 px-5 py-3.5">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm text-white/85">{feature.name}</p>
-                        <div
-                          className="info-icon flex-shrink-0"
-                          onClick={() => setShowModal(feature.tooltip)}
-                        >
-                          i
-                        </div>
-                      </div>
-                      {feature.subtitle ? (
-                        <p className="text-xs text-white/45">{feature.subtitle}</p>
-                      ) : null}
-                    </div>
-                    <p className={`shrink-0 text-right text-sm font-semibold ${isCheckmark ? 'text-[#0FF1CE]' : 'text-white'}`}>
-                      {value}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="border-t border-white/10 p-4">
-              <div className="mb-3 text-center text-2xl font-bold text-[#0FF1CE]">
-                ${data.prices[selectedAccount].toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-              </div>
-              <button
-                type="button"
-                onClick={() => {
-                  sessionStorage.setItem('preselectedBalance', selectedAccount.toString());
-                  handlePurchase(`${data.name} $${selectedAccount.toLocaleString()}`, data.prices[selectedAccount]);
-                }}
-                className="w-full rounded-2xl bg-[#0FF1CE] py-3.5 text-base font-bold text-black transition-transform duration-300 hover:scale-[1.01]"
-              >
-                Start now
-              </button>
-              <p className="mt-3 text-center text-[11px] text-white/40">One-time activation fee</p>
-            </div>
+          <div className="mx-auto mt-4 hidden max-w-xl md:block lg:mt-6">
+            {renderAccountCard(selectedAccount)}
           </div>
         )}
       </div>
@@ -1023,36 +1067,33 @@ export default function PricingTable() {
         </button>
       </div>
 
-      {/* Info Modal */}
-      {showModal && typeof document !== 'undefined' && ReactDOM.createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 modal-container">
-          {/* Backdrop */}
-          <div 
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm modal-backdrop"
-            onClick={() => setShowModal(null)}
+      {infoModal && typeof document !== 'undefined' && ReactDOM.createPortal(
+        <div className="modal-container fixed inset-0 z-[9999] flex items-end justify-center p-3 sm:items-center sm:p-6">
+          <div
+            className="modal-backdrop absolute inset-0 bg-black/70 backdrop-blur-md"
+            onClick={() => setInfoModal(null)}
           />
-          
-          {/* Modal Content */}
-          <div className="relative bg-gradient-to-br from-[#0D0D0D] to-[#1a1a1a] border-2 border-[#0FF1CE] rounded-2xl p-6 md:p-8 max-w-md w-full shadow-2xl shadow-[#0FF1CE]/20 modal-content">
-            {/* Close Button */}
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="pricing-info-title"
+            className="modal-content relative w-full max-w-md overflow-hidden rounded-[28px] border border-white/10 bg-[#0b0d0f]/90 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.55)] backdrop-blur-2xl sm:p-7"
+          >
+            <div className="pointer-events-none absolute inset-x-8 -top-8 h-16 rounded-full bg-[#0FF1CE]/20 blur-3xl" />
             <button
-              onClick={() => setShowModal(null)}
-              className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-[#0FF1CE]/10 hover:bg-[#0FF1CE]/20 transition-colors"
-              aria-label="Close modal"
+              type="button"
+              onClick={() => setInfoModal(null)}
+              className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+              aria-label="Close"
             >
-              <span className="text-[#0FF1CE] text-xl font-bold">×</span>
+              ×
             </button>
-            
-            {/* Modal Title */}
-            <h3 className="text-[#0FF1CE] text-xl md:text-2xl font-bold mb-4">
-              {showModal.split('-').map(word => 
-                word.charAt(0).toUpperCase() + word.slice(1)
-              ).join(' ')}
+            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#0FF1CE]">Account rule</p>
+            <h3 id="pricing-info-title" className="mt-2 pr-8 text-2xl font-semibold tracking-tight text-white">
+              {infoModal.title}
             </h3>
-            
-            {/* Modal Description */}
-            <p className="text-white/90 text-sm md:text-base leading-relaxed">
-              {tooltipData[showModal]}
+            <p className="mt-3 text-sm leading-relaxed text-white/65">
+              {infoModal.body}
             </p>
           </div>
         </div>,

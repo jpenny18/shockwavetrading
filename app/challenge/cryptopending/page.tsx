@@ -14,17 +14,17 @@ export default function CryptoPendingPage() {
   }, []);
 
   return (
-    <div className="bg-gradient-to-b from-[#0D0D0D] via-[#121212] to-[#151515] text-white min-h-screen font-sans">
+    <div className="min-h-screen bg-black font-sans text-white">
       <Particles />
       
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-2xl p-8 border border-[#2F2F2F]/50">
+        <div className="rounded-[22px] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-xl">
           <div className="text-center space-y-6">
             <div className="w-16 h-16 mx-auto">
               <Loader2 className="w-16 h-16 text-[#0FF1CE] animate-spin" />
             </div>
             
-            <h1 className="text-3xl font-bold text-white">Payment Pending</h1>
+            <h1 className="text-3xl font-semibold tracking-tight text-white">Payment Pending</h1>
             
             <div className="max-w-lg mx-auto space-y-4 text-gray-300">
               <p>
@@ -38,7 +38,7 @@ export default function CryptoPendingPage() {
               </p>
             </div>
 
-            <div className="pt-6 border-t border-[#2F2F2F]/50 space-y-4">
+            <div className="pt-6 border-t border-white/10 space-y-4">
               <p className="text-sm text-gray-400">
                 Having issues? Contact our support at{' '}
                 <a href="mailto:support@shockwave-capital.com" className="text-[#0FF1CE] hover:underline">
@@ -48,7 +48,7 @@ export default function CryptoPendingPage() {
               
               <button
                 onClick={() => router.push('/dashboard')}
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[#0FF1CE]/10 hover:bg-[#0FF1CE]/20 text-[#0FF1CE] rounded-xl transition-colors"
+                className="inline-flex items-center gap-2 rounded-2xl bg-[#0FF1CE] px-6 py-3 font-bold text-black shadow-[0_8px_30px_rgba(15,241,206,0.22)] transition-transform duration-300 hover:scale-[1.02]"
               >
                 <LayoutDashboard size={18} />
                 <span>Go to Dashboard</span>

@@ -158,7 +158,7 @@ const VipCard = () => {
                         </div>
                       </button>
                     </Link>
-                    <p className="text-center text-gray-400 text-sm">Monthly payouts via bank transfer, Wise or crypto — VIP dashboard included</p>
+                    <p className="text-center text-gray-400 text-sm">Payouts in USDC (ERC-20) or USDT (Tron or Solana) — VIP dashboard included</p>
                   </div>
                 </div>
               </div>
@@ -544,24 +544,10 @@ function PayoutCard({ item }: { item: PayoutStory }) {
 }
 
 export default function ShockwaveLandingPage() {
-    const [showPromoModal, setShowPromoModal] = useState(false);
-    
-    useEffect(() => {
-      const timer = setTimeout(() => {
-        setShowPromoModal(true);
-      }, 5000);
-
-      return () => clearTimeout(timer);
-    }, []);
-
     return (
       <div className="bg-black text-white min-h-screen font-sans">
         <Header />
-
-        <PromotionalModal
-          isOpen={showPromoModal}
-          onClose={() => setShowPromoModal(false)}
-        />
+        <PromotionalModal isOpen={false} onClose={() => {}} />
         
         {/* Hero Section */}
         <section className="relative z-10 px-6 pt-36 md:pt-44 pb-12 md:pb-10 text-center overflow-hidden bg-black">
@@ -585,7 +571,7 @@ export default function ShockwaveLandingPage() {
 
               {/* Title */}
               <h1 className="text-5xl md:text-6xl font-extrabold bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-transparent bg-clip-text mb-8 leading-tight">
-                We sponsor your<br />trading journey
+                The highest drawdown<br />CFD prop firm
               </h1>
 
               {/* Stats Cards */}
@@ -618,34 +604,18 @@ export default function ShockwaveLandingPage() {
             </div>
        
 
-            {/* Payouts showcase card with running glow border */}
-            <div className="relative max-w-3xl mx-auto rounded-2xl p-[2px] overflow-hidden">
-              <div
-                className={`
-                  absolute 
-                  inset-[-200%] 
-                  animate-[borderGlowSpin_7.5s_linear_infinite]
-                  md:inset-0 
-                  md:w-full 
-                  md:h-full
-                `}
-                style={{
-                  background: 'conic-gradient(from 0deg, transparent 0deg, transparent 320deg, rgba(15, 241, 206, 0.2) 340deg, #0FF1CE 350deg, #ffffff 355deg, #00D9FF 358deg, transparent 360deg)'
-                }}
-              />
-              <div className="relative bg-black rounded-[14px] px-2.5 py-6 md:px-8 md:py-7 border border-[#0FF1CE]/10">
-                <div className="flex flex-row justify-between items-center gap-2 md:grid md:grid-cols-3 md:gap-4">
-                  {[
-                    { value: "$2M+", label: "Paid Out" },
-                    { value: "4 Hours", label: "Avg. Processing Time" },
-                    { value: "1,000+", label: "Funded Traders" }
-                  ].map(({ value, label }) => (
-                    <div key={label} className="flex-1 text-center">
-                      <div className="text-2xl md:text-3xl font-bold text-[#0FF1CE] mb-1">{value}</div>
-                      <div className="text-xs md:text-sm text-gray-400">{label}</div>
-                    </div>
-                  ))}
-                </div>
+            <div className="mx-auto max-w-3xl overflow-hidden rounded-[22px] border border-white/10 bg-white/[0.04] backdrop-blur-xl">
+              <div className="grid grid-cols-3 divide-x divide-white/10">
+                {[
+                  { value: "$2M+", label: "Paid out" },
+                  { value: "1 Hour", label: "Processing" },
+                  { value: "1,000+", label: "Funded traders" }
+                ].map(({ value, label }) => (
+                  <div key={label} className="px-2 py-5 text-center md:px-6 md:py-7">
+                    <div className="text-2xl font-semibold tracking-tight text-white md:text-4xl">{value}</div>
+                    <div className="mt-1 text-[10px] font-medium uppercase tracking-[0.14em] text-white/45 md:text-xs">{label}</div>
+                  </div>
+                ))}
               </div>
             </div>
       
@@ -664,7 +634,7 @@ export default function ShockwaveLandingPage() {
                 Live interviews and verified certificates. Pass, trade, request a payout.
               </p>
               <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-                {['15% max drawdown', '1:200 leverage', '14-day payouts'].map((item) => (
+                {['15% max drawdown', '1:200 leverage', 'On-demand payouts'].map((item) => (
                   <span
                     key={item}
                     className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-xs font-medium text-white/80 backdrop-blur-xl"
@@ -722,7 +692,7 @@ export default function ShockwaveLandingPage() {
             {/* First set of certificates */}
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((index) => (
               <div key={`first-${index}`} className="flex-shrink-0 mx-4">
-                <div className="relative aspect-[4/3] rounded-lg overflow-hidden w-64 md:w-80 hover:scale-105 transition-all duration-300">
+                <div className="relative aspect-[4/3] w-64 overflow-hidden rounded-[18px] border border-white/10 md:w-80">
                   {/* Payout certificate image */}
                   <Image
                     src={`/certificates/certificate-${index}.png`}
@@ -755,7 +725,7 @@ export default function ShockwaveLandingPage() {
             {/* Duplicate set for seamless loop */}
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((index) => (
               <div key={`second-${index}`} className="flex-shrink-0 mx-4">
-                <div className="relative aspect-[4/3] rounded-lg overflow-hidden w-64 md:w-80 hover:scale-105 transition-all duration-300">
+                <div className="relative aspect-[4/3] w-64 overflow-hidden rounded-[18px] border border-white/10 md:w-80">
                   {/* Payout certificate image */}
                   <Image
                     src={`/certificates/certificate-${index}.png`}
@@ -793,7 +763,7 @@ export default function ShockwaveLandingPage() {
           <div className="absolute bottom-1/3 left-0 w-1/2 h-[300px] bg-[#0FF1CE]/[0.01] blur-[120px] rounded-full"></div>
           <div className="relative z-10 max-w-6xl mx-auto">
             <div className="text-center mb-8 md:mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-[#0FF1CE] mb-3 md:mb-4">How It Works</h2>
+              <h2 className="mb-3 text-3xl font-semibold tracking-tight text-white md:mb-4 md:text-4xl">How It Works</h2>
               <p className="text-gray-400 text-sm md:text-base max-w-2xl mx-auto">
                 Get started in three simple steps and begin your journey to becoming a funded trader
               </p>
@@ -805,40 +775,30 @@ export default function ShockwaveLandingPage() {
                 {
                   icon: "1",
                   title: "Create Your Account",
-                  description: "Choose your evaluation plan and gain immediate access to a live-market simulated environment."
+                  description: "Choose your evaluation plan and gain immediate access to a live trading environment."
                 },
                 {
                   icon: "2",
                   title: "Complete the Challenge",
-                  description: "Demonstrate consistency, discipline, and strategic risk management in real-time simulated conditions."
+                  description: "Demonstrate consistency, discipline, and strategic risk management in live market conditions."
                 },
                 {
                   icon: "3",
-                  title: "Progress to Simulated Funded Status",
-                  description: "Once your performance meets the challenge criteria, you'll be transitioned into our Simulated Funded Program — designed to mirror the pressure and opportunity of trading at scale."
+                  title: "Progress to a Funded Account",
+                  description: "Once your performance meets the challenge criteria, you'll move into a funded account and trade live capital at scale."
                 },
-              ].map(({ icon, title, description }, index) => (
+              ].map(({ icon, title, description }) => (
                 <div
                   key={title}
-                  className="group relative bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-6 border-2 border-[#0FF1CE]/30 hover:border-[#0FF1CE]/50 transition-all duration-300 hover:scale-105 overflow-hidden"
-                  style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}
+                  className="relative overflow-hidden rounded-[22px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl"
                 >
-                  {/* Background glow */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-[#0FF1CE]/10 blur-[40px] rounded-full"></div>
-                  
                   <div className="relative z-10">
-                    {/* Step Number Badge */}
-                    <div className="w-12 h-12 rounded-full bg-[#0FF1CE]/10 border-2 border-[#0FF1CE] flex items-center justify-center mb-4">
-                      <span className="text-[#0FF1CE] text-xl font-bold">{icon}</span>
+                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04]">
+                      <span className="text-xl font-bold text-[#0FF1CE]">{icon}</span>
                     </div>
-
-                    {/* Content */}
-                    <h3 className="text-xl font-bold text-white mb-3">{title}</h3>
-                    <p className="text-gray-400 text-sm leading-relaxed">{description}</p>
+                    <h3 className="mb-3 text-xl font-semibold text-white">{title}</h3>
+                    <p className="text-sm leading-relaxed text-white/55">{description}</p>
                   </div>
-
-                  {/* Hover effect */}
-                  <div className="absolute inset-0 rounded-2xl bg-[#0FF1CE]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                 </div>
               ))}
             </div>
@@ -849,31 +809,26 @@ export default function ShockwaveLandingPage() {
                 {
                   icon: "1",
                   title: "Create Your Account",
-                  description: "Choose your evaluation plan and gain immediate access to a live-market simulated environment."
+                  description: "Choose your evaluation plan and gain immediate access to a live trading environment."
                 },
                 {
                   icon: "2",
                   title: "Complete the Challenge",
-                  description: "Demonstrate consistency, discipline, and strategic risk management in real-time simulated conditions."
+                  description: "Demonstrate consistency, discipline, and strategic risk management in live market conditions."
                 },
                 {
                   icon: "3",
-                  title: "Progress to Simulated Funded Status",
-                  description: "Once your performance meets the challenge criteria, you'll be transitioned into our Simulated Funded Program."
+                  title: "Progress to a Funded Account",
+                  description: "Once your performance meets the challenge criteria, you'll move into a funded account."
                 },
               ].map(({ icon, title, description }, index) => (
                 <div key={title} className="relative">
                   {/* Card */}
-                  <div className="relative bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl p-5 border-2 border-[#0FF1CE]/30 overflow-hidden"
-                    style={{ boxShadow: '0 0 15px rgba(15, 241, 206, 0.1)' }}>
-                    
-                    {/* Background glow */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-[#0FF1CE]/10 blur-[30px] rounded-full"></div>
+                  <div className="relative overflow-hidden rounded-[22px] border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl">
                     
                     <div className="relative z-10">
-                      {/* Step Number Badge */}
                       <div className="flex items-start gap-4 mb-3">
-                        <div className="w-10 h-10 rounded-full bg-[#0FF1CE]/10 border-2 border-[#0FF1CE] flex items-center justify-center flex-shrink-0">
+                        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04]">
                           <span className="text-[#0FF1CE] text-lg font-bold">{icon}</span>
                         </div>
                         <div className="flex-1">
@@ -899,7 +854,7 @@ export default function ShockwaveLandingPage() {
             {/* CTA Button */}
             <div className="text-center mt-10 md:mt-12">
               <Link href="/challenge">
-                <button className="px-8 md:px-12 py-3 md:py-4 bg-[#0FF1CE] text-black text-base md:text-lg font-bold rounded-lg hover:scale-105 transition-transform shadow-lg hover:shadow-[#0FF1CE]/20">
+                <button className="rounded-2xl bg-[#0FF1CE] px-8 py-3.5 text-base font-bold text-black shadow-[0_8px_30px_rgba(15,241,206,0.22)] transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98] md:px-12 md:text-lg">
                   Start Your Challenge
                 </button>
               </Link>
@@ -921,18 +876,14 @@ export default function ShockwaveLandingPage() {
         <section className="py-12 md:py-20 px-4 md:px-6 bg-black relative overflow-hidden">
           <div className="absolute top-1/2 right-1/4 w-1/2 h-[350px] bg-[#0FF1CE]/[0.02] blur-[130px] rounded-full"></div>
           <div className="relative z-10">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-[#0FF1CE] mb-3 md:mb-6">Performance Scaling Plan</h2>
+            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-center text-white mb-3 md:mb-6">Performance Scaling Plan</h2>
             <p className="text-gray-300 text-center text-sm md:text-base max-w-3xl mx-auto mb-8 md:mb-12">
               We believe trader development is a journey — not a one-time event. That's why Shockwave Capital offers an ongoing scale-up path for consistent performers.
             </p>
 
-            <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12">
+            <div className="-mx-4 flex snap-x snap-mandatory scroll-pl-4 gap-3 overflow-x-auto px-4 pb-2 hide-scrollbar md:mx-auto md:grid md:max-w-7xl md:snap-none md:grid-cols-2 md:gap-12 md:overflow-visible md:px-0 md:pb-0">
               {/* Overview Card */}
-              <div className="relative bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl md:rounded-2xl p-5 md:p-8 border-2 border-[#0FF1CE]/30 hover:border-[#0FF1CE]/50 hover:scale-[1.01] transition-all duration-300 overflow-hidden"
-                style={{ boxShadow: '0 0 15px rgba(15, 241, 206, 0.1)' }}>
-                {/* Background glow */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2/3 h-2/3 bg-[#0FF1CE]/10 blur-[60px] rounded-full"></div>
-                
+              <div className="relative flex w-[calc(100vw-7.5rem)] shrink-0 snap-start flex-col overflow-hidden rounded-[22px] border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl md:w-auto md:shrink md:p-8">
                 <div className="relative z-10">
                   <h3 className="text-xl md:text-2xl font-bold text-white mb-4 md:mb-8">Scaling plan <span className="text-[#0FF1CE]">overview</span></h3>
                 <ul className="space-y-3 md:space-y-6 text-sm md:text-base">
@@ -941,7 +892,7 @@ export default function ShockwaveLandingPage() {
                     "Balance Scale up of 50% every 3 months",
                     "Ongoing increases every 3 months if objectives are met",
                     "Trading Objectives remain the same as your original plan on increased balance",
-                    "Maximum Allocation per trader of $5 million Simulated Account"
+                    "Maximum allocation per trader of $5 million on a funded account"
                   ].map((item, index) => (
                     <li key={index} className="flex items-start space-x-3 md:space-x-4 group">
                       <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-[#0FF1CE]/10 flex items-center justify-center mt-0.5 md:mt-1 group-hover:scale-110 transition-transform shrink-0">
@@ -953,7 +904,7 @@ export default function ShockwaveLandingPage() {
                 </ul>
                   <div className="mt-6 md:mt-8">
                     <Link href="/challenge">
-                      <button className="w-full md:w-auto px-4 py-2 md:px-8 md:py-4 bg-[#0FF1CE] text-black text-sm md:text-lg font-bold rounded-lg hover:scale-105 transition-transform">
+                      <button className="w-full rounded-2xl bg-[#0FF1CE] px-8 py-3.5 text-base font-bold text-black shadow-[0_8px_30px_rgba(15,241,206,0.22)] transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98] md:w-auto">
                         Get Funded
                       </button>
                     </Link>
@@ -962,18 +913,14 @@ export default function ShockwaveLandingPage() {
               </div>
 
               {/* Table Card */}
-              <div className="relative bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl md:rounded-2xl p-5 md:p-8 border-2 border-[#0FF1CE]/30 hover:border-[#0FF1CE]/50 overflow-hidden hover:scale-[1.01] transition-all duration-300"
-                style={{ boxShadow: '0 0 15px rgba(15, 241, 206, 0.1)' }}>
-                {/* Background glow */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2/3 h-2/3 bg-[#0FF1CE]/10 blur-[60px] rounded-full"></div>
-                
+              <div className="relative flex w-[calc(100vw-7.5rem)] shrink-0 snap-start flex-col overflow-hidden rounded-[22px] border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl md:w-auto md:shrink md:p-8">
                 <div className="relative z-10">
                 <div className="overflow-x-auto -mx-5 px-5 md:mx-0 md:px-0">
                   <table className="w-full text-sm md:text-base">
                     <thead>
-                      <tr className="border-b border-[#0FF1CE]/20">
-                        <th className="py-3 md:py-4 px-3 md:px-6 text-left text-[#0FF1CE] font-bold">Elapsed Time</th>
-                        <th className="py-3 md:py-4 px-3 md:px-6 text-right text-[#0FF1CE] font-bold">Simulated Capital</th>
+                      <tr className="border-b border-white/10">
+                        <th className="py-3 md:py-4 px-3 md:px-6 text-left text-white/50 text-xs font-semibold uppercase tracking-wider">Elapsed Time</th>
+                        <th className="py-3 md:py-4 px-3 md:px-6 text-right text-white/50 text-xs font-semibold uppercase tracking-wider">Funded Capital</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -990,7 +937,7 @@ export default function ShockwaveLandingPage() {
                       ].map((row, index) => (
                         <tr 
                           key={index}
-                          className="border-b border-[#2F2F2F] last:border-b-0 hover:bg-[#0FF1CE]/5 transition-colors group"
+                          className="border-b border-white/10 last:border-b-0"
                         >
                           <td className="py-2 md:py-4 px-3 md:px-6 text-left text-gray-300 group-hover:text-white transition-colors">
                             {row.time}
@@ -1004,7 +951,7 @@ export default function ShockwaveLandingPage() {
                   </table>
                 </div>
                   <div className="mt-4 md:mt-6 text-xs md:text-sm text-gray-400">
-                    Simulated capital increments on the Shockwave Funded Account can occur every 3 months. To qualify for a capital increase, the trader must generate at least 10% net profit over 3 consecutive months.
+                    Funded capital can increase every 3 months. To qualify, the trader must generate at least 10% net profit over 3 consecutive months.
                   </div>
                 </div>
               </div>
@@ -1016,120 +963,74 @@ export default function ShockwaveLandingPage() {
         <section className="py-12 md:py-20 px-4 md:px-6 bg-black relative overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-[400px] bg-[#0FF1CE]/[0.015] blur-[130px] rounded-full"></div>
           <div className="relative z-10">
-            <h2 className="text-3xl md:text-4xl font-bold text-center text-[#0FF1CE] mb-3 md:mb-6">How we compare?</h2>
+            <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-center text-white mb-3 md:mb-6">How we compare</h2>
             <p className="text-gray-300 text-center text-sm md:text-base max-w-3xl mx-auto mb-8 md:mb-16">
               Discover how Shockwave Capital stands out in the industry and compares to other leading prop firms.
             </p>
 
-            {/* Comparison Section Table */}
-            <div className="max-w-7xl mx-auto overflow-x-auto pb-4 px-4 md:px-8 py-2 md:py-4">
-              <div className="min-w-[768px] grid grid-cols-4 gap-px bg-[#0FF1CE]/20 rounded-2xl overflow-hidden border-2 border-[#0FF1CE]/30 transform hover:scale-[1.01] hover:border-[#0FF1CE]/50 transition-all duration-300 mx-auto"
-                style={{ boxShadow: '0 0 30px rgba(15, 241, 206, 0.15)' }}>
-                {/* Header Row */}
-                <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 p-4 md:p-8 flex items-center justify-center"></div>
-                <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 p-4 md:p-8 flex flex-col items-center justify-center">
-                  <div className="bg-gradient-to-br from-[#0FF1CE]/20 to-[#0FF1CE]/5 p-3 md:p-4 rounded-xl md:rounded-2xl mb-2 md:mb-4 w-20 h-20 md:w-40 md:h-40 flex items-center justify-center border border-[#0FF1CE]/30">
-                    <Image src="/logo.png" alt="Shockwave Capital" width={120} height={120} className="w-16 h-16 md:w-32 md:h-32" />
-                  </div>
-                  <span className="text-[#0FF1CE] font-bold text-base md:text-xl">Shockwave</span>
+            <div className="mx-auto max-w-5xl overflow-hidden rounded-[22px] border border-white/10 bg-white/[0.04] backdrop-blur-xl">
+              <div className="hidden border-b border-white/10 md:grid md:grid-cols-[minmax(180px,1.35fr)_repeat(3,1fr)]">
+                <div />
+                <div className="flex flex-col items-center gap-2 bg-white/[0.05] px-4 py-5">
+                  <Image src="/logo.png" alt="Shockwave Capital" width={48} height={48} className="h-10 w-10" />
+                  <span className="text-sm font-semibold text-[#0FF1CE]">Shockwave</span>
                 </div>
-                <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 p-4 md:p-8 flex flex-col items-center justify-center">
-                  <div className="bg-gradient-to-br from-[#0FF1CE]/5 to-transparent p-3 md:p-4 rounded-xl md:rounded-2xl mb-2 md:mb-4 w-20 h-20 md:w-40 md:h-40 flex items-center justify-center border border-[#0FF1CE]/20">
-                    <span className="text-lg md:text-2xl font-bold text-white">FTMO</span>
+                <div className="flex items-center justify-center px-4 py-5 text-sm font-semibold text-white/70">FTMO</div>
+                <div className="flex items-center justify-center px-4 py-5 text-sm font-semibold text-white/70">FundedNext</div>
+              </div>
+
+              {[
+                { feature: "Max Drawdown", shockwave: "15%", ftmo: "10%", fundedNext: "10%" },
+                { feature: "Max Daily Drawdown", shockwave: "8%", ftmo: "5%", fundedNext: "5%" },
+                { feature: "Leverage", shockwave: "1:200", ftmo: "1:30", fundedNext: "1:100" },
+                { feature: "First Payout", shockwave: "On-demand", ftmo: "14 Days", fundedNext: "21 Days" },
+                { feature: "Instant Funding", shockwave: true, ftmo: false, fundedNext: false },
+                { feature: "Max Allocation", shockwave: "$500k", ftmo: "$400k", fundedNext: "$300k" },
+                { feature: "Minimum Trading Days", shockwave: "None", ftmo: "5", fundedNext: "5" },
+                { feature: "Weekend Holding", shockwave: true, ftmo: false, fundedNext: true }
+              ].map((row) => (
+                <div
+                  key={row.feature}
+                  className="border-b border-white/10 px-4 py-4 last:border-b-0 md:grid md:grid-cols-[minmax(180px,1.35fr)_repeat(3,1fr)] md:items-center md:px-0 md:py-0"
+                >
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/45 md:px-6 md:py-4 md:text-sm md:font-medium md:normal-case md:tracking-normal md:text-white/80">
+                    {row.feature}
                   </div>
-                  <span className="text-white font-bold text-base md:text-xl">FTMO</span>
-                </div>
-                <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 p-4 md:p-8 flex flex-col items-center justify-center">
-                  <div className="bg-gradient-to-br from-[#0FF1CE]/5 to-transparent p-3 md:p-4 rounded-xl md:rounded-2xl mb-2 md:mb-4 w-20 h-20 md:w-40 md:h-40 flex items-center justify-center border border-[#0FF1CE]/20">
-                    <span className="text-xs md:text-2xl font-bold text-white">FundedNext</span>
-                  </div>
-                  <span className="text-white font-bold text-base md:text-xl">FundedNext</span>
-                </div>
-
-                {/* Comparison Rows */}
-                {[
-                  {
-                    feature: "Max Drawdown",
-                    shockwave: "15%",
-                    ftmo: "10%",
-                    fundedNext: "10%"
-                  },
-                  {
-                    feature: "Max Daily Drawdown",
-                    shockwave: "8%",
-                    ftmo: "5%",
-                    fundedNext: "5%"
-                  },
-
-                  {
-                    feature: "Leverage",
-                    shockwave: "1:200",
-                    ftmo: "1:30",
-                    fundedNext: "1:100"
-                  },
-
-                  {
-                    feature: "First Payout Eligibility",
-                    shockwave: "14 Days",
-                    ftmo: "14 Days",
-                    fundedNext: "21 Days"
-                  },
-        
-                  {
-                    feature: "Simulated Instant Access",
-                    shockwave: true,
-                    ftmo: false,
-                    fundedNext: false
-                  },
-                  {
-                    feature: "Simulated Max Allocation",
-                    shockwave: "$500k",
-                    ftmo: "$400k",
-                    fundedNext: "$300k"
-                  },
-                  {
-                    feature: "Minimum Trading Days",
-                    shockwave: "5",
-                    ftmo: "5",
-                    fundedNext: "5"
-                  },
-                  {
-                    feature: "Weekend Holding",
-                    shockwave: true,
-                    ftmo: false,
-                    fundedNext: true
-                  }
-                ].map((row, index) => (
-                  <React.Fragment key={index}>
-                    <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 p-3 md:p-6 flex items-center font-medium text-white border-t border-[#0FF1CE]/20 text-xs md:text-base">
-                      {row.feature}
-                    </div>
-                    {[row.shockwave, row.ftmo, row.fundedNext].map((value, i) => (
-                      <div key={i} className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 p-3 md:p-6 flex items-center justify-center border-t border-[#0FF1CE]/20 group hover:bg-[#0FF1CE]/15 transition-colors">
-                        {typeof value === 'boolean' ? (
-                          value ? (
-                            <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#0FF1CE]/10 flex items-center justify-center group-hover:scale-110 transition-transform border border-[#0FF1CE]/30">
-                              <span className="text-[#0FF1CE] text-lg md:text-2xl">✓</span>
-                            </div>
+                  <div className="mt-3 grid grid-cols-3 gap-2 md:contents md:mt-0">
+                    {[
+                      { name: "Shockwave", value: row.shockwave, highlight: true },
+                      { name: "FTMO", value: row.ftmo, highlight: false },
+                      { name: "FundedNext", value: row.fundedNext, highlight: false }
+                    ].map((column) => (
+                      <div
+                        key={column.name}
+                        className={`flex flex-col items-center justify-center rounded-2xl border px-1.5 py-2.5 text-center md:rounded-none md:border-0 md:px-4 md:py-4 ${
+                          column.highlight
+                            ? 'border-[#0FF1CE]/25 bg-[#0FF1CE]/10 md:bg-white/[0.05]'
+                            : 'border-white/10 bg-black/30 md:bg-transparent'
+                        }`}
+                      >
+                        <span className="mb-1 text-[10px] font-medium text-white/40 md:hidden">{column.name}</span>
+                        {typeof column.value === 'boolean' ? (
+                          column.value ? (
+                            <span className="text-base font-semibold text-[#0FF1CE]">✓</span>
                           ) : (
-                            <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-red-500/10 flex items-center justify-center group-hover:scale-110 transition-transform border border-red-500/30">
-                              <span className="text-red-500 text-lg md:text-2xl">×</span>
-                            </div>
+                            <span className="text-base font-semibold text-red-400">×</span>
                           )
                         ) : (
-                          <span className={`font-bold text-xs md:text-base ${i === 0 ? 'text-[#0FF1CE]' : 'text-white'}`}>{value}</span>
+                          <span className={`text-sm font-semibold ${column.highlight ? 'text-[#0FF1CE]' : 'text-white'}`}>{column.value}</span>
                         )}
                       </div>
                     ))}
-                  </React.Fragment>
-                ))}
-              </div>
+                  </div>
+                </div>
+              ))}
             </div>
 
             {/* CTA Button */}
             <div className="max-w-4xl mx-auto mt-8 md:mt-16 text-center">
               <Link href="/challenge">
-                <button className="px-6 py-3 md:px-8 md:py-4 bg-[#0FF1CE] text-black text-base md:text-xl font-bold rounded-lg hover:scale-105 transition-transform shadow-lg hover:shadow-[#0FF1CE]/20">
+                <button className="rounded-2xl bg-[#0FF1CE] px-8 py-3.5 text-base font-bold text-black shadow-[0_8px_30px_rgba(15,241,206,0.22)] transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98]">
                   Choose the Best. Choose Shockwave
                 </button>
               </Link>
@@ -1141,16 +1042,16 @@ export default function ShockwaveLandingPage() {
         <section className="py-20 px-6 bg-black relative overflow-hidden">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3/4 h-3/4 bg-[#0FF1CE]/[0.05] blur-[120px] rounded-full"></div>
           <div className="relative z-10">
-            <h2 className="text-3xl font-bold text-center text-[#0FF1CE] mb-6">Global Network</h2>
+            <h2 className="text-3xl font-semibold tracking-tight text-center text-white mb-6">Global Network</h2>
             <p className="text-base md:text-xl text-gray-300 text-center max-w-2xl mx-auto mb-16">
-              Global Access. Elite Focus. Unmatched Simulation.
+              Global Access. Elite Focus. Live Markets.
             </p>
 
             <div className="max-w-5xl mx-auto relative">
               {/* Logo positioned above SVG */}
               <div className="absolute left-1/2 -translate-x-1/2 -top-10 z-10">
                 <div className="relative">
-                  <div className="absolute inset-0 rounded-full bg-[#121212] border-2 border-[#0FF1CE] animate-pulse"></div>
+                  <div className="absolute inset-0 rounded-full border border-white/15 bg-black"></div>
                   <Image
                     src="/logo.png"
                     alt="Shockwave Capital" 
@@ -1174,7 +1075,7 @@ export default function ShockwaveLandingPage() {
                 </defs>
 
                 {/* Background Circle */}
-                <circle cx="400" cy="400" r="400" fill="#181818" />
+                <circle cx="400" cy="400" r="400" fill="#0b0d0f" />
 
                 {/* Grid Lines */}
                 <g stroke="url(#globe-gradient)" strokeWidth="1">
@@ -1274,17 +1175,17 @@ export default function ShockwaveLandingPage() {
             {/* Stats Cards - Positioned to overlap SVG */}
             <div className="relative -mt-5 md:-mt-15 px-6">
               <div className="grid grid-cols-3 gap-4 max-w-4xl mx-auto">
-                <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-4 md:p-6">
+                <div className="rounded-[22px] border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl md:p-6">
                   <h3 className="text-[#0FF1CE] text-lg md:text-4xl font-bold mb-2">24/7</h3>
                   <p className="text-gray-400 text-[0.625rem] md:text-base">Global Market Access</p>
                 </div>
-                <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-4 md:p-6">
+                <div className="rounded-[22px] border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl md:p-6">
                   <h3 className="text-[#0FF1CE] text-lg md:text-4xl font-bold mb-2">100+</h3>
                   <p className="text-gray-400 text-[0.625rem] md:text-base">Countries Supported</p>
                 </div>
-                <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-4 md:p-6">
+                <div className="rounded-[22px] border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl md:p-6">
                   <h3 className="text-[#0FF1CE] text-lg md:text-4xl font-bold mb-2">$2M+</h3>
-                  <p className="text-gray-400 text-[0.625rem] md:text-base">Simulated Capital Programs</p>
+                  <p className="text-gray-400 text-[0.625rem] md:text-base">Funded Capital</p>
                 </div>
               </div>
             </div>
@@ -1293,7 +1194,7 @@ export default function ShockwaveLandingPage() {
            <div className="absolute top-1/3 right-1/4 w-1/2 h-[300px] bg-[#0FF1CE]/[0.02] blur-[120px] rounded-full"></div>
           <div className="absolute bottom-1/3 left-1/4 w-1/2 h-[300px] bg-[#0FF1CE]/[0.015] blur-[120px] rounded-full"></div>
           <div className="relative z-10">
-            <h2 id="faq" className="text-4xl font-bold text-center text-[#0FF1CE] mb-12 mt-16 md:mt-20">FAQ</h2>
+            <h2 id="faq" className="text-4xl font-semibold tracking-tight text-center text-white mb-12 mt-16 md:mt-20">FAQ</h2>
             
             {/* Mobile Scroll Indicators */}
             <div className="relative">
@@ -1314,17 +1215,17 @@ export default function ShockwaveLandingPage() {
                     {
                       question: "What makes Shockwave different?",
                       questionShort: "We don't play small.",
-                      answer: "While other platforms overpromise and underdeliver, we offer structured simulations with higher drawdown tolerance, tighter feedback loops, and faster scaling potential — all with fully disclosed rules and performance metrics."
+                      answer: "While other platforms overpromise and underdeliver, we offer funded accounts with higher drawdown tolerance, tighter feedback loops, and faster scaling — all with fully disclosed rules and performance metrics."
                     },
                     {
                       question: "How soon can I start trading?",
                       questionShort: "Immediately after setup.",
-                      answer: "Once your account is set up and your evaluation fee is processed, you're good to go. No long waiting times, no phases to unlock — just start trading in our live-market simulation environment."
+                      answer: "Once your account is set up and your evaluation fee is processed, you're good to go. No long waiting times, no phases to unlock — start trading a live account."
                     },
                     {
                       question: "What's the payout process like?",
-                      questionShort: "Fast and straightforward.",
-                      answer: "After meeting performance benchmarks, simulated payouts become eligible after 14 days and the required number of profitable trade days. Standard accounts: up to 90% simulated share. Instant accounts: up to 70%."
+                      questionShort: "On demand. 24/7.",
+                      answer: "Request a payout any day, including weekends, as long as you have no open positions and have not breached your funded account. The minimum is $50 after Shockwave's performance split. The amount comes off your balance immediately, and you can keep trading the same account while it is processed. Payouts are sent as USDC on ERC-20, or USDT on Tron or Solana. Breached accounts cannot be paid."
                     },
                     {
                       question: "What trading styles are allowed?",
@@ -1339,45 +1240,12 @@ export default function ShockwaveLandingPage() {
                   ].map(({ question, questionShort, answer }, index) => (
                     <div
                       key={question}
-                      className="group relative bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-6 hover:scale-105 transition-all duration-300 min-w-[300px] md:min-w-0 animate-fadeIn"
-                      style={{
-                        boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)',
-                        animationDelay: `${index * 0.1}s`
-                      }}
+                      className="min-w-[280px] rounded-[22px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl md:min-w-0"
                     >
-                      {/* Chat Container */}
-                      <div className="space-y-4">
-                        {/* Trader Question */}
-                        <div className="flex flex-col space-y-2">
-                          <div className="flex items-center space-x-2 mb-2">
-                            <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center">
-                              <span className="text-sm text-white">T</span>
-                            </div>
-                            <span className="text-gray-400 text-sm">Trader</span>
-                          </div>
-                          <div className="bg-gray-800 rounded-2xl rounded-tl-none p-4 text-white text-sm">
-                            {question}
-                          </div>
-                        </div>
-
-                        {/* Shockwave Response */}
-                        <div className="flex flex-col space-y-2">
-                          <div className="flex items-center space-x-2 mb-2">
-                            <div className="w-8 h-8 rounded-full bg-[#0FF1CE] flex items-center justify-center">
-                              <span className="text-sm text-black font-bold">S</span>
-                            </div>
-                            <span className="text-[#0FF1CE] text-sm">Shockwave</span>
-                          </div>
-                          <div className="bg-[#0FF1CE]/10 backdrop-blur-sm rounded-2xl rounded-tl-none p-4">
-                            <p className="text-[#0FF1CE] font-bold mb-2">{questionShort}</p>
-                            <p className="text-gray-300 text-sm whitespace-pre-line">{answer}</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Hover gradient overlay */}
-                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#0FF1CE]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  </div>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#0FF1CE]">{questionShort}</p>
+                      <h3 className="mt-2 text-lg font-semibold text-white">{question}</h3>
+                      <p className="mt-3 text-sm leading-relaxed text-white/60 whitespace-pre-line">{answer}</p>
+                    </div>
                 ))}
                 </div>
               </div>
@@ -1387,7 +1255,7 @@ export default function ShockwaveLandingPage() {
           {/* CTA Button */}
           <div className="max-w-4xl mx-auto mt-16 text-center">
             <Link href="/challenge">
-              <button className="px-8 md:px-12 py-3 md:py-4 bg-[#0FF1CE] text-black text-sm md:text-xl font-bold rounded-lg hover:scale-105 transition-transform shadow-lg hover:shadow-[#0FF1CE]/20">
+              <button className="rounded-2xl bg-[#0FF1CE] px-8 py-3.5 text-base font-bold text-black shadow-[0_8px_30px_rgba(15,241,206,0.22)] transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98] md:px-12">
                 Stop coasting and go full throttle
               </button>
             </Link>
@@ -1403,15 +1271,12 @@ export default function ShockwaveLandingPage() {
           <div className="relative z-10">
             <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
               {/* Discord Community */}
-              <div className="relative bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-8 hover:scale-105 transition-all duration-300"
-                style={{
-                  boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)'
-                }}>
+              <div className="relative rounded-[22px] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-xl">
                 <div className="flex flex-col h-full justify-between">
                   <div>
-                    <h2 className="text-3xl md:text-4xl font-bold text-[#0FF1CE] mb-4">LEARN FROM OUR DISCORD COMMUNITY</h2>
-                    <a href="#" className="inline-block mt-6 text-[#0FF1CE] hover:text-[#0FF1CE]/80 font-bold text-lg transition-colors">
-                      JOIN OUR DISCORD →
+                    <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-white mb-4">Learn with the community</h2>
+                    <a href="#" className="mt-6 inline-flex items-center rounded-2xl bg-[#0FF1CE] px-6 py-3 text-sm font-bold text-black shadow-[0_8px_30px_rgba(15,241,206,0.22)] transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98]">
+                      Join Discord
                     </a>
                   </div>
                   <div className="mt-8">
@@ -1423,11 +1288,8 @@ export default function ShockwaveLandingPage() {
               </div>
 
               {/* Email Signup */}
-              <div className="relative bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-8 hover:scale-105 transition-all duration-300"
-                style={{
-                  boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)'
-                }}>
-                <h2 className="text-3xl md:text-4xl font-bold text-[#0FF1CE] mb-6">Subscribe for Email Updates</h2>
+              <div className="relative rounded-[22px] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-xl">
+                <h2 className="text-3xl md:text-4xl font-semibold tracking-tight text-white mb-6">Email updates</h2>
                 <form className="space-y-4">
                   <div>
                     <label htmlFor="fullName" className="block text-white mb-2">Full Name</label>
@@ -1435,7 +1297,7 @@ export default function ShockwaveLandingPage() {
                       type="text"
                       id="fullName"
                       placeholder="Type your name"
-                      className="w-full px-4 py-3 bg-[#181818] border border-[#0FF1CE]/20 rounded-lg focus:outline-none focus:border-[#0FF1CE] text-white placeholder-gray-400"
+                      className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none"
                     />
                   </div>
                   <div>
@@ -1444,10 +1306,10 @@ export default function ShockwaveLandingPage() {
                       type="email"
                       id="email"
                       placeholder="Type your email"
-                      className="w-full px-4 py-3 bg-[#181818] border border-[#0FF1CE]/20 rounded-lg focus:outline-none focus:border-[#0FF1CE] text-white placeholder-gray-400"
+                      className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none"
                     />
                   </div>
-                  <button type="submit" className="w-full md:w-auto px-8 py-3 bg-[#0FF1CE] text-black font-bold rounded-lg hover:scale-105 transition-transform">
+                  <button type="submit" className="w-full rounded-2xl bg-[#0FF1CE] px-8 py-3.5 font-bold text-black shadow-[0_8px_30px_rgba(15,241,206,0.22)] transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98] md:w-auto">
                     Submit
                   </button>
                 </form>
@@ -1472,7 +1334,7 @@ export default function ShockwaveLandingPage() {
                   className="h-auto w-auto"
                 />
                 <p className="text-gray-400 text-sm">
-                High-performance simulated trading for skilled traders. Test your strategy with industry-leading virtual conditions and 1:200 simulated leverage in our evaluation programs.
+                High-drawdown CFD funding for skilled traders. Pass the evaluation, trade a funded account, and request payouts on demand with up to 1:200 leverage.
                 </p>
                 <div className="flex space-x-4">
                   {[
@@ -1484,8 +1346,7 @@ export default function ShockwaveLandingPage() {
                     <a
                       key={icon}
                       href={href}
-                      className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm flex items-center justify-center group hover:scale-110 transition-all duration-300"
-                      style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}
+                      className="group flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-[#0FF1CE] transition-colors hover:bg-white/10"
                     >
                       <span className="text-[#0FF1CE] group-hover:text-white transition-colors">
                         {icon === 'twitter' && (
@@ -1567,9 +1428,9 @@ export default function ShockwaveLandingPage() {
                   <input
                     type="email"
                     placeholder="Enter your email"
-                    className="w-full px-4 py-2 bg-[#181818] border border-[#0FF1CE]/20 rounded-lg focus:outline-none focus:border-[#0FF1CE] text-white placeholder-gray-400"
+                    className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-2 text-white placeholder-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none"
                   />
-                  <button type="submit" className="w-full px-4 py-2 bg-[#0FF1CE] text-black font-bold rounded-lg hover:scale-105 transition-transform">
+                  <button type="submit" className="w-full rounded-2xl bg-[#0FF1CE] px-4 py-2.5 font-bold text-black shadow-[0_8px_30px_rgba(15,241,206,0.18)] transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98]">
                     Subscribe
                   </button>
                 </form>
@@ -1581,7 +1442,7 @@ export default function ShockwaveLandingPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
                 <div className="text-xs text-gray-500">
                 <p className="mb-2">
-  ⚠️ <strong>Disclaimer:</strong> Shockwave Capital provides access to simulated trading environments for educational and evaluation purposes only. No real funds are traded, invested, or deposited by participants at any stage. References to "funded accounts," "capital," "payouts," or "profit splits" refer exclusively to simulated performance metrics within our proprietary trading models.
+  ⚠️ <strong>Disclaimer:</strong> Shockwave Capital provides funded trading accounts after an evaluation. Payouts can be requested on demand when you have no open positions and have not breached the account. A breached funded account cannot receive a payout.
 </p>
 
 <p className="mb-2">
@@ -1589,11 +1450,11 @@ export default function ShockwaveLandingPage() {
 </p>
 
 <p className="mb-2">
-  All trading activity on our platform takes place in a simulated environment using live or delayed market data. Any strategies executed, profits generated, or losses incurred are part of a simulated experience and do not reflect actual market performance or real financial gain/loss.
+  Funded accounts trade live market conditions. The requested payout is deducted from the account balance immediately, and you can keep trading that same account while the payout is processed. The minimum payout is $50 after Shockwave's performance split. Payouts are sent as USDC on ERC-20, or USDT on Tron or Solana.
 </p>
 
 <p className="mb-2">
-  By purchasing access to any evaluation or subscription plan, you acknowledge and agree to our Terms of Use, Privacy Policy, and Program Rules. All purchases are final. Fees are non-refundable once your simulated trading account is activated or access to our services is granted.
+  By purchasing access to any evaluation or subscription plan, you acknowledge and agree to our Terms of Use, Privacy Policy, and Program Rules. All purchases are final. Fees are non-refundable once your funded account is activated or access to our services is granted.
 </p>
 
 <p className="mb-2">
@@ -1601,7 +1462,7 @@ export default function ShockwaveLandingPage() {
 </p>
 
 <p className="mb-2">
-  Trading leveraged products like forex, indices, and commodities carries inherent risk. Even in simulated environments, practicing risk management and caution is essential. Past simulated performance is not indicative of future results.
+  Trading leveraged products like forex, indices, and commodities carries inherent risk. Risk management is essential. Past performance is not indicative of future results.
 </p>
 
                   <p>

@@ -77,7 +77,7 @@ export default function SuccessPage() {
   }
 
   return (
-    <div className="bg-gradient-to-b from-[#0D0D0D] via-[#121212] to-[#151515] text-white min-h-screen font-sans">
+    <div className="min-h-screen bg-black font-sans text-white">
       {/* Background Effects */}
       <div className="absolute top-0 left-0 w-full h-full bg-[#0FF1CE]/[0.02] background-noise"></div>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:w-3/4 h-full rounded-full bg-[#0FF1CE]/[0.03] blur-[150px] opacity-60"></div>
@@ -92,19 +92,19 @@ export default function SuccessPage() {
           <span>Back to Home</span>
         </button>
 
-        <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-2xl p-6 md:p-8 border border-[#2F2F2F]/50">
+        <div className="rounded-[22px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl md:p-8">
           <div className="flex items-center gap-4 mb-8">
             <div className="w-12 h-12 rounded-full bg-[#0FF1CE]/10 flex items-center justify-center">
               <CheckCircle className="h-6 w-6 text-[#0FF1CE]" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-white">Payment Successful</h1>
+              <h1 className="text-2xl font-semibold tracking-tight text-white">Payment Successful</h1>
               <p className="text-gray-400">Your challenge has been created successfully</p>
             </div>
           </div>
           
           {/* Email confirmation notice */}
-          <div className="bg-[#0FF1CE]/10 rounded-lg p-4 mb-6 flex items-start gap-3">
+          <div className="mb-6 flex items-start gap-3 rounded-[18px] border border-white/10 bg-black/30 p-4">
             <Mail className="h-5 w-5 text-[#0FF1CE] mt-0.5 flex-shrink-0" />
             <div>
               <p className="text-white text-sm">
@@ -117,27 +117,27 @@ export default function SuccessPage() {
           </div>
 
           <div className="space-y-4">
-            <div className="flex justify-between py-2 border-b border-[#2F2F2F]/50">
+            <div className="flex justify-between py-2 border-b border-white/10">
               <span className="text-gray-400">Order number</span>
               <span className="text-white">{paymentData.orderId}</span>
             </div>
-            <div className="flex justify-between py-2 border-b border-[#2F2F2F]/50">
+            <div className="flex justify-between py-2 border-b border-white/10">
               <span className="text-gray-400">Account Size</span>
               <span className="text-white">{challengeData.amount}</span>
             </div>
-            <div className="flex justify-between py-2 border-b border-[#2F2F2F]/50">
+            <div className="flex justify-between py-2 border-b border-white/10">
               <span className="text-gray-400">Account Type</span>
               <span className="text-white">{challengeData.type}</span>
             </div>
-            <div className="flex justify-between py-2 border-b border-[#2F2F2F]/50">
+            <div className="flex justify-between py-2 border-b border-white/10">
               <span className="text-gray-400">Platform</span>
               <span className="text-white">{challengeData.platform}</span>
             </div>
-            <div className="flex justify-between py-2 border-b border-[#2F2F2F]/50">
+            <div className="flex justify-between py-2 border-b border-white/10">
               <span className="text-gray-400">Trading Account Currency</span>
               <span className="text-white">USD</span>
             </div>
-            <div className="flex justify-between py-2 border-b border-[#2F2F2F]/50">
+            <div className="flex justify-between py-2 border-b border-white/10">
               <span className="text-gray-400">Payment Method</span>
               <span className="text-white">{paymentData.paymentMethod === 'card' ? 'Credit/Debit Card' : 'Cryptocurrency'}</span>
             </div>

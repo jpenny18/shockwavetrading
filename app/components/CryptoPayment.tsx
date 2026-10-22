@@ -214,23 +214,23 @@ export default function CryptoPayment({ challengeData, successRedirectPath, onPr
           <button
             key={crypto}
             onClick={() => handleCryptoSelect(crypto)}
-            className={`p-4 rounded-xl border ${
+            className={`rounded-[18px] border p-4 transition-colors ${
               selectedCrypto === crypto
-                ? 'border-[#0FF1CE] bg-[#0FF1CE]/10'
-                : 'border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50'
-            } transition-colors`}
+                ? 'border-[#0FF1CE] bg-[#0FF1CE] text-black'
+                : 'border-white/10 bg-white/[0.04] text-white hover:border-white/20'
+            }`}
           >
             <div className="text-center">
               <div className="font-medium">
                 {crypto}
               </div>
               {crypto === 'USDT' && (
-                <div className="text-xs text-gray-400">
+                <div className="text-xs opacity-70">
                   (TRC20)
                 </div>
               )}
               {crypto === 'USDC' && (
-                <div className="text-xs text-gray-400">
+                <div className="text-xs opacity-70">
                   (SOL)
                 </div>
               )}
@@ -239,7 +239,7 @@ export default function CryptoPayment({ challengeData, successRedirectPath, onPr
         ))}
       </div>
 
-      <div className="bg-[#151515] rounded-xl p-4 border border-[#2F2F2F]/50">
+      <div className="rounded-[18px] border border-white/10 bg-black/30 p-4">
         <div className="text-center mb-4">
           <div className="text-lg font-medium">
             {pricesReady
@@ -266,7 +266,7 @@ export default function CryptoPayment({ challengeData, successRedirectPath, onPr
 
       {/* Payment Details */}
       <div className="space-y-4">
-        <div className="bg-[#151515] rounded-xl p-4 border border-[#2F2F2F]/50">
+        <div className="rounded-[18px] border border-white/10 bg-black/30 p-4">
           <div className="text-center mb-4">
             <div className="text-sm text-gray-400 mb-1">Send exactly</div>
             <div className="text-2xl font-bold text-[#0FF1CE]">
@@ -288,7 +288,7 @@ export default function CryptoPayment({ challengeData, successRedirectPath, onPr
             />
           </div>
 
-          <div className="flex items-center gap-2 bg-[#1A1A1A] rounded-lg p-3">
+          <div className="flex items-center gap-2 rounded-2xl border border-white/10 bg-black/40 p-3">
             <div className="flex-1 font-mono text-sm truncate">
               {CRYPTO_ADDRESSES[selectedCrypto]}
             </div>
@@ -303,10 +303,10 @@ export default function CryptoPayment({ challengeData, successRedirectPath, onPr
         </div>
 
         {/* Verification Phrase */}
-        <div className="bg-[#151515] rounded-xl p-4 border border-[#2F2F2F]/50">
+        <div className="rounded-[18px] border border-white/10 bg-black/30 p-4">
           <div className="mb-4">
             <div className="text-sm text-gray-400 mb-2">Type this phrase to verify:</div>
-            <div className="font-mono bg-[#1A1A1A] p-3 rounded-lg text-[#0FF1CE] text-sm">
+            <div className="rounded-2xl border border-white/10 bg-black/40 p-3 font-mono text-sm text-[#0FF1CE]">
               {verificationPhrase.join(' ')}
             </div>
           </div>
@@ -317,7 +317,7 @@ export default function CryptoPayment({ challengeData, successRedirectPath, onPr
             onChange={(e) => setUserPhrase(e.target.value)}
             onPaste={(e) => e.preventDefault()}
             placeholder="Type the verification phrase here"
-            className="w-full bg-[#1A1A1A] border border-[#2F2F2F]/50 rounded-lg p-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE]/50"
+            className="w-full rounded-2xl border border-white/10 bg-black/40 p-3 text-white placeholder-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none"
           />
           {error && <div className="text-red-400 text-sm mt-2">{error}</div>}
         </div>
@@ -325,7 +325,7 @@ export default function CryptoPayment({ challengeData, successRedirectPath, onPr
         <button
           onClick={handleSubmit}
           disabled={isLoading || !pricesReady || userPhrase.toLowerCase() !== verificationPhrase.join(' ').toLowerCase()}
-          className="w-full bg-[#0FF1CE] hover:bg-[#0FF1CE]/90 disabled:bg-[#0FF1CE]/50 disabled:cursor-not-allowed text-black font-medium py-4 rounded-xl transition-colors"
+          className="w-full rounded-2xl bg-[#0FF1CE] py-4 font-bold text-black shadow-[0_8px_30px_rgba(15,241,206,0.22)] transition-transform duration-300 hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
         >
           {isLoading ? (
             <div className="flex items-center justify-center gap-2">

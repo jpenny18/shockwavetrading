@@ -15,7 +15,6 @@ export default function Header() {
 
   const navItems = [
     { name: 'Home', href: '/' },
-    { name: 'FAQ', href: '/#faq' },
     { name: 'How Shockwave Operates', href: '/How-Shockwave-Operates' },
     { name: 'Shockwave Pulse', href: '/Shockwave-Pulse' }
   ];

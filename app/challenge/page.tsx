@@ -44,7 +44,7 @@ const challengeTypes = [
     name: 'Shockwave Instant', 
     amounts: ['$5,000', '$10,000', '$25,000', '$50,000', '$100,000', '$200,000', '$500,000'],
     image: '/shockwaveinstant.png',
-    description: 'Access a simulated funded account instantly',
+    description: 'Access a funded account instantly',
     badge: 'FASTEST',
     features: ['Instant Funding', '70% Profit Split', '4% Max Drawdown']
   },
@@ -961,12 +961,12 @@ export default function ChallengePage() {
     const sizeClasses = size === 'sm' ? 'w-7 h-7 text-xs' : 'w-8 h-8 text-sm';
     return (
       <div
-        className={`${sizeClasses} rounded-full flex items-center justify-center font-bold border-2 transition-all duration-500 shrink-0 ${
+        className={`${sizeClasses} rounded-full flex items-center justify-center font-bold border transition-colors duration-300 shrink-0 ${
           state === 'complete'
-            ? 'bg-[#0FF1CE] border-[#0FF1CE] text-black shadow-[0_0_12px_rgba(15,241,206,0.45)]'
+            ? 'bg-[#0FF1CE] border-[#0FF1CE] text-black'
             : state === 'current'
-              ? 'bg-[#0FF1CE]/15 border-[#0FF1CE] text-[#0FF1CE] shadow-[0_0_12px_rgba(15,241,206,0.35)] scale-110'
-              : 'bg-[#151515] border-[#2F2F2F] text-gray-500'
+              ? 'border-[#0FF1CE] bg-[#0FF1CE]/15 text-[#0FF1CE]'
+              : 'border-white/10 bg-white/[0.04] text-white/35'
         }`}
       >
         {state === 'complete' ? <Check size={size === 'sm' ? 14 : 16} strokeWidth={3} /> : step}
@@ -975,7 +975,7 @@ export default function ChallengePage() {
   };
 
   const renderProgressStepper = () => (
-    <div className="mb-8 lg:mb-10 bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl p-4 sm:p-5 border border-[#2F2F2F]/50">
+    <div className="mb-8 rounded-[22px] border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl sm:p-5 lg:mb-10">
       <div className="flex items-center justify-between gap-1 sm:gap-2">
         {challengeSteps.map((step, index) => {
           const state = getStepState(step.id);
@@ -1007,7 +1007,7 @@ export default function ChallengePage() {
               {index < challengeSteps.length - 1 && (
                 <div className="flex-1 h-0.5 mx-1 sm:mx-2 bg-[#2F2F2F] rounded-full overflow-hidden min-w-[12px]">
                   <div
-                    className="h-full bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] rounded-full transition-all duration-700 ease-out"
+                    className="h-full rounded-full bg-[#0FF1CE] transition-all duration-700 ease-out"
                     style={{ width: lineFilled ? '100%' : '0%' }}
                   />
                 </div>
@@ -1028,7 +1028,7 @@ export default function ChallengePage() {
         {showConnector && (
           <div className="w-0.5 flex-1 min-h-[1.5rem] mt-2 bg-[#2F2F2F] rounded-full overflow-hidden relative">
             <div
-              className="absolute top-0 left-0 right-0 bg-gradient-to-b from-[#0FF1CE] to-[#00D4FF] transition-all duration-700 ease-out rounded-full"
+              className="absolute top-0 left-0 right-0 rounded-full bg-[#0FF1CE] transition-all duration-700 ease-out"
               style={{ height: connectorFilled ? '100%' : state === 'current' ? '40%' : '0%' }}
             />
           </div>
@@ -1051,7 +1051,7 @@ export default function ChallengePage() {
           {renderStepCircle(4)}
           <div className="w-0.5 flex-1 min-h-[1.5rem] mt-2 bg-[#2F2F2F] rounded-full overflow-hidden relative">
             <div
-              className="absolute top-0 left-0 right-0 bg-gradient-to-b from-[#0FF1CE] to-[#00D4FF] transition-all duration-700 ease-out rounded-full"
+              className="absolute top-0 left-0 right-0 rounded-full bg-[#0FF1CE] transition-all duration-700 ease-out"
               style={{ height: connectorFilled ? '100%' : connectorPartial ? '45%' : '0%' }}
             />
           </div>
@@ -1063,7 +1063,7 @@ export default function ChallengePage() {
         </div>
 
         <div className="flex-1 min-w-0 flex flex-col pb-2">
-          <h3 className={`text-lg font-medium mb-4 transition-colors duration-300 ${getStepState(4) === 'upcoming' ? 'text-gray-500' : 'text-[#0FF1CE]'}`}>
+          <h3 className={`text-lg font-medium mb-4 transition-colors duration-300 ${getStepState(4) === 'upcoming' ? 'text-white/35' : 'text-white'}`}>
             Available Add-ons
           </h3>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -1075,18 +1075,18 @@ export default function ChallengePage() {
                 <div
                   key={addOn.id}
                   onClick={() => selectedPlatform && handleAddOnToggle(addOn.id)}
-                  className={`relative group rounded-xl overflow-hidden border-2 transition-all duration-300 cursor-pointer ${
+                  className={`relative cursor-pointer overflow-hidden rounded-[18px] border p-4 backdrop-blur-xl transition-colors duration-300 ${
                     isSelected
-                      ? 'border-[#0FF1CE] shadow-[0_0_20px_rgba(15,241,206,0.3)]'
-                      : 'border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50'
+                      ? 'border-[#0FF1CE]/70 bg-white/[0.07]'
+                      : 'border-white/10 bg-white/[0.04] hover:border-white/20'
                   }`}
                 >
-                  <div className="relative p-4 bg-gradient-to-b from-[#151515] to-[#0D0D0D]">
+                  <div className="relative">
                     <div className="relative flex items-start gap-3">
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border transition-all duration-300 ${
+                      <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border transition-colors duration-300 ${
                         isSelected
-                          ? 'bg-[#0FF1CE]/20 border-[#0FF1CE]/50 text-[#0FF1CE] shadow-[0_0_16px_rgba(15,241,206,0.35)]'
-                          : 'bg-[#1A1A1A] border-[#2F2F2F] text-gray-400 group-hover:text-[#0FF1CE] group-hover:border-[#0FF1CE]/40'
+                          ? 'border-[#0FF1CE]/40 bg-[#0FF1CE]/15 text-[#0FF1CE]'
+                          : 'border-white/10 bg-black/30 text-white/45'
                       }`}>
                         <Icon size={22} />
                       </div>
@@ -1145,10 +1145,10 @@ export default function ChallengePage() {
             <div className="mt-8 space-y-4 flex-1 flex flex-col">
               {renderDiscountSection()}
 
-              <div className="hidden lg:block p-4 bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 rounded-lg border border-[#0FF1CE]/20">
+              <div className="hidden rounded-[18px] border border-white/10 bg-black/30 p-4 lg:block">
                 {renderPriceSection()}
               </div>
-              <div className="p-4 bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 rounded-lg border border-[#0FF1CE]/20 lg:hidden">
+              <div className="rounded-[18px] border border-white/10 bg-black/30 p-4 lg:hidden">
                 {renderPriceSection()}
               </div>
 
@@ -1158,20 +1158,16 @@ export default function ChallengePage() {
                   setAddonsContinued(true);
                   scrollToStep(5, true);
                 }}
-                className={`mt-auto w-full rounded-xl overflow-hidden border-2 transition-all duration-300 group ${
-                  getStepState(5) === 'upcoming'
-                    ? 'border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50'
-                    : 'border-[#0FF1CE]/40 hover:border-[#0FF1CE] shadow-[0_0_16px_rgba(15,241,206,0.15)] hover:shadow-[0_0_20px_rgba(15,241,206,0.3)]'
-                }`}
+                className="group mt-auto w-full rounded-2xl bg-[#0FF1CE] px-4 py-3.5 text-black shadow-[0_8px_30px_rgba(15,241,206,0.22)] transition-transform duration-300 hover:scale-[1.01] active:scale-[0.99]"
               >
-                <div className="flex items-center justify-between gap-3 px-4 py-3.5 bg-gradient-to-b from-[#151515] to-[#0D0D0D] group-hover:from-[#0FF1CE]/10 group-hover:to-[#0D0D0D] transition-colors">
+                <div className="flex items-center justify-between gap-3">
                   <div className="text-left min-w-0">
-                    <div className="text-[10px] uppercase tracking-wide text-[#0FF1CE]/80 font-semibold">Next Step</div>
-                    <div className="text-sm sm:text-base font-semibold text-white group-hover:text-[#0FF1CE] transition-colors truncate">
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-black/60">Next Step</div>
+                    <div className="truncate text-sm font-semibold text-black sm:text-base">
                       Continue to Your Information
                     </div>
                   </div>
-                  <ChevronRight size={20} className="text-[#0FF1CE] shrink-0 group-hover:translate-x-1 transition-transform" />
+                  <ChevronRight size={20} className="shrink-0 text-black transition-transform group-hover:translate-x-1" />
                 </div>
               </button>
             </div>
@@ -1187,17 +1183,17 @@ export default function ChallengePage() {
         <button
           type="button"
           onClick={() => setShowDiscountInput(true)}
-          className="w-full rounded-xl overflow-hidden border-2 border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50 transition-all duration-300 group"
+          className="group w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3.5 transition-colors duration-300 hover:bg-white/[0.07]"
         >
-          <div className="flex items-center justify-center gap-2 px-4 py-3.5 bg-gradient-to-b from-[#151515] to-[#0D0D0D] text-white font-medium group-hover:text-[#0FF1CE] transition-colors">
+          <div className="flex items-center justify-center gap-2 font-medium text-white">
             <Tag size={18} className="text-[#0FF1CE]" />
             <span>Apply Discount</span>
             <ChevronDown size={16} className="text-gray-400 group-hover:text-[#0FF1CE] transition-colors" />
           </div>
         </button>
       ) : (
-        <div className="rounded-xl overflow-hidden border-2 border-[#2F2F2F]/50 bg-gradient-to-b from-[#151515] to-[#0D0D0D]">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-[#2F2F2F]/50">
+        <div className="overflow-hidden rounded-[18px] border border-white/10 bg-white/[0.04]">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
             <div className="flex items-center gap-2 text-[#0FF1CE] font-medium text-sm">
               <Tag size={16} />
               <span>Discount Code</span>
@@ -1228,7 +1224,7 @@ export default function ChallengePage() {
                   }}
                   onBlur={() => validateDiscountCode(discountCode)}
                   placeholder="Enter discount code"
-                  className="w-full bg-[#0D0D0D]/80 border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-[#0FF1CE]/40 transition-all placeholder:text-gray-600"
+                  className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-white placeholder:text-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none"
                 />
                 {isValidatingCode && (
                   <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -1239,7 +1235,7 @@ export default function ChallengePage() {
               <button
                 onClick={() => validateDiscountCode(discountCode)}
                 disabled={isValidatingCode || !discountCode}
-                className="bg-[#0FF1CE] text-black px-5 py-3 rounded-lg font-semibold hover:bg-[#0FF1CE]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+                className="shrink-0 rounded-2xl bg-[#0FF1CE] px-5 py-3 font-semibold text-black transition-transform duration-300 hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Apply
               </button>
@@ -1248,7 +1244,7 @@ export default function ChallengePage() {
               <p className="mt-2 text-red-400 text-sm">{formErrors.discountCode}</p>
             )}
             {appliedDiscount && (
-              <div className="mt-3 text-[#0FF1CE] text-sm flex items-center gap-2 bg-[#0FF1CE]/10 border border-[#0FF1CE]/20 rounded-lg px-3 py-2">
+              <div className="mt-3 flex items-center gap-2 rounded-2xl border border-[#0FF1CE]/30 bg-[#0FF1CE]/10 px-3 py-2 text-sm text-[#0FF1CE]">
                 <Check size={16} />
                 <span>
                   Discount applied: {appliedDiscount.type === 'percentage' 
@@ -1325,27 +1321,24 @@ export default function ChallengePage() {
     if (!selectedType) return null;
 
     return (
-      <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl p-6 border border-[#2F2F2F]/50">
-        <h3 className="text-xl font-bold text-[#0FF1CE] mb-6 text-center">Challenge Details</h3>
+      <div className="rounded-[22px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
+        <h3 className="mb-6 text-center text-xl font-semibold tracking-tight text-white">Challenge Details</h3>
         
         <div className={`${selectedType === 'Standard' ? 'max-w-5xl' : 'max-w-3xl'} mx-auto overflow-x-auto py-4 px-4 md:px-8`}>
-          <div className={`${selectedType === 'Standard' ? 'min-w-[650px]' : 'min-w-[450px]'} md:min-w-0 rounded-2xl transform hover:scale-[1.01] transition-transform duration-300 overflow-hidden mx-auto md:scale-[0.85] md:origin-top`}>
+          <div className={`${selectedType === 'Standard' ? 'min-w-[650px]' : 'min-w-[450px]'} mx-auto overflow-hidden rounded-[18px] md:min-w-0 md:origin-top md:scale-[0.85]`}>
             <div 
-              className={`grid ${selectedType === 'Standard' ? 'grid-cols-4' : 'grid-cols-2'} text-xs md:text-sm bg-gradient-to-br from-[#0FF1CE]/10 to-transparent backdrop-blur-sm rounded-2xl border border-[#0FF1CE]/30`}
-              style={{
-                boxShadow: '0 0 30px rgba(15, 241, 206, 0.2)'
-              }}
+              className={`grid ${selectedType === 'Standard' ? 'grid-cols-4' : 'grid-cols-2'} overflow-hidden rounded-[18px] border border-white/10 bg-[#0b0d0f] text-xs md:text-sm`}
             >
               {/* Header */}
               {selectedType === 'Standard' ? (
-                <div className="col-span-4 grid grid-cols-4 bg-gradient-to-r from-[#0FF1CE] to-[#0FF1CE]/80">
+                <div className="col-span-4 grid grid-cols-4 bg-[#0FF1CE]">
                   <div className="p-3 md:p-4 border-r border-black/20 text-black font-bold"></div>
                   <div className="p-3 md:p-4 border-r border-black/20 text-center text-black font-bold">CHALLENGE</div>
                   <div className="p-3 md:p-4 border-r border-black/20 text-center text-black font-bold">VERIFICATION</div>
                   <div className="p-3 md:p-4 text-center text-black font-bold">FUNDED</div>
                 </div>
               ) : selectedType === '1-Step' ? (
-                <div className="col-span-2 grid grid-cols-2 bg-gradient-to-r from-[#0FF1CE] to-[#0FF1CE]/80">
+                <div className="col-span-2 grid grid-cols-2 bg-[#0FF1CE]">
                   <div className="p-3 md:p-4 border-r border-black/20 text-black font-bold"></div>
                   <div className="p-3 md:p-4 text-center text-black font-bold">FUNDED</div>
                 </div>
@@ -1355,7 +1348,7 @@ export default function ChallengePage() {
                   <div className="p-3 md:p-4 text-center text-white font-bold">GAUNTLET</div>
                 </div>
               ) : (
-                <div className="col-span-2 grid grid-cols-2 bg-gradient-to-r from-[#0FF1CE] to-[#0FF1CE]/80">
+                <div className="col-span-2 grid grid-cols-2 bg-[#0FF1CE]">
                   <div className="p-3 md:p-4 border-r border-black/20 text-black font-bold"></div>
                   <div className="p-3 md:p-4 text-center text-black font-bold">FUNDED</div>
                 </div>
@@ -1366,7 +1359,7 @@ export default function ChallengePage() {
                 <>
                   {[
                     ['Trading Period', 'Unlimited', 'Unlimited', 'Unlimited'],
-                    ['Minimum Trading Days', '5 Days', '5 Days', 'X'],
+                    ['Minimum Trading Days', 'None', 'None', 'None'],
                     ['Maximum Daily Loss', 
                       <div key="daily1" className="flex flex-col items-center">
                         <span className="text-[#0FF1CE] font-bold text-base md:text-lg">8%</span>
@@ -1408,14 +1401,14 @@ export default function ChallengePage() {
                     ],
                     ['Leverage', '1:200', '1:200', '1:200'],
                     ['News Trading', 'Allowed', 'Allowed', 'Allowed'],
-                    ['Payout Eligibility', 'X', 'X', '14 Days'],
+                    ['Payout Eligibility', 'X', 'X', 'On-demand'],
                     ['Profit Split', 'X', 'X', 'Up to 95%']
                   ].map((row, index) => (
-                    <div key={index} className={`contents text-white ${index % 2 === 0 ? 'bg-[#ffffff08]' : 'bg-[#0FF1CE]/[0.08]'}`}>
-                      <div className="p-3 md:p-4 border-t border-[#2F2F2F]/50 font-medium text-sm md:text-xs">{row[0]}</div>
-                      <div className="p-3 md:p-4 border-t border-l border-[#2F2F2F]/50 text-center text-sm md:text-xs">{row[1]}</div>
-                      <div className="p-3 md:p-4 border-t border-l border-[#2F2F2F]/50 text-center text-sm md:text-xs">{row[2]}</div>
-                      <div className="p-3 md:p-4 border-t border-l border-[#2F2F2F]/50 text-center text-sm md:text-xs">{row[3]}</div>
+                    <div key={index} className={`contents text-white ${index % 2 === 0 ? 'bg-[#ffffff08]' : 'bg-white/[0.03]'}`}>
+                      <div className="p-3 md:p-4 border-t border-white/10 font-medium text-sm md:text-xs">{row[0]}</div>
+                      <div className="p-3 md:p-4 border-t border-l border-white/10 text-center text-sm md:text-xs">{row[1]}</div>
+                      <div className="p-3 md:p-4 border-t border-l border-white/10 text-center text-sm md:text-xs">{row[2]}</div>
+                      <div className="p-3 md:p-4 border-t border-l border-white/10 text-center text-sm md:text-xs">{row[3]}</div>
                     </div>
                   ))}
                 </>
@@ -1423,7 +1416,7 @@ export default function ChallengePage() {
                 <>
                   {[
                     ['Trading Period', 'Unlimited'],
-                    ['Minimum Trading Days', '5 Days'],
+                    ['Minimum Trading Days', 'None'],
                     ['Maximum Daily Loss', 
                       <div key="daily" className="flex flex-col items-center">
                         <span className="text-[#0FF1CE] font-bold text-base md:text-lg">4%</span>
@@ -1444,12 +1437,12 @@ export default function ChallengePage() {
                     ],
                     ['Leverage', '1:200'],
                     ['News Trading', 'Allowed'],
-                    ['First Withdrawal', '5 Days'],
+                    ['First Withdrawal', 'On-demand'],
                     ['Profit Split', 'Up to 95%']
                   ].map((row, index) => (
-                    <div key={index} className={`contents text-white ${index % 2 === 0 ? 'bg-[#ffffff08]' : 'bg-[#0FF1CE]/[0.08]'}`}>
-                      <div className="p-3 md:p-4 border-t border-[#2F2F2F]/50 font-medium text-sm md:text-xs">{row[0]}</div>
-                      <div className="p-3 md:p-4 border-t border-l border-[#2F2F2F]/50 text-center text-sm md:text-xs">{row[1]}</div>
+                    <div key={index} className={`contents text-white ${index % 2 === 0 ? 'bg-[#ffffff08]' : 'bg-white/[0.03]'}`}>
+                      <div className="p-3 md:p-4 border-t border-white/10 font-medium text-sm md:text-xs">{row[0]}</div>
+                      <div className="p-3 md:p-4 border-t border-l border-white/10 text-center text-sm md:text-xs">{row[1]}</div>
                     </div>
                   ))}
                 </>
@@ -1457,7 +1450,7 @@ export default function ChallengePage() {
                 <>
                   {[
                     ['Trading Period', '30 Days'],
-                    ['Minimum Profitable Days', '5 Days'],
+                    ['Minimum Profitable Days', 'None'],
                     ['Maximum Loss', 
                       <div key="max" className="flex flex-col items-center">
                         <span className="text-[#0FF1CE] font-bold text-base md:text-lg">4%</span>
@@ -1472,12 +1465,12 @@ export default function ChallengePage() {
                     ],
                     ['Leverage', '1:100'],
                     ['News Trading', 'Allowed'],
-                    ['First Withdrawal', '6 Days'],
+                    ['First Withdrawal', 'On-demand'],
                     ['Profit Split', '70%']
                   ].map((row, index) => (
-                    <div key={index} className={`contents text-white ${index % 2 === 0 ? 'bg-[#ffffff08]' : 'bg-[#0FF1CE]/[0.08]'}`}>
-                      <div className="p-3 md:p-4 border-t border-[#2F2F2F]/50 font-medium text-sm md:text-xs">{row[0]}</div>
-                      <div className="p-3 md:p-4 border-t border-l border-[#2F2F2F]/50 text-center text-sm md:text-xs">{row[1]}</div>
+                    <div key={index} className={`contents text-white ${index % 2 === 0 ? 'bg-[#ffffff08]' : 'bg-white/[0.03]'}`}>
+                      <div className="p-3 md:p-4 border-t border-white/10 font-medium text-sm md:text-xs">{row[0]}</div>
+                      <div className="p-3 md:p-4 border-t border-l border-white/10 text-center text-sm md:text-xs">{row[1]}</div>
                     </div>
                   ))}
                 </>
@@ -1512,8 +1505,8 @@ export default function ChallengePage() {
                     ['Profit Split', 'Up to 95%']
                   ].map((row, index) => (
                     <div key={index} className={`contents text-white ${index % 2 === 0 ? 'bg-[#ffffff08]' : 'bg-[#FF6B6B]/[0.08]'}`}>
-                      <div className="p-3 md:p-4 border-t border-[#2F2F2F]/50 font-medium text-sm md:text-xs">{row[0]}</div>
-                      <div className="p-3 md:p-4 border-t border-l border-[#2F2F2F]/50 text-center text-sm md:text-xs">{row[1]}</div>
+                      <div className="p-3 md:p-4 border-t border-white/10 font-medium text-sm md:text-xs">{row[0]}</div>
+                      <div className="p-3 md:p-4 border-t border-l border-white/10 text-center text-sm md:text-xs">{row[1]}</div>
                     </div>
                   ))}
                 </>
@@ -1526,11 +1519,9 @@ export default function ChallengePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0D0D0D] via-[#0D0D0D] to-[#151515] text-white relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0">
-        <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse"></div>
-        <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse delay-1000"></div>
+    <div className="relative min-h-screen overflow-hidden bg-black text-white">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute left-1/2 top-0 h-64 w-[70%] -translate-x-1/2 rounded-full bg-[#0FF1CE]/10 blur-[120px]"></div>
       </div>
       <Particles />
 
@@ -1538,7 +1529,8 @@ export default function ChallengePage() {
       <div className="relative z-10 px-4 sm:px-6 lg:px-8 py-8 lg:py-12 max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8 lg:mb-12">
-          <h1 className="text-xl lg:text-5xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent mb-4">
+          <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.22em] text-[#0FF1CE]">Checkout</p>
+          <h1 className="mb-4 text-3xl font-semibold tracking-tight text-white lg:text-5xl">
             Start Your Trading Journey
           </h1>
             </div>
@@ -1577,11 +1569,11 @@ export default function ChallengePage() {
         {/* Challenge Selection Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* First Card - Challenge Selection */}
-          <div className="lg:col-span-7 bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl p-6 border border-[#2F2F2F]/50">
+          <div className="rounded-[22px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl lg:col-span-7">
             <div ref={step1Ref} className="flex gap-3 sm:gap-4 mb-2">
               {renderStepRail(1)}
               <div className="flex-1 min-w-0 pb-8">
-                <h3 className={`text-lg font-medium mb-4 transition-colors duration-300 ${getStepState(1) === 'upcoming' ? 'text-gray-500' : 'text-[#0FF1CE]'}`}>
+                <h3 className={`text-lg font-medium mb-4 transition-colors duration-300 ${getStepState(1) === 'upcoming' ? 'text-white/35' : 'text-white'}`}>
                   Select Challenge Type
                 </h3>
                 <div className="max-md:scale-[1] max-md:origin-top">
@@ -1590,14 +1582,14 @@ export default function ChallengePage() {
                       <button
                         key={type.id}
                         onClick={() => handleTypeSelect(type.id)}
-                        className={`relative group w-full rounded-xl overflow-hidden border-2 transition-all duration-300 ${
+                        className={`relative w-full overflow-hidden rounded-[18px] border transition-colors duration-300 ${
                           selectedType === type.id
-                            ? 'border-[#0FF1CE] shadow-[0_0_20px_rgba(15,241,206,0.3)]'
-                            : 'border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50'
+                            ? 'border-[#0FF1CE]/70 bg-white/[0.07]'
+                            : 'border-white/10 bg-black/20 hover:border-white/20'
                         }`}
                       >
                         {/* Image section */}
-                        <div className="relative w-full aspect-[16/12] overflow-hidden flex items-center justify-center bg-gradient-to-b from-[#151515] to-[#0D0D0D]">
+                        <div className="relative flex aspect-[16/12] w-full items-center justify-center overflow-hidden bg-black/40">
                           <div className="relative w-[85%] h-[85%]">
                             <Image
                               src={type.image}
@@ -1610,7 +1602,7 @@ export default function ChallengePage() {
                         </div>
                         
                         {/* Text section */}
-                        <div className="p-3 bg-[#0D0D0D]">
+                        <div className="bg-black/30 p-3">
                           <h2 className="text-xs lg:text-sm font-bold mb-1 text-white text-center">
                             {type.name}
                           </h2>
@@ -1633,7 +1625,7 @@ export default function ChallengePage() {
             >
               {renderStepRail(2)}
               <div className="flex-1 min-w-0 pb-8">
-                <h3 className={`text-lg font-medium mb-4 transition-colors duration-300 ${getStepState(2) === 'upcoming' ? 'text-gray-500' : 'text-[#0FF1CE]'}`}>
+                <h3 className={`text-lg font-medium mb-4 transition-colors duration-300 ${getStepState(2) === 'upcoming' ? 'text-white/35' : 'text-white'}`}>
                   Select Account Size
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -1641,15 +1633,13 @@ export default function ChallengePage() {
                     <button
                       key={amount}
                       onClick={() => handleAmountSelect(amount)}
-                      className={`relative rounded-xl overflow-hidden border-2 transition-all duration-300 ${
+                      className={`relative overflow-hidden rounded-[18px] border transition-colors duration-300 ${
                         selectedAmount === amount
-                          ? 'border-[#0FF1CE] shadow-[0_0_20px_rgba(15,241,206,0.3)]'
-                          : 'border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50'
+                          ? 'border-[#0FF1CE] bg-[#0FF1CE] text-black'
+                          : 'border-white/10 bg-white/[0.04] text-white/80 hover:border-white/20'
                       }`}
                     >
-                      <div className={`px-3 py-4 bg-gradient-to-b from-[#151515] to-[#0D0D0D] font-semibold transition-colors ${
-                        selectedAmount === amount ? 'text-[#0FF1CE]' : 'text-gray-300'
-                      }`}>
+                      <div className="px-3 py-4 font-semibold">
                         {amount}
                       </div>
                     </button>
@@ -1665,7 +1655,7 @@ export default function ChallengePage() {
             >
               {renderStepRail(3)}
               <div className="flex-1 min-w-0 pb-8">
-                <h3 className={`text-lg font-medium mb-4 transition-colors duration-300 ${getStepState(3) === 'upcoming' ? 'text-gray-500' : 'text-[#0FF1CE]'}`}>
+                <h3 className={`text-lg font-medium mb-4 transition-colors duration-300 ${getStepState(3) === 'upcoming' ? 'text-white/35' : 'text-white'}`}>
                   Select Platform
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
@@ -1673,13 +1663,13 @@ export default function ChallengePage() {
                     <button
                       key={platform}
                       onClick={() => handlePlatformSelect(platform)}
-                      className={`relative group rounded-xl overflow-hidden border-2 transition-all duration-300 ${
+                      className={`relative overflow-hidden rounded-[18px] border transition-colors duration-300 ${
                         selectedPlatform === platform
-                          ? 'border-[#0FF1CE] shadow-[0_0_20px_rgba(15,241,206,0.3)]'
-                          : 'border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50'
+                          ? 'border-[#0FF1CE]/70 bg-white/[0.07]'
+                          : 'border-white/10 bg-black/20 hover:border-white/20'
                       }`}
                     >
-                      <div className="relative w-full aspect-[16/7] overflow-hidden flex items-center justify-center bg-gradient-to-b from-[#151515] to-[#0D0D0D] px-4">
+                      <div className="relative flex aspect-[16/7] w-full items-center justify-center overflow-hidden bg-black/40 px-4">
                         <Image
                           src={platformImages[platform]}
                           alt={platform}
@@ -1704,7 +1694,7 @@ export default function ChallengePage() {
             <div className="lg:sticky lg:top-8">
               {/* Sticky Price Display - Desktop Only */}
               {selectedType && selectedAmount && (
-                <div className="hidden lg:block mb-4 bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl p-4 border border-[#0FF1CE]/30">
+                <div className="mb-4 hidden rounded-[22px] border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl lg:block">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-sm text-gray-400">Your Selection</div>
@@ -1720,7 +1710,7 @@ export default function ChallengePage() {
                   
                   {/* Show price breakdown if there are add-ons or discount */}
                   {(selectedAddOns.length > 0 || appliedDiscount) && (
-                    <div className="mt-4 pt-4 border-t border-[#0FF1CE]/20">
+                    <div className="mt-4 border-t border-white/10 pt-4">
                       {renderPriceSection()}
                     </div>
                   )}
@@ -1736,11 +1726,11 @@ export default function ChallengePage() {
         {/* Personal Information Section - Full Width Mobile First */}
         <div
           ref={step5Ref}
-          className="mt-8 lg:mt-12 bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl p-6 lg:p-8 border border-[#2F2F2F]/50"
+          className="mt-8 rounded-[22px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl lg:mt-12 lg:p-8"
         >
           <div className="flex items-center justify-center gap-3 mb-6">
             {renderStepCircle(5)}
-            <h3 className={`text-xl lg:text-2xl font-bold transition-colors duration-300 ${getStepState(5) === 'upcoming' ? 'text-gray-500' : 'text-[#0FF1CE]'}`}>
+            <h3 className={`text-xl lg:text-2xl font-bold transition-colors duration-300 ${getStepState(5) === 'upcoming' ? 'text-white/35' : 'text-white'}`}>
               Your Information
             </h3>
           </div>
@@ -1753,7 +1743,7 @@ export default function ChallengePage() {
                   name="firstName"
                   value={formData.firstName}
                   onChange={handleInputChange}
-                className={`w-full bg-[#151515]/50 backdrop-blur-sm border ${formErrors.firstName ? 'border-red-500' : 'border-[#2F2F2F]'} rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all`}
+                className={`w-full rounded-2xl border bg-black/40 px-3 py-2.5 text-white placeholder-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none md:px-4 md:py-3 ${formErrors.firstName ? 'border-red-500' : 'border-white/10'}`}
                 placeholder="First Name"
                 />
               {formErrors.firstName && <p className="mt-1 text-sm text-red-400 flex items-center gap-1"><AlertCircle size={14} />{formErrors.firstName}</p>}
@@ -1766,7 +1756,7 @@ export default function ChallengePage() {
                   name="lastName"
                   value={formData.lastName}
                   onChange={handleInputChange}
-                className={`w-full bg-[#151515]/50 backdrop-blur-sm border ${formErrors.lastName ? 'border-red-500' : 'border-[#2F2F2F]'} rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all`}
+                className={`w-full rounded-2xl border bg-black/40 px-3 py-2.5 text-white placeholder-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none md:px-4 md:py-3 ${formErrors.lastName ? 'border-red-500' : 'border-white/10'}`}
                 placeholder="Last Name"
                 />
               {formErrors.lastName && <p className="mt-1 text-sm text-red-400 flex items-center gap-1"><AlertCircle size={14} />{formErrors.lastName}</p>}
@@ -1780,7 +1770,7 @@ export default function ChallengePage() {
                   value={accountUser?.email || formData.email}
                   onChange={handleInputChange}
                   readOnly={Boolean(accountUser)}
-                className={`w-full bg-[#151515]/50 backdrop-blur-sm border ${formErrors.email ? 'border-red-500' : 'border-[#2F2F2F]'} rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all ${accountUser ? 'opacity-80' : ''}`}
+                className={`w-full rounded-2xl border bg-black/40 px-3 py-2.5 text-white placeholder-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none md:px-4 md:py-3 ${formErrors.email ? 'border-red-500' : 'border-white/10'} ${accountUser ? 'opacity-80' : ''}`}
                 placeholder="Email"
                 />
               {formErrors.email && <p className="mt-1 text-sm text-red-400 flex items-center gap-1"><AlertCircle size={14} />{formErrors.email}</p>}
@@ -1796,7 +1786,7 @@ export default function ChallengePage() {
                   name="phone"
                   value={formData.phone}
                   onChange={handleInputChange}
-                className={`w-full bg-[#151515]/50 backdrop-blur-sm border ${formErrors.phone ? 'border-red-500' : 'border-[#2F2F2F]'} rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all`}
+                className={`w-full rounded-2xl border bg-black/40 px-3 py-2.5 text-white placeholder-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none md:px-4 md:py-3 ${formErrors.phone ? 'border-red-500' : 'border-white/10'}`}
                 placeholder="Phone"
                 />
               {formErrors.phone && <p className="mt-1 text-sm text-red-400 flex items-center gap-1"><AlertCircle size={14} />{formErrors.phone}</p>}
@@ -1808,7 +1798,7 @@ export default function ChallengePage() {
                   name="country"
                   value={formData.country}
                   onChange={handleInputChange}
-                className={`w-full bg-[#151515]/50 backdrop-blur-sm border ${formErrors.country ? 'border-red-500' : 'border-[#2F2F2F]'} rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all`}
+                className={`w-full rounded-2xl border bg-black/40 px-3 py-2.5 text-white focus:border-[#0FF1CE]/60 focus:outline-none md:px-4 md:py-3 ${formErrors.country ? 'border-red-500' : 'border-white/10'}`}
                 >
                   <option value="">Country</option>
                   {countries.map((country) => (
@@ -1830,7 +1820,7 @@ export default function ChallengePage() {
                   name="discordUsername"
                   value={formData.discordUsername}
                   onChange={handleInputChange}
-                className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
+                className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2.5 text-white placeholder-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none md:px-4 md:py-3"
                 placeholder="Discord Username"
                 />
             </div>
@@ -1845,7 +1835,7 @@ export default function ChallengePage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     autoComplete="new-password"
-                    className={`w-full bg-[#151515]/50 backdrop-blur-sm border ${formErrors.password ? 'border-red-500' : 'border-[#2F2F2F]'} rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all`}
+                    className={`w-full rounded-2xl border bg-black/40 px-3 py-2.5 text-white placeholder-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none md:px-4 md:py-3 ${formErrors.password ? 'border-red-500' : 'border-white/10'}`}
                     placeholder="Create a password"
                   />
                   {formErrors.password && <p className="mt-1 text-sm text-red-400 flex items-center gap-1"><AlertCircle size={14} />{formErrors.password}</p>}
@@ -1858,7 +1848,7 @@ export default function ChallengePage() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     autoComplete="new-password"
-                    className={`w-full bg-[#151515]/50 backdrop-blur-sm border ${formErrors.confirmPassword ? 'border-red-500' : 'border-[#2F2F2F]'} rounded-lg px-3 py-2.5 md:px-4 md:py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all`}
+                    className={`w-full rounded-2xl border bg-black/40 px-3 py-2.5 text-white placeholder-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none md:px-4 md:py-3 ${formErrors.confirmPassword ? 'border-red-500' : 'border-white/10'}`}
                     placeholder="Confirm password"
                   />
                   {formErrors.confirmPassword && <p className="mt-1 text-sm text-red-400 flex items-center gap-1"><AlertCircle size={14} />{formErrors.confirmPassword}</p>}
@@ -1881,10 +1871,10 @@ export default function ChallengePage() {
                   />
                   <label htmlFor="disclaimer" className="text-sm text-gray-400">
                     <span className="md:hidden">
-                      I understand Shockwave Capital is a simulated trading environment for educational and evaluative purposes only. I agree to the{' '}
+                      I understand Shockwave Capital provides a funded trading account and that payouts follow the program rules. I agree to the{' '}
                     </span>
                     <span className="hidden md:inline">
-                      I acknowledge that Shockwave Capital provides a simulated trading environment and that all activity is for educational and evaluative purposes only. I agree to the{' '}
+                      I acknowledge that Shockwave Capital provides a funded trading account and that payouts follow the program rules. I agree to the{' '}
                     </span>
                     <Link href="/disclaimer" className="text-[#0FF1CE] hover:underline">
                       Disclaimer
@@ -1927,10 +1917,10 @@ export default function ChallengePage() {
               <button
                 onClick={handleProceedToPayment}
                 disabled={!isFormValid()}
-                className={`w-full mt-6 relative overflow-hidden rounded-xl font-bold py-4 px-6 transition-all duration-300 ${
+                className={`mt-6 w-full rounded-2xl px-6 py-4 font-bold transition-all duration-300 ${
                   isFormValid()
-                    ? 'bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25'
-                    : 'bg-gray-700 text-gray-400 cursor-not-allowed opacity-50'
+                    ? 'bg-[#0FF1CE] text-black shadow-[0_8px_30px_rgba(15,241,206,0.22)] hover:scale-[1.02] active:scale-[0.98]'
+                    : 'cursor-not-allowed bg-white/10 text-white/35'
                 }`}
               >
                 <div className="relative flex items-center justify-center gap-2">
@@ -1939,7 +1929,7 @@ export default function ChallengePage() {
                 </div>
               </button>
               {selectedType === 'Gauntlet' ? (
-                <div className="text-center mt-3 p-3 bg-[#FF6B6B]/10 border border-[#FF6B6B]/30 rounded-lg">
+                <div className="mt-3 rounded-2xl border border-[#FF6B6B]/30 bg-[#FF6B6B]/10 p-4 text-center">
                   <p className="text-[#FF6B6B] font-bold text-sm mb-1">🔥 Gauntlet Challenge</p>
                   <p className="text-white text-xs">
                     Pay only $19.99 now. If you pass, you'll pay the activation fee to get your funded account.
