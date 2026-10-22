@@ -16,6 +16,7 @@ import {
   Users,
   Wallet,
   X,
+  type LucideIcon,
 } from 'lucide-react';
 import Header from '../components/Header';
 import {
@@ -29,7 +30,7 @@ import {
   type SearchHit,
 } from './content';
 
-const ICONS: Record<CollectionIcon, React.ComponentType<{ className?: string; strokeWidth?: number }>> = {
+const ICONS: Record<CollectionIcon, LucideIcon> = {
   globe: Globe,
   wallet: Wallet,
   shield: Shield,
