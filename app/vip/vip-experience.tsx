@@ -4,7 +4,8 @@ import React, { Suspense } from 'react';
 import Particles from '../components/Particles';
 import Header from '../components/Header';
 import { ChevronDown, Crown, Headphones, TrendingUp, Copy } from 'lucide-react';
-import VipCheckout from './components/VipCheckout';
+
+const VIP_CHECKOUT_URL = 'https://www.scxdashboards.com/vip';
 
 const VIP_RULES = [
   '15% Max Drawdown',
@@ -19,7 +20,7 @@ const VIP_RULES = [
   'Consolidated Account Structure'
 ];
 
-function VipContent({ publishableKey }: { publishableKey: string }) {
+function VipContent() {
   return (
     <div className="bg-black text-white min-h-screen font-sans">
       <Header />
@@ -87,14 +88,14 @@ function VipContent({ publishableKey }: { publishableKey: string }) {
             </div>
           </div>
 
-          {/* Mobile CTA - scrolls to allocation selector */}
-          <button
-            onClick={() => document.getElementById('account-selector')?.scrollIntoView({ behavior: 'smooth' })}
+          {/* Mobile CTA - opens the external checkout */}
+          <a
+            href={VIP_CHECKOUT_URL}
             className="md:hidden w-full max-w-xs mx-auto flex items-center justify-center gap-2 px-8 py-3.5 bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-black text-sm font-bold rounded-xl active:scale-[0.98] transition-transform shadow-[0_0_20px_rgba(15,241,206,0.3)]"
           >
             <span>Choose Your Allocation</span>
             <ChevronDown size={18} />
-          </button>
+          </a>
         </div>
       </section>
 
@@ -176,17 +177,15 @@ function VipContent({ publishableKey }: { publishableKey: string }) {
             <p className="text-gray-400 text-sm md:text-base mb-6">
               A structure built for experienced traders. Ready to trade serious capital?
             </p>
-            <button
-              onClick={() => document.getElementById('account-selector')?.scrollIntoView({ behavior: 'smooth' })}
-              className="px-8 py-4 bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-black text-base md:text-lg font-bold rounded-xl hover:scale-105 transition-transform shadow-[0_0_20px_rgba(15,241,206,0.3)]"
+            <a
+              href={VIP_CHECKOUT_URL}
+              className="inline-block px-8 py-4 bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-black text-base md:text-lg font-bold rounded-xl hover:scale-105 transition-transform shadow-[0_0_20px_rgba(15,241,206,0.3)]"
             >
               Choose Your Allocation & Get Started
-            </button>
+            </a>
           </div>
         </div>
       </section>
-
-      <VipCheckout publishableKey={publishableKey} />
 
       <style jsx global>{`
         .background-noise {
@@ -213,14 +212,14 @@ function VipContent({ publishableKey }: { publishableKey: string }) {
 }
 
 
-export default function VipExperience({ publishableKey }: { publishableKey: string }) {
+export default function VipExperience() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center bg-[#0D0D0D]">
         <div className="w-8 h-8 border-4 border-[#0FF1CE] border-t-transparent rounded-full animate-spin"></div>
       </div>
     }>
-      <VipContent publishableKey={publishableKey} />
+      <VipContent />
     </Suspense>
   );
 }
