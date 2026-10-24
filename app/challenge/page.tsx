@@ -6,7 +6,7 @@ import Particles from '../components/Particles';
 import Image from 'next/image';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db, auth, registerUser, signInUser, getUser, updateUser, getCurrentUser } from '@/lib/firebase';
-import { Check, Zap, Shield, TrendingUp, ChevronRight, AlertCircle, CreditCard, CalendarOff, Percent, Tag, Gift, ChevronDown } from 'lucide-react';
+import { Check, Zap, Shield, TrendingUp, ChevronRight, AlertCircle, CreditCard, CalendarOff, Percent, Tag, Gift, ChevronDown, Bitcoin } from 'lucide-react';
 import Link from 'next/link';
 
 // Define the type for challenge options
@@ -419,6 +419,8 @@ export default function ChallengePage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [accountUser, setAccountUser] = useState<{ uid: string; email: string | null } | null>(null);
   const [isLinkingAccount, setIsLinkingAccount] = useState(false);
+  const [isRedirecting, setIsRedirecting] = useState(false);
+  const [cardError, setCardError] = useState<string | null>(null);
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [discountCode, setDiscountCode] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState<DiscountCode | null>(null);
@@ -802,6 +804,83 @@ export default function ChallengePage() {
     router.push('/challenge/payment');
     } finally {
       setIsLinkingAccount(false);
+    }
+  };
+
+  const handlePayWithCard = async () => {
+    if (isRedirecting || isLinkingAccount) return;
+
+    if (!isFormValid()) {
+      const errors: FormErrors = {};
+      if (!formData.firstName) errors.firstName = 'First name is required';
+      if (!formData.lastName) errors.lastName = 'Last name is required';
+      if (!formData.email) errors.email = 'Email is required';
+      if (!formData.phone) errors.phone = 'Phone number is required';
+      if (!formData.country) errors.country = 'Country is required';
+      if (!selectedType) errors.type = 'Please select a challenge type';
+      if (!selectedAmount) errors.amount = 'Please select an amount';
+      if (!selectedPlatform) errors.platform = 'Please select a platform';
+      if (!termsAccepted) errors.terms = 'Please accept the terms and conditions';
+      if (!accountUser && password.length < 6) errors.password = 'Password must be at least 6 characters';
+      if (!accountUser && password !== confirmPassword) errors.confirmPassword = 'Passwords do not match';
+      setFormErrors(errors);
+      return;
+    }
+
+    const idempotencyKey = crypto.randomUUID();
+    setCardError(null);
+    setIsRedirecting(true);
+
+    try {
+      const account = await ensureAccount();
+      if (!account) {
+        setIsRedirecting(false);
+        return;
+      }
+
+      const expectedAmount = getCurrentPrice();
+      if (expectedAmount === null) {
+        setCardError('Choose a challenge before paying.');
+        setIsRedirecting(false);
+        return;
+      }
+
+      let response: Response | null = null;
+      let data: { error?: string; checkoutUrl?: string } = {};
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        response = await fetch('/api/checkout-handoff', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            idempotencyKey,
+            userId: account.uid,
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: account.email || formData.email,
+            phone: formData.phone,
+            country: formData.country,
+            discordUsername: formData.discordUsername || '',
+            challengeType: selectedType,
+            challengeAmount: selectedAmount,
+            platform: selectedPlatform,
+            addOns: selectedAddOns,
+            discountCode: appliedDiscount?.code || '',
+            expectedAmount,
+          }),
+        });
+        data = await response.json().catch(() => ({}));
+        if (response.ok || response.status < 500) break;
+      }
+
+      if (!response?.ok || !data.checkoutUrl) {
+        throw new Error(data.error || 'Unable to start card checkout');
+      }
+
+      window.location.href = data.checkoutUrl;
+    } catch (error) {
+      console.error(error);
+      setCardError(error instanceof Error ? error.message : 'Unable to start card checkout');
+      setIsRedirecting(false);
     }
   };
 
@@ -1915,20 +1994,44 @@ export default function ChallengePage() {
               </div>
               
               <button
-                onClick={handleProceedToPayment}
-                disabled={!isFormValid()}
+                onClick={handlePayWithCard}
+                disabled={!isFormValid() || isRedirecting || isLinkingAccount}
                 className={`mt-6 w-full rounded-2xl px-6 py-4 font-bold transition-all duration-300 ${
-                  isFormValid()
+                  isFormValid() && !isRedirecting
                     ? 'bg-[#0FF1CE] text-black shadow-[0_8px_30px_rgba(15,241,206,0.22)] hover:scale-[1.02] active:scale-[0.98]'
                     : 'cursor-not-allowed bg-white/10 text-white/35'
                 }`}
               >
                 <div className="relative flex items-center justify-center gap-2">
-                  <span>{isLinkingAccount ? 'Saving your account...' : 'Continue To Payment'}</span>
-                  <ChevronRight size={20} className={isFormValid() ? 'group-hover:translate-x-1 transition-transform' : ''} />
+                  <CreditCard size={20} />
+                  <span>Pay with card</span>
                 </div>
               </button>
-              {selectedType === 'Gauntlet' ? (
+              <p className="mt-2 text-center text-xs text-gray-400">
+                You will be redirected to complete your purchase
+              </p>
+              {cardError && (
+                <p className="mt-2 flex items-center justify-center gap-1 text-sm text-red-400">
+                  <AlertCircle size={14} />
+                  {cardError}
+                </p>
+              )}
+
+              <button
+                onClick={handleProceedToPayment}
+                disabled={!isFormValid() || isRedirecting || isLinkingAccount}
+                className={`mt-3 w-full rounded-2xl px-6 py-4 font-bold transition-all duration-300 ${
+                  isFormValid() && !isLinkingAccount
+                    ? 'border border-[#0FF1CE] text-[#0FF1CE] hover:bg-[#0FF1CE]/10'
+                    : 'cursor-not-allowed bg-white/10 text-white/35'
+                }`}
+              >
+                <div className="relative flex items-center justify-center gap-2">
+                  <Bitcoin size={20} />
+                  <span>{isLinkingAccount ? 'Saving your account...' : 'Pay with crypto'}</span>
+                </div>
+              </button>
+              {selectedType === 'Gauntlet' && (
                 <div className="mt-3 rounded-2xl border border-[#FF6B6B]/30 bg-[#FF6B6B]/10 p-4 text-center">
                   <p className="text-[#FF6B6B] font-bold text-sm mb-1">🔥 Gauntlet Challenge</p>
                   <p className="text-white text-xs">
@@ -1938,14 +2041,18 @@ export default function ChallengePage() {
                     Activation fees: $10k→$199, $25k→$299, $50k→$499, $100k→$799, $200k→$1,499, $500k→$2,999
                   </p>
                 </div>
-              ) : (
-                <p className="text-xs text-gray-400 text-center mt-2">
-                  You will be redirected to complete your purchase
-                </p>
               )}
             </div>
           </div>
         </div>
+      {isRedirecting && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-[22px] border border-white/10 bg-[#121212] p-8 text-center">
+            <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-2 border-[#0FF1CE] border-t-transparent" />
+            <p className="text-white">Please wait while we redirect you to our payment portal</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

@@ -38,6 +38,7 @@ const navItems = [
   { name: 'Email Templates', href: '/admin/emails', icon: Mail },
   { name: 'Pulse Management', href: '/admin/pulse', icon: MessageSquare },
   { name: 'Discount Codes', href: '/admin/discounts', icon: Tag },
+  { name: 'VIP Reset Codes', href: '/admin/vip-reset-codes', icon: Tag },
   { name: 'Feature Toggles', href: '/admin/feature-toggles', icon: ToggleLeft },
   { name: 'Settings', href: '/admin/settings', icon: Settings }
 ];

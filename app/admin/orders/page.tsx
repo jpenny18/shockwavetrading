@@ -37,6 +37,8 @@ interface Order {
   challengeStatus?: 'pending' | 'passed' | 'failed' | 'funded' | 'in progress';
   paymentIntentId?: string;
   transactionId?: string;
+  resetCode?: string | null;
+  originalAmount?: number;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
@@ -71,7 +73,7 @@ const sortOptions = [
 // Filter options
 const filterOptions = {
   status: ['All', 'Completed', 'Processing', 'Pending', 'Failed'],
-  type: ['All', 'Standard Challenge', 'Express Challenge', 'Instant Funding'],
+  type: ['All', 'Standard Challenge', 'Express Challenge', 'Instant Funding', 'VIP Activation', 'vip-activation'],
 };
 
 export default function OrdersPage() {
@@ -791,6 +793,18 @@ export default function OrdersPage() {
                                   <span className="text-gray-400">Platform:</span>
                                   <span className="text-white">{order.platform}</span>
                                 </div>
+                                {order.resetCode && (
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-400">Reset code:</span>
+                                    <span className="text-white">{order.resetCode}</span>
+                                  </div>
+                                )}
+                                {typeof order.originalAmount === 'number' && order.originalAmount !== order.totalAmount && (
+                                  <div className="flex justify-between">
+                                    <span className="text-gray-400">Original price:</span>
+                                    <span className="text-white">${order.originalAmount.toLocaleString()}</span>
+                                  </div>
+                                )}
                                 {order.addOns && order.addOns.length > 0 && (
                                   <div className="flex justify-between items-start">
                                     <span className="text-gray-400">Add-ons:</span>
