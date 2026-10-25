@@ -24,6 +24,7 @@ import {
   Eye
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { isVipMetaApiAccount } from '../../../../lib/vip-accounts';
 
 // Dynamically import ApexCharts to avoid SSR issues
 const ApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -696,6 +697,10 @@ export default function AdminAccountDetailsPage() {
       }
       
       const accountData = accountSnapshot.docs[0].data();
+      if (isVipMetaApiAccount(accountData)) {
+        router.replace(`/admin/vip-accounts/${accountId}`);
+        return;
+      }
       setAccountStatus(accountData.status);
       
       // Get user info

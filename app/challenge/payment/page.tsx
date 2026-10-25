@@ -57,9 +57,9 @@ const addOnNames: { [key: string]: string } = {
 };
 
 const validateChallengeData = (data: ChallengeData | null): boolean => {
-  if (!data) return false;
-  
-  // Required fields
+  if (!data?.formData) return false;
+
+  // Checkout needs the signed-in account's name, phone, and country.
   const requiredFields = [
     data.type,
     data.amount,
@@ -69,9 +69,9 @@ const validateChallengeData = (data: ChallengeData | null): boolean => {
     data.formData.lastName,
     data.formData.email,
     data.formData.phone,
-    data.formData.country
+    data.formData.country,
   ];
-  
+
   return requiredFields.every(field => field && String(field).trim() !== '');
 };
 

@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { 
   BarChart2, 
   Users, 
@@ -112,6 +113,8 @@ interface DashboardStats {
   avgOrderValue: number;
   cardOrders: number;
   cryptoOrders: number;
+  cardRevenue: number;
+  cryptoRevenue: number;
   monthlyGrowth: {
     orders: number;
     revenue: number;
@@ -131,6 +134,7 @@ interface DashboardStats {
 export default function AdminDashboard() {
   const [timeRange, setTimeRange] = useState('30');
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [recentOrders, setRecentOrders] = useState<UnifiedOrder[]>([]);
   const [stats, setStats] = useState<DashboardStats>({
     totalOrders: 0,
@@ -139,6 +143,8 @@ export default function AdminDashboard() {
     avgOrderValue: 0,
     cardOrders: 0,
     cryptoOrders: 0,
+    cardRevenue: 0,
+    cryptoRevenue: 0,
     monthlyGrowth: {
       orders: 0,
       revenue: 0,
@@ -160,6 +166,7 @@ export default function AdminDashboard() {
   const fetchDashboardData = async () => {
     try {
       setIsLoading(true);
+      setLoadError(null);
       
       // Get the date ranges for comparison
       const now = new Date();
@@ -179,26 +186,41 @@ export default function AdminDashboard() {
       const cryptoOrdersSnapshot = await getDocs(cryptoOrdersQuery);
       const allCryptoOrders = cryptoOrdersSnapshot.docs;
       
+      const cardOrderDate = (orderDoc: (typeof allCardOrders)[number]) => {
+        try {
+          const createdAt = orderDoc.data().createdAt;
+          return createdAt?.toDate ? createdAt.toDate() : null;
+        } catch {
+          return null;
+        }
+      };
+      const cryptoOrderDate = (orderDoc: (typeof allCryptoOrders)[number]) => {
+        const createdAt = orderDoc.data().createdAt;
+        if (!createdAt) return null;
+        const orderDate = new Date(createdAt);
+        return Number.isNaN(orderDate.getTime()) ? null : orderDate;
+      };
+
       // Filter card orders by period
-      const currentPeriodCardOrders = allCardOrders.filter(doc => {
-        const orderDate = doc.data().createdAt.toDate();
-        return orderDate >= currentPeriodStart && orderDate <= now;
+      const currentPeriodCardOrders = allCardOrders.filter(orderDoc => {
+        const orderDate = cardOrderDate(orderDoc);
+        return orderDate && orderDate >= currentPeriodStart && orderDate <= now;
       });
       
-      const previousPeriodCardOrders = allCardOrders.filter(doc => {
-        const orderDate = doc.data().createdAt.toDate();
-        return orderDate >= previousPeriodStart && orderDate < currentPeriodStart;
+      const previousPeriodCardOrders = allCardOrders.filter(orderDoc => {
+        const orderDate = cardOrderDate(orderDoc);
+        return orderDate && orderDate >= previousPeriodStart && orderDate < currentPeriodStart;
       });
       
       // Filter crypto orders by period
-      const currentPeriodCryptoOrders = allCryptoOrders.filter(doc => {
-        const orderDate = new Date(doc.data().createdAt);
-        return orderDate >= currentPeriodStart && orderDate <= now;
+      const currentPeriodCryptoOrders = allCryptoOrders.filter(orderDoc => {
+        const orderDate = cryptoOrderDate(orderDoc);
+        return orderDate && orderDate >= currentPeriodStart && orderDate <= now;
       });
       
-      const previousPeriodCryptoOrders = allCryptoOrders.filter(doc => {
-        const orderDate = new Date(doc.data().createdAt);
-        return orderDate >= previousPeriodStart && orderDate < currentPeriodStart;
+      const previousPeriodCryptoOrders = allCryptoOrders.filter(orderDoc => {
+        const orderDate = cryptoOrderDate(orderDoc);
+        return orderDate && orderDate >= previousPeriodStart && orderDate < currentPeriodStart;
       });
       
       // Calculate current period stats
@@ -255,15 +277,25 @@ export default function AdminDashboard() {
         orderType: 'crypto' as const,
         displayName: doc.data().customerName,
         displayAmount: doc.data().usdAmount,
-        displayStatus: doc.data().status.toLowerCase(),
+        displayStatus: (doc.data().status || 'unknown').toString().toLowerCase(),
         displayDate: doc.data().createdAt
       })) as UnifiedOrder[];
       
       // Combine and sort by date
       const combinedOrders = [...recentCardOrders, ...recentCryptoOrdersList].sort((a, b) => {
-        const dateA = a.orderType === 'card' ? (a as CardOrder).createdAt.toDate() : new Date((a as CryptoOrder).createdAt);
-        const dateB = b.orderType === 'card' ? (b as CardOrder).createdAt.toDate() : new Date((b as CryptoOrder).createdAt);
-        return dateB.getTime() - dateA.getTime();
+        const toTime = (order: UnifiedOrder) => {
+          try {
+            if (order.orderType === 'card') {
+              const createdAt = (order as CardOrder).createdAt;
+              return createdAt?.toDate ? createdAt.toDate().getTime() : 0;
+            }
+            const createdAt = new Date((order as CryptoOrder).createdAt);
+            return Number.isNaN(createdAt.getTime()) ? 0 : createdAt.getTime();
+          } catch {
+            return 0;
+          }
+        };
+        return toTime(b) - toTime(a);
       }).slice(0, 10);
       
       setRecentOrders(combinedOrders);
@@ -279,11 +311,24 @@ export default function AdminDashboard() {
         challengeTypes[type] = (challengeTypes[type] || 0) + 1;
       });
       
-      // Calculate challenge statuses (from crypto orders)
+      const cardStatus = (orderDoc: (typeof currentPeriodCardOrders)[number]) => orderDoc.data().challengeStatus;
+      // Calculate challenge statuses from both card and crypto orders
       const challengeStatuses = {
-        passed: currentPeriodCryptoOrders.filter(doc => doc.data().challengeStatus === 'PASSED').length,
-        failed: currentPeriodCryptoOrders.filter(doc => doc.data().challengeStatus === 'FAILED').length,
-        inProgress: currentPeriodCryptoOrders.filter(doc => doc.data().challengeStatus === 'IN_PROGRESS').length
+        passed:
+          currentPeriodCryptoOrders.filter(orderDoc => orderDoc.data().challengeStatus === 'PASSED').length +
+          currentPeriodCardOrders.filter(orderDoc => {
+            const status = cardStatus(orderDoc);
+            return status === 'passed' || status === 'funded';
+          }).length,
+        failed:
+          currentPeriodCryptoOrders.filter(orderDoc => orderDoc.data().challengeStatus === 'FAILED').length +
+          currentPeriodCardOrders.filter(orderDoc => cardStatus(orderDoc) === 'failed').length,
+        inProgress:
+          currentPeriodCryptoOrders.filter(orderDoc => orderDoc.data().challengeStatus === 'IN_PROGRESS').length +
+          currentPeriodCardOrders.filter(orderDoc => {
+            const status = cardStatus(orderDoc);
+            return status === 'in progress' || status === 'pending';
+          }).length
       };
       
       // Update stats
@@ -294,6 +339,8 @@ export default function AdminDashboard() {
         avgOrderValue: currentAvgOrder,
         cardOrders: currentPeriodCardOrders.length,
         cryptoOrders: currentPeriodCryptoOrders.length,
+        cardRevenue: currentCardRevenue,
+        cryptoRevenue: currentCryptoRevenue,
         monthlyGrowth,
         challengeTypes,
         challengeStatuses
@@ -301,9 +348,16 @@ export default function AdminDashboard() {
       
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
+      setLoadError('Failed to load dashboard data. Please try again.');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const formatMoney = (amount: unknown) => {
+    const value = typeof amount === 'number' ? amount : Number(amount);
+    if (!Number.isFinite(value)) return '—';
+    return `$${value.toFixed(2)}`;
   };
 
   const formatDate = (date: any) => {
@@ -337,13 +391,25 @@ export default function AdminDashboard() {
         </select>
       </div>
 
+      {loadError && (
+        <div className="mb-4 p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <span className="text-red-400 text-sm">{loadError}</span>
+          <button
+            onClick={fetchDashboardData}
+            className="text-sm text-[#0FF1CE] hover:underline"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
       {/* Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
         <StatCard 
           title="Total Orders" 
           value={stats.totalOrders.toLocaleString()} 
           icon={ShoppingCart} 
-          change={`${stats.monthlyGrowth.orders >= 0 ? '+' : ''}${stats.monthlyGrowth.orders.toFixed(2)}%`}
+          change={`${stats.monthlyGrowth.orders >= 0 ? '+' : ''}${stats.monthlyGrowth.orders.toFixed(1)}% vs prior period`}
           changeType={stats.monthlyGrowth.orders >= 0 ? "up" : "down"}
           isLoading={isLoading}
         />
@@ -351,7 +417,7 @@ export default function AdminDashboard() {
           title="Total Revenue" 
           value={`$${stats.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`} 
           icon={DollarSign} 
-          change={`${stats.monthlyGrowth.revenue >= 0 ? '+' : ''}${stats.monthlyGrowth.revenue.toFixed(2)}%`}
+          change={`${stats.monthlyGrowth.revenue >= 0 ? '+' : ''}${stats.monthlyGrowth.revenue.toFixed(1)}% vs prior period`}
           changeType={stats.monthlyGrowth.revenue >= 0 ? "up" : "down"}
           isLoading={isLoading}
         />
@@ -359,7 +425,7 @@ export default function AdminDashboard() {
           title="Customers" 
           value={stats.totalCustomers.toLocaleString()} 
           icon={Users} 
-          change={`${stats.monthlyGrowth.customers >= 0 ? '+' : ''}${stats.monthlyGrowth.customers.toFixed(2)}%`}
+          change={`${stats.monthlyGrowth.customers >= 0 ? '+' : ''}${stats.monthlyGrowth.customers.toFixed(1)}% vs prior period`}
           changeType={stats.monthlyGrowth.customers >= 0 ? "up" : "down"}
           isLoading={isLoading}
         />
@@ -367,7 +433,7 @@ export default function AdminDashboard() {
           title="Avg. Order Value" 
           value={`$${stats.avgOrderValue.toFixed(2)}`} 
           icon={BarChart2} 
-          change={`${stats.monthlyGrowth.avgOrder >= 0 ? '+' : ''}${stats.monthlyGrowth.avgOrder.toFixed(2)}%`}
+          change={`${stats.monthlyGrowth.avgOrder >= 0 ? '+' : ''}${stats.monthlyGrowth.avgOrder.toFixed(1)}% vs prior period`}
           changeType={stats.monthlyGrowth.avgOrder >= 0 ? "up" : "down"}
           isLoading={isLoading}
         />
@@ -376,12 +442,12 @@ export default function AdminDashboard() {
       {/* Additional Stats */}
       <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-2 md:gap-4 mb-6 md:mb-8">
         {[
-          { label: 'Card Orders', value: stats.cardOrders, color: 'blue', Icon: ShoppingCart, textColor: 'text-white' },
-          { label: 'Crypto', value: stats.cryptoOrders, color: 'orange', Icon: Bitcoin, textColor: 'text-white' },
-          { label: 'Passed', value: stats.challengeStatuses.passed, color: 'green', Icon: CheckCircle, textColor: 'text-green-400' },
-          { label: 'Failed', value: stats.challengeStatuses.failed, color: 'red', Icon: AlertCircle, textColor: 'text-red-400' },
-          { label: 'In Progress', value: stats.challengeStatuses.inProgress, color: 'yellow', Icon: Clock, textColor: 'text-yellow-400' },
-        ].map(({ label, value, color, Icon, textColor }) => (
+          { label: 'Card Orders', value: stats.cardOrders, tone: 'bg-blue-500/10 text-blue-400', Icon: ShoppingCart, textColor: 'text-white' },
+          { label: 'Crypto', value: stats.cryptoOrders, tone: 'bg-orange-500/10 text-orange-400', Icon: Bitcoin, textColor: 'text-white' },
+          { label: 'Passed', value: stats.challengeStatuses.passed, tone: 'bg-green-500/10 text-green-400', Icon: CheckCircle, textColor: 'text-green-400' },
+          { label: 'Failed', value: stats.challengeStatuses.failed, tone: 'bg-red-500/10 text-red-400', Icon: AlertCircle, textColor: 'text-red-400' },
+          { label: 'In Progress', value: stats.challengeStatuses.inProgress, tone: 'bg-yellow-500/10 text-yellow-400', Icon: Clock, textColor: 'text-yellow-400' },
+        ].map(({ label, value, tone, Icon, textColor }) => (
           <div key={label} className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-2.5 md:p-4">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1 md:gap-0">
               <div className="min-w-0">
@@ -392,7 +458,7 @@ export default function AdminDashboard() {
                   <h4 className={`text-lg md:text-xl font-bold mt-0.5 ${textColor}`}>{value}</h4>
                 )}
               </div>
-              <div className={`p-1.5 md:p-2 rounded-lg bg-${color}-500/10 text-${color}-400 self-end md:self-auto`}>
+              <div className={`p-1.5 md:p-2 rounded-lg ${tone} self-end md:self-auto`}>
                 <Icon size={14} />
               </div>
             </div>
@@ -419,7 +485,7 @@ export default function AdminDashboard() {
                 <div className="bg-[#151515]/50 rounded-lg p-4">
                   <div className="text-gray-400 text-xs mb-1">Card Revenue</div>
                   <div className="text-xl font-bold text-blue-400">
-                    ${((stats.totalRevenue * stats.cardOrders) / (stats.totalOrders || 1)).toFixed(2)}
+                    ${stats.cardRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                   <div className="text-xs text-gray-500 mt-1">
                     {stats.cardOrders} orders
@@ -428,7 +494,7 @@ export default function AdminDashboard() {
                 <div className="bg-[#151515]/50 rounded-lg p-4">
                   <div className="text-gray-400 text-xs mb-1">Crypto Revenue</div>
                   <div className="text-xl font-bold text-orange-400">
-                    ${((stats.totalRevenue * stats.cryptoOrders) / (stats.totalOrders || 1)).toFixed(2)}
+                    ${stats.cryptoRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
                   <div className="text-xs text-gray-500 mt-1">
                     {stats.cryptoOrders} orders
@@ -439,22 +505,28 @@ export default function AdminDashboard() {
               {/* Order Type Distribution */}
               <div>
                 <div className="text-sm text-gray-400 mb-2">Order Type Distribution</div>
-                <div className="flex gap-2 h-8 rounded-lg overflow-hidden">
-                  {stats.cardOrders > 0 && (
-                    <div 
-                      className="bg-blue-500 flex items-center justify-center text-xs text-white font-medium"
-                      style={{ width: `${(stats.cardOrders / stats.totalOrders) * 100}%` }}
-                    >
-                      {stats.cardOrders > 0 && `${((stats.cardOrders / stats.totalOrders) * 100).toFixed(0)}%`}
-                    </div>
-                  )}
-                  {stats.cryptoOrders > 0 && (
-                    <div 
-                      className="bg-orange-500 flex items-center justify-center text-xs text-white font-medium"
-                      style={{ width: `${(stats.cryptoOrders / stats.totalOrders) * 100}%` }}
-                    >
-                      {stats.cryptoOrders > 0 && `${((stats.cryptoOrders / stats.totalOrders) * 100).toFixed(0)}%`}
-                    </div>
+                <div className="flex gap-2 h-8 rounded-lg overflow-hidden bg-[#2F2F2F]/40">
+                  {stats.totalOrders === 0 ? (
+                    <div className="flex-1 flex items-center justify-center text-xs text-gray-500">No orders in this period</div>
+                  ) : (
+                    <>
+                      {stats.cardOrders > 0 && (
+                        <div 
+                          className="bg-blue-500 flex items-center justify-center text-xs text-white font-medium"
+                          style={{ width: `${(stats.cardOrders / stats.totalOrders) * 100}%` }}
+                        >
+                          {`${((stats.cardOrders / stats.totalOrders) * 100).toFixed(0)}%`}
+                        </div>
+                      )}
+                      {stats.cryptoOrders > 0 && (
+                        <div 
+                          className="bg-orange-500 flex items-center justify-center text-xs text-white font-medium"
+                          style={{ width: `${(stats.cryptoOrders / stats.totalOrders) * 100}%` }}
+                        >
+                          {`${((stats.cryptoOrders / stats.totalOrders) * 100).toFixed(0)}%`}
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
                 <div className="flex justify-between mt-2 text-xs">
@@ -561,19 +633,19 @@ export default function AdminDashboard() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 md:mb-6 gap-3">
           <h2 className="text-base md:text-lg font-semibold text-white">Recent Orders</h2>
           <div className="flex gap-3">
-            <button 
-              onClick={() => window.location.href = '/admin/orders'}
+            <Link 
+              href="/admin/orders"
               className="text-[#0FF1CE] hover:underline text-xs md:text-sm"
             >
               Card Orders
-            </button>
+            </Link>
             <span className="text-gray-600">|</span>
-            <button 
-              onClick={() => window.location.href = '/admin/crypto-orders'}
+            <Link 
+              href="/admin/crypto-orders"
               className="text-[#0FF1CE] hover:underline text-xs md:text-sm"
             >
               Crypto Orders
-            </button>
+            </Link>
           </div>
         </div>
         
@@ -603,7 +675,7 @@ export default function AdminDashboard() {
                           {isCrypto ? <Bitcoin size={10} className="mr-1" /> : <ShoppingCart size={10} className="mr-1" />}
                           {isCrypto ? 'Crypto' : 'Card'}
                         </div>
-                        <span className="text-white text-xs font-mono">#{order.id.slice(0, 8)}</span>
+                        <Link href={`/admin/${isCrypto ? 'crypto-orders' : 'orders'}?q=${order.id}`} className="text-white text-xs font-mono hover:text-[#0FF1CE]">#{order.id.slice(0, 8)}</Link>
                       </div>
                       <div className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusStyles[statusKey]?.bg || statusStyles.unknown.bg} ${statusStyles[statusKey]?.color || statusStyles.unknown.color}`}>
                         <Status size={10} className="mr-1" />
@@ -616,7 +688,7 @@ export default function AdminDashboard() {
                         <div className="text-gray-500 text-xs">{order.challengeType} · {order.challengeAmount}</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-[#0FF1CE] text-sm font-semibold">${order.displayAmount.toFixed(2)}</div>
+                        <div className="text-[#0FF1CE] text-sm font-semibold">{formatMoney(order.displayAmount)}</div>
                         <div className="text-gray-500 text-xs">{formatDate(order.displayDate)}</div>
                       </div>
                     </div>
@@ -660,7 +732,9 @@ export default function AdminDashboard() {
                           </div>
                         </td>
                         <td className="py-4 px-4 whitespace-nowrap text-sm font-medium text-white">
-                          #{order.id.slice(0, 8)}
+                          <Link href={`/admin/${isCrypto ? 'crypto-orders' : 'orders'}?q=${order.id}`} className="hover:text-[#0FF1CE]">
+                            #{order.id.slice(0, 8)}
+                          </Link>
                         </td>
                         <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-300">
                           {order.displayName}
@@ -671,7 +745,7 @@ export default function AdminDashboard() {
                         <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-300">{order.challengeType}</td>
                         <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-300">{order.challengeAmount}</td>
                         <td className="py-4 px-4 whitespace-nowrap text-sm text-gray-300">
-                          ${order.displayAmount.toFixed(2)}
+                          {formatMoney(order.displayAmount)}
                           {isCrypto && (
                             <div className="text-xs text-gray-500">
                               {(order as CryptoOrder).cryptoAmount} {(order as CryptoOrder).cryptoType}

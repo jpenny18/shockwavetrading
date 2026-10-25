@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, getUserMetaApiAccount, getCachedMetrics } from '../../../../lib/firebase';
+import { formatMetaApiAccountName, isVipMetaApiAccount } from '../../../../lib/vip-accounts';
 import dynamic from 'next/dynamic';
 import { 
   TrendingUp, 
@@ -498,6 +499,11 @@ export default function AccountDetailsPage() {
         return;
       }
 
+      if (isVipMetaApiAccount(userAccount)) {
+        router.replace(`/dashboard/vip/accounts/${accountId}`);
+        return;
+      }
+
       // Store user account data for display
       setUserAccount(userAccount);
 
@@ -750,9 +756,7 @@ export default function AccountDetailsPage() {
                 <div>
                   <p className="text-xs text-gray-400 mb-1">Account Type</p>
                   <p className="text-white font-medium">
-                    {userAccount?.accountType === '1-step' ? 'Shockwave 1-Step' : 
-                     userAccount?.accountType === 'gauntlet' ? 'Shockwave Gauntlet' :
-                     userAccount?.accountType === 'instant' ? 'Shockwave Instant' : 'Shockwave Standard'}
+                    {formatMetaApiAccountName(userAccount?.accountType)}
                   </p>
                 </div>
                 <div>

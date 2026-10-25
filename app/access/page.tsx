@@ -8,6 +8,7 @@ import {
   Mail,
   Lock,
   User,
+  Phone,
   ArrowRight,
   Check,
   AlertCircle,
@@ -22,12 +23,17 @@ import {
 import { useRouter } from 'next/navigation';
 import { registerUser, signInUser, resetPassword } from '@/lib/firebase';
 import { auth } from '@/lib/firebase';
+import { countries } from '@/lib/countries';
 
 interface AuthData {
   email: string;
   password: string;
+  confirmPassword: string;
   rememberMe: boolean;
-  name?: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  country: string;
 }
 
 interface AuthErrors {
@@ -169,8 +175,12 @@ export default function EarlyAccessPage() {
   const [formData, setFormData] = useState<AuthData>({
     email: '',
     password: '',
+    confirmPassword: '',
     rememberMe: false,
-    name: ''
+    firstName: '',
+    lastName: '',
+    phone: '',
+    country: ''
   });
   const [errors, setErrors] = useState<AuthErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -267,12 +277,21 @@ export default function EarlyAccessPage() {
       } else {
         // For registration form
         // Validation
-        if (!formData.email || !formData.password || !formData.name) {
-          setErrors({
-            email: !formData.email ? 'Please enter your email address' : undefined,
-            password: !formData.password ? 'Please enter your password' : undefined,
-            name: !formData.name ? 'Please enter your name' : undefined
-          });
+        const phoneDigits = formData.phone.replace(/\D/g, '');
+        const nextErrors: AuthErrors = {
+          email: !formData.email ? 'Please enter your email address' : undefined,
+          password: !formData.password ? 'Please enter your password' : undefined,
+          firstName: !formData.firstName.trim() ? 'Please enter your first name' : undefined,
+          lastName: !formData.lastName.trim() ? 'Please enter your last name' : undefined,
+          phone: !formData.phone.trim()
+            ? 'Please enter your phone number'
+            : (phoneDigits.length < 7 || phoneDigits.length > 15)
+              ? 'Enter a valid phone number'
+              : undefined,
+          country: !formData.country ? 'Please select your country' : undefined
+        };
+        if (Object.values(nextErrors).some(Boolean)) {
+          setErrors(nextErrors);
           setIsSubmitting(false);
           return;
         }
@@ -293,15 +312,21 @@ export default function EarlyAccessPage() {
           return;
         }
 
-        // Register with Firebase
-        const nameParts = formData.name.split(' ');
-        const firstName = nameParts[0];
-        const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : '';
+        if (formData.password !== formData.confirmPassword) {
+          setErrors({ confirmPassword: 'Passwords do not match' });
+          setIsSubmitting(false);
+          return;
+        }
+
+        const firstName = formData.firstName.trim();
+        const lastName = formData.lastName.trim();
 
         await registerUser(formData.email, formData.password, {
-          displayName: formData.name,
-          firstName: firstName,
-          lastName: lastName
+          displayName: `${firstName} ${lastName}`.trim(),
+          firstName,
+          lastName,
+          phone: formData.phone.trim(),
+          country: formData.country
         });
 
         // If successful, redirect to main page
@@ -616,15 +641,57 @@ export default function EarlyAccessPage() {
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 {!isLogin && (
-                  <FloatingLabelInput
-                    id="name"
-                    label="Full Name"
-                    icon={User}
-                    value={formData.name || ''}
-                    onChange={(value) => setFormData({ ...formData, name: value })}
-                    error={errors.name}
-                    required
-                  />
+                  <>
+                    <FloatingLabelInput
+                      id="firstName"
+                      label="First Name"
+                      icon={User}
+                      value={formData.firstName}
+                      onChange={(value) => setFormData({ ...formData, firstName: value })}
+                      error={errors.firstName}
+                      required
+                    />
+                    <FloatingLabelInput
+                      id="lastName"
+                      label="Last Name"
+                      icon={User}
+                      value={formData.lastName}
+                      onChange={(value) => setFormData({ ...formData, lastName: value })}
+                      error={errors.lastName}
+                      required
+                    />
+                    <FloatingLabelInput
+                      id="phone"
+                      label="Phone Number"
+                      icon={Phone}
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(value) => setFormData({ ...formData, phone: value })}
+                      error={errors.phone}
+                      required
+                    />
+                    <div>
+                      <label htmlFor="country" className="mb-2 block text-sm text-gray-400">Country</label>
+                      <select
+                        id="country"
+                        value={formData.country}
+                        onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                        className={`w-full rounded-xl border bg-[#1A1A1A]/50 px-4 py-4 text-sm text-white focus:outline-none md:text-base ${errors.country ? 'border-red-500/50' : 'border-[#2F2F2F]/50'}`}
+                        required
+                      >
+                        <option value="">Select country</option>
+                        {countries.map((country) => (
+                          <option key={country.code} value={country.code}>{country.name}</option>
+                        ))}
+                      </select>
+                      {errors.country && (
+                        <p className="mt-2 flex items-center gap-1 text-xs text-red-400 md:text-sm">
+                          <AlertCircle size={14} />
+                          {errors.country}
+                        </p>
+                      )}
+                    </div>
+                  </>
                 )}
 
                 <FloatingLabelInput
@@ -648,6 +715,24 @@ export default function EarlyAccessPage() {
                   error={errors.password}
                   required
                 />
+
+                {!isLogin && (
+                  <>
+                    <p className={`-mt-2 text-xs ${formData.password.length >= 6 ? 'text-[#0FF1CE]' : 'text-gray-500'}`}>
+                      At least 6 characters. Use the eye icon to view it, then retype it below.
+                    </p>
+                    <FloatingLabelInput
+                      id="confirmPassword"
+                      label="Retype Password"
+                      icon={Lock}
+                      type="password"
+                      value={formData.confirmPassword}
+                      onChange={(value) => setFormData({ ...formData, confirmPassword: value })}
+                      error={errors.confirmPassword}
+                      required
+                    />
+                  </>
+                )}
 
                 <div className="flex items-center justify-between">
                   <label className="flex items-center gap-2 cursor-pointer group">

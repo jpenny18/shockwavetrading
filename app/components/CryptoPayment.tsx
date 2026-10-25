@@ -11,6 +11,7 @@ interface CryptoPaymentProps {
   onProcessingStateChange: (state: boolean) => void;
   cryptoPrices: CryptoPrice;
   beforeSubmit?: () => boolean | Promise<boolean>;
+  onPaymentSubmitted?: (orderId: string) => void | Promise<void>;
 }
 
 interface CryptoPrice {
@@ -71,7 +72,7 @@ const getQrValue = (symbol: keyof CryptoPrice, amount: number, address: string):
   return `ethereum:${address}?value=${ethToWeiString(amount)}`;
 };
 
-export default function CryptoPayment({ challengeData, successRedirectPath, onProcessingStateChange, cryptoPrices, beforeSubmit }: CryptoPaymentProps) {
+export default function CryptoPayment({ challengeData, successRedirectPath, onProcessingStateChange, cryptoPrices, beforeSubmit, onPaymentSubmitted }: CryptoPaymentProps) {
   const router = useRouter();
   const [selectedCrypto, setSelectedCrypto] = useState<'BTC' | 'ETH' | 'USDT' | 'USDC'>('BTC');
   const [cryptoAmount, setCryptoAmount] = useState<CryptoPrice>({ BTC: 0, ETH: 0, USDT: 0, USDC: 0 });
@@ -193,6 +194,10 @@ export default function CryptoPayment({ challengeData, successRedirectPath, onPr
         }
       } catch (emailError) {
         console.error('Error sending order emails:', emailError);
+      }
+
+      if (onPaymentSubmitted) {
+        await onPaymentSubmitted(orderId);
       }
 
       router.push(successRedirectPath);

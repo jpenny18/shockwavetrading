@@ -70,21 +70,34 @@ export default function CryptoOrdersPage() {
   const [challengeStatusFilter, setChallengeStatusFilter] = useState<'ALL' | 'IN_PROGRESS' | 'FAILED' | 'PASSED'>('ALL');
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [copiedText, setCopiedText] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [listError, setListError] = useState<string | null>(null);
+  const [statusError, setStatusError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Subscribe to crypto orders collection
+    const search = new URLSearchParams(window.location.search).get('q');
+    if (search) setSearchTerm(search);
+  }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    setListError(null);
     const q = query(collection(db, 'crypto-orders'), orderBy('createdAt', 'desc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const ordersData: CryptoOrder[] = [];
-      snapshot.forEach((doc) => {
-        ordersData.push({ id: doc.id, ...doc.data() } as CryptoOrder);
+      snapshot.forEach((orderDoc) => {
+        ordersData.push({ id: orderDoc.id, ...orderDoc.data() } as CryptoOrder);
       });
       setOrders(ordersData);
+      setLoading(false);
+    }, (error) => {
+      console.error('Error loading crypto orders:', error);
+      setListError('Failed to load crypto orders. Please try again.');
       setLoading(false);
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [refreshKey]);
 
   const handleStatusChange = async (orderId: string, newStatus: 'COMPLETED' | 'CANCELLED') => {
     try {
@@ -177,15 +190,18 @@ export default function CryptoOrdersPage() {
       });
     } catch (error) {
       console.error('Error updating challenge status:', error);
+      setStatusError('Failed to update challenge status. Please try again.');
     }
   };
 
   const filteredOrders = orders.filter(order => {
     const matchesSearch = 
-      order.customerEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.verificationPhrase.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.cryptoAddress.toLowerCase().includes(searchTerm.toLowerCase());
+      (order.customerEmail || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (order.customerName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (order.verificationPhrase || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (order.cryptoAddress || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (order.id || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (order.challengeType || '').toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesStatus = statusFilter === 'ALL' || order.status === statusFilter;
     const matchesCrypto = cryptoFilter === 'ALL' || order.cryptoType === cryptoFilter;
@@ -199,13 +215,19 @@ export default function CryptoOrdersPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h1 className="text-xl md:text-2xl font-bold text-white">Crypto Orders</h1>
         <button
-          onClick={() => setLoading(true)}
+          onClick={() => setRefreshKey((key) => key + 1)}
           className="flex items-center gap-2 px-3 md:px-4 py-2 bg-[#0FF1CE]/10 hover:bg-[#0FF1CE]/20 text-[#0FF1CE] rounded-lg text-sm w-full sm:w-auto justify-center sm:justify-start"
         >
           <RefreshCw size={14} />
           <span>Refresh</span>
         </button>
       </div>
+
+      {(listError || statusError) && (
+        <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+          {listError || statusError}
+        </div>
+      )}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2 md:gap-4">
@@ -230,7 +252,7 @@ export default function CryptoOrdersPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
           <input
             type="text"
-            placeholder="Search by email, name, phrase..."
+            placeholder="Search by email, name, phrase, or order ID..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-9 pr-4 py-2 bg-[#151515] border border-[#2F2F2F]/50 rounded-lg text-white text-sm placeholder-gray-400 focus:outline-none focus:border-[#0FF1CE]/50"

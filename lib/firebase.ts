@@ -10,7 +10,8 @@ import {
   getDocs,
   query,
   where,
-  setDoc
+  setDoc,
+  deleteDoc
 } from 'firebase/firestore';
 import { 
   getAuth, 
@@ -23,6 +24,7 @@ import {
   User as FirebaseUser,
   UserCredential
 } from 'firebase/auth';
+import { isVipMetaApiAccount } from './vip-accounts';
 import { 
   getStorage, 
   ref, 
@@ -79,6 +81,9 @@ export interface UserData {
   totalSpent?: number;
   orderCount?: number;
   lastOrderDate?: Timestamp;
+  payoutsUnlocked?: boolean;
+  payoutsUnlockedAt?: Timestamp;
+  payoutsUnlockedBy?: string;
 }
 
 /**
@@ -112,7 +117,7 @@ export interface UserMetaApiAccount {
   userId: string;
   accountId: string;
   accountToken: string;
-  accountType: 'standard' | 'instant' | '1-step' | 'gauntlet';
+  accountType: 'standard' | 'instant' | '1-step' | 'gauntlet' | 'vip';
   accountSize: number;
   platform: 'mt4' | 'mt5';
   status: 'active' | 'inactive' | 'passed' | 'failed' | 'funded';
@@ -123,6 +128,12 @@ export interface UserMetaApiAccount {
   lastMetricsUpdate?: Timestamp;
   trackerId?: string; // Risk management tracker ID
   fundedDate?: Timestamp; // Date when account became funded
+  loginCredentials?: {
+    login: string;
+    password: string;
+    server: string;
+  };
+  profitSplit?: number; // VIP funded accounts only, 80-100
 }
 
 /**
@@ -217,6 +228,50 @@ export interface WithdrawalRequest {
 }
 
 /**
+ * Interface for a VIP activation offer (admin-unlocked, per-user)
+ * Doc ID = userId in the 'vipActivations' collection.
+ * Presence of the doc unlocks the /dashboard/vip page for that user.
+ */
+export interface VIPActivation {
+  userId: string;
+  userEmail: string;
+  accountSize: string;
+  tierName?: string;
+  price: number;
+  publicPrice?: number;
+  adminNotes?: string;
+  enabledAt: Timestamp;
+  enabledBy: string;
+  paymentStatus: 'unpaid' | 'pending' | 'completed';
+  platform?: string;
+  cryptoOrderId?: string;
+  paymentSubmittedAt?: Timestamp;
+  paymentCompletedAt?: Timestamp;
+  kybStatus: 'not_submitted' | 'pending' | 'approved' | 'rejected' | 'needs_resubmission';
+  companyName?: string;
+  customTerms?: {
+    title: string;
+    content: string;
+  };
+  documents: {
+    corporateDocs?: Array<{
+      url: string;
+      fileName: string;
+      uploadedAt: Timestamp;
+    }>;
+    agreementSignedAt?: Timestamp;
+    customTermsSignedAt?: Timestamp;
+  };
+  kybSubmittedAt?: Timestamp;
+  reviewNotes?: string;
+  reviewedAt?: Timestamp;
+  reviewedBy?: string;
+  lastVisitedAt?: Timestamp;
+  createdAt: Timestamp;
+  updatedAt: Timestamp;
+}
+
+/**
  * Register a new user with email and password
  * @param email User's email
  * @param password User's password
@@ -248,8 +303,8 @@ export async function registerUser(
       displayName: userData.displayName || '',
       firstName: userData.firstName || '',
       lastName: userData.lastName || '',
-      phone: '',
-      country: '',
+      phone: userData.phone || '',
+      country: userData.country || '',
       createdAt: now,
       updatedAt: now,
       status: 'active' as const,
@@ -374,6 +429,17 @@ export async function getAllUsers(): Promise<UserData[]> {
     console.error('Error retrieving users:', error);
     throw error;
   }
+}
+
+/**
+ * Open or close the customer payouts page without creating a payout request.
+ */
+export async function setUserPayoutsAccess(userId: string, unlocked: boolean, adminId: string): Promise<void> {
+  await updateUser(userId, {
+    payoutsUnlocked: unlocked,
+    payoutsUnlockedAt: Timestamp.now(),
+    payoutsUnlockedBy: adminId,
+  });
 }
 
 /**
@@ -596,10 +662,19 @@ export async function getAllUserMetaApiAccounts(userId: string): Promise<UserMet
 }
 
 /**
+ * Get a user's VIP MetaAPI accounts only (excludes challenge accounts).
+ */
+export async function getUserVipMetaApiAccounts(userId: string): Promise<UserMetaApiAccount[]> {
+  const accounts = await getAllUserMetaApiAccounts(userId);
+  return accounts.filter((account) => isVipMetaApiAccount(account));
+}
+
+/**
  * Create or update user's MetaAPI account mapping
  */
 export async function setUserMetaApiAccount(data: Omit<UserMetaApiAccount, 'createdAt' | 'updatedAt'>): Promise<void> {
   try {
+    const payload = isVipMetaApiAccount(data) ? { ...data, accountType: 'vip' as const } : data;
     const accountsRef = collection(db, 'userMetaApiAccounts');
     
     // Check if this specific accountId already exists for this user (to prevent duplicates)
@@ -614,13 +689,13 @@ export async function setUserMetaApiAccount(data: Omit<UserMetaApiAccount, 'crea
       // Update existing account with same accountId
       const docId = duplicateSnapshot.docs[0].id;
       await updateDoc(doc(db, 'userMetaApiAccounts', docId), {
-        ...data,
+        ...payload,
         updatedAt: Timestamp.now()
       });
     } else {
       // Create new account (allow multiple accounts per user)
       await addDoc(accountsRef, {
-        ...data,
+        ...payload,
         createdAt: Timestamp.now(),
         updatedAt: Timestamp.now()
       });
@@ -1051,5 +1126,165 @@ export async function isUserEligibleForWithdrawal(userId: string): Promise<boole
   } catch (error) {
     console.error('Error checking withdrawal eligibility:', error);
     return false;
+  }
+}
+
+/**
+ * Enable (unlock) the VIP portal for a user with a custom offer (admin only)
+ */
+export async function enableVIPActivation(
+  userId: string,
+  userEmail: string,
+  offer: {
+    accountSize: string;
+    tierName?: string;
+    price: number;
+    publicPrice?: number;
+    adminNotes?: string;
+    customTermsTitle?: string;
+    customTermsContent?: string;
+  },
+  enabledBy: string
+): Promise<string> {
+  try {
+    const vipRef = doc(db, 'vipActivations', userId);
+
+    const data: Record<string, unknown> = {
+      userId,
+      userEmail,
+      accountSize: offer.accountSize,
+      price: offer.price,
+      paymentStatus: 'unpaid',
+      kybStatus: 'not_submitted',
+      documents: {},
+      enabledAt: Timestamp.now(),
+      enabledBy,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now()
+    };
+
+    if (offer.tierName) data.tierName = offer.tierName;
+    if (offer.publicPrice !== undefined) data.publicPrice = offer.publicPrice;
+    if (offer.adminNotes) data.adminNotes = offer.adminNotes;
+    if (offer.customTermsContent && offer.customTermsContent.trim()) {
+      data.customTerms = {
+        title: offer.customTermsTitle?.trim() || 'Additional Account Terms',
+        content: offer.customTermsContent.trim()
+      };
+    }
+
+    await setDoc(vipRef, data);
+    return userId;
+  } catch (error) {
+    console.error('Error enabling VIP activation:', error);
+    throw error;
+  }
+}
+
+export async function recordVIPPageVisit(userId: string): Promise<void> {
+  try {
+    const vipRef = doc(db, 'vipActivations', userId);
+    const vipSnap = await getDoc(vipRef);
+    if (!vipSnap.exists()) return;
+    await updateDoc(vipRef, { lastVisitedAt: Timestamp.now() });
+  } catch (error) {
+    console.error('Error recording VIP page visit:', error);
+  }
+}
+
+export async function getVIPActivation(userId: string): Promise<VIPActivation | null> {
+  try {
+    const vipRef = doc(db, 'vipActivations', userId);
+    const vipSnap = await getDoc(vipRef);
+    if (vipSnap.exists()) {
+      return vipSnap.data() as VIPActivation;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error fetching VIP activation:', error);
+    throw error;
+  }
+}
+
+export async function getAllVIPActivations(): Promise<(VIPActivation & { id: string })[]> {
+  try {
+    const vipRef = collection(db, 'vipActivations');
+    const querySnapshot = await getDocs(query(vipRef));
+    const activations: (VIPActivation & { id: string })[] = [];
+    querySnapshot.forEach((vipDoc) => {
+      activations.push({
+        ...(vipDoc.data() as VIPActivation),
+        id: vipDoc.id
+      });
+    });
+    return activations;
+  } catch (error) {
+    console.error('Error fetching VIP activations:', error);
+    throw error;
+  }
+}
+
+export async function updateVIPActivation(
+  userId: string,
+  vipData: Partial<VIPActivation>
+): Promise<void> {
+  try {
+    const vipRef = doc(db, 'vipActivations', userId);
+    const existingDoc = await getDoc(vipRef);
+    if (!existingDoc.exists()) {
+      throw new Error('VIP activation not found');
+    }
+
+    const existingData = existingDoc.data() as VIPActivation;
+    const mergedData: Record<string, any> = {
+      ...vipData,
+      updatedAt: Timestamp.now()
+    };
+
+    if (vipData.documents) {
+      mergedData.documents = {
+        ...existingData.documents,
+        ...vipData.documents
+      };
+    }
+
+    await updateDoc(vipRef, mergedData);
+  } catch (error) {
+    console.error('Error updating VIP activation:', error);
+    throw error;
+  }
+}
+
+export async function updateVIPKybStatus(
+  userId: string,
+  kybStatus: VIPActivation['kybStatus'],
+  reviewNotes?: string,
+  reviewedBy?: string
+): Promise<void> {
+  try {
+    const vipRef = doc(db, 'vipActivations', userId);
+    const updateData: Record<string, any> = {
+      kybStatus,
+      reviewedAt: Timestamp.now(),
+      updatedAt: Timestamp.now()
+    };
+
+    if (reviewNotes) updateData.reviewNotes = reviewNotes;
+    if (reviewedBy) updateData.reviewedBy = reviewedBy;
+
+    await updateDoc(vipRef, updateData);
+  } catch (error) {
+    console.error('Error updating VIP KYB status:', error);
+    throw error;
+  }
+}
+
+export async function deleteVIPActivation(userId: string): Promise<void> {
+  try {
+    const vipRef = doc(db, 'vipActivations', userId);
+    await deleteDoc(vipRef);
+  } catch (error) {
+    console.error('Error deleting VIP activation:', error);
+    throw error;
   }
 } 

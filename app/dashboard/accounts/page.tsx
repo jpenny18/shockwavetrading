@@ -6,7 +6,9 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db, UserMetaApiAccount, getCachedMetrics } from '../../../lib/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import Particles from '../../components/Particles';
+import { formatMetaApiAccountName, isVipMetaApiAccount } from '../../../lib/vip-accounts';
 import { Lock, Plus, AlertTriangle, TrendingUp, Loader2, ChevronRight, DollarSign, BarChart } from 'lucide-react';
+import VipLoginCredentialsAccordion from '../../components/VipLoginCredentials';
 
 interface AccountWithMetrics extends UserMetaApiAccount {
   cachedMetrics?: any;
@@ -50,6 +52,8 @@ export default function MyAccountsPage() {
           // Fetch each account with its cached metrics
           for (const doc of snapshot.docs) {
             const account = doc.data() as UserMetaApiAccount;
+            // VIP accounts are managed on /dashboard/vip/accounts
+            if (isVipMetaApiAccount(account)) continue;
             
             // Try to get cached metrics for each account
             const metrics = await getCachedMetrics(account.accountId);
@@ -284,8 +288,7 @@ export default function MyAccountsPage() {
               return (
                 <div 
                   key={account.accountId}
-                  className={`bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-6 ${getBorderStyle(account.status)} transition-all duration-300 cursor-pointer ${isPlaceholder ? 'relative' : ''}`}
-                  onClick={() => handleViewAccount(account.accountId)}
+                  className={`bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-6 ${getBorderStyle(account.status)} transition-all duration-300 ${isPlaceholder ? 'relative' : ''}`}
                 >
                   {/* Placeholder Badge */}
                   {isPlaceholder && (
@@ -294,12 +297,14 @@ export default function MyAccountsPage() {
                     </div>
                   )}
 
+                  <div
+                    className="cursor-pointer"
+                    onClick={() => handleViewAccount(account.accountId)}
+                  >
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <h3 className="text-lg font-semibold text-white">
-                        {account.accountType === '1-step' ? 'Shockwave 1-Step' : 
-                         account.accountType === 'gauntlet' ? 'Shockwave Gauntlet' :
-                         account.accountType === 'standard' ? 'Shockwave Standard' : 'Shockwave Instant'}
+                        {formatMetaApiAccountName(account.accountType)}
                       </h3>
                       <p className="text-sm text-gray-400 mt-1">
                         ${account.accountSize.toLocaleString()} • {account.step === 3 ? 'Funded' : 
@@ -353,6 +358,13 @@ export default function MyAccountsPage() {
                     </div>
                     <ChevronRight className="text-gray-400" size={16} />
                   </div>
+                  </div>
+
+                  <VipLoginCredentialsAccordion
+                    credentials={account.loginCredentials}
+                    platform={account.platform}
+                    emptyMessage="Login details will appear here after your challenge account is connected with broker credentials."
+                  />
                 </div>
               );
             })}

@@ -49,17 +49,24 @@ export default function CardOrdersPage() {
   const [challengeTypeFilter, setChallengeTypeFilter] = useState<ChallengeTypeFilter>('ALL');
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
-  const [showBulkActions, setShowBulkActions] = useState(false);
+  const [pageError, setPageError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const search = new URLSearchParams(window.location.search).get('q');
+    if (search) setSearchTerm(search);
+  }, []);
 
   const fetchOrders = async () => {
     try {
+      setPageError(null);
       const response = await fetch('/api/card-orders');
       if (!response.ok) throw new Error('Failed to fetch orders');
       const data = await response.json();
-      setOrders(data.orders);
+      setOrders(data.orders || []);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching card orders:', error);
+      setPageError('Failed to load card orders. Please try again.');
       setLoading(false);
     }
   };
@@ -84,10 +91,10 @@ export default function CardOrdersPage() {
 
       if (!response.ok) throw new Error('Failed to update order');
       
-      // Refresh orders
       await fetchOrders();
     } catch (error) {
       console.error('Error updating order:', error);
+      setPageError('Failed to update the order. Please try again.');
     }
   };
 
@@ -101,10 +108,10 @@ export default function CardOrdersPage() {
 
       if (!response.ok) throw new Error('Failed to delete order');
       
-      // Refresh orders
       await fetchOrders();
     } catch (error) {
       console.error('Error deleting order:', error);
+      setPageError('Failed to delete the order. Please try again.');
     }
   };
 
@@ -121,6 +128,7 @@ export default function CardOrdersPage() {
       await fetchOrders();
     } catch (error) {
       console.error('Error bulk deleting orders:', error);
+      setPageError('Failed to delete the selected orders. Please try again.');
     }
   };
 
@@ -141,6 +149,7 @@ export default function CardOrdersPage() {
       await fetchOrders();
     } catch (error) {
       console.error('Error bulk updating orders:', error);
+      setPageError('Failed to update the selected orders. Please try again.');
     }
   };
 
@@ -175,11 +184,11 @@ export default function CardOrdersPage() {
   const filteredOrders = orders
     .filter((order) => {
       const matchesSearch = 
-        order.customerEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.challengeType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.id.toLowerCase().includes(searchTerm.toLowerCase());
+        (order.customerEmail || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (order.firstName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (order.lastName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (order.challengeType || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (order.id || '').toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesStatus = statusFilter === 'ALL' || order.status === statusFilter;
       const matchesChallengeType = challengeTypeFilter === 'ALL' || order.challengeType === challengeTypeFilter;
@@ -231,6 +240,12 @@ export default function CardOrdersPage() {
             <span>Refresh</span>
           </button>
         </div>
+
+        {pageError && (
+          <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+            {pageError}
+          </div>
+        )}
 
         {/* Challenge Type Tabs */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-0.5 px-0.5">

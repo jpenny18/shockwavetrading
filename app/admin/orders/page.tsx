@@ -71,10 +71,25 @@ const sortOptions = [
 ];
 
 // Filter options
-const filterOptions = {
-  status: ['All', 'Completed', 'Processing', 'Pending', 'Failed'],
-  type: ['All', 'Standard Challenge', 'Express Challenge', 'Instant Funding', 'VIP Activation', 'vip-activation'],
-};
+const statusFilterOptions = ['All', 'Completed', 'Processing', 'Pending', 'Failed'];
+const knownChallengeTypes = ['Standard', '1-Step', 'Instant', 'Gauntlet', 'VIP Activation', 'vip-activation'];
+
+function csvField(value: unknown) {
+  const normalized = String(value ?? '')
+    .replace(/\r\n/g, ' ')
+    .replace(/[\r\n]/g, ' ');
+  return `"${normalized.replace(/"/g, '""')}"`;
+}
+
+interface CredentialAccountOption {
+  accountId: string;
+  accountType: string;
+  accountSize: number;
+  platform: string;
+  status: string;
+  login: string;
+  server: string;
+}
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -92,6 +107,14 @@ export default function OrdersPage() {
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const [showPaymentDropdown, setShowPaymentDropdown] = useState<string | null>(null);
   const [showChallengeDropdown, setShowChallengeDropdown] = useState<string | null>(null);
+  const [resendingOrderId, setResendingOrderId] = useState<string | null>(null);
+  const [actionMessage, setActionMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [credentialChoices, setCredentialChoices] = useState<{ order: Order; accounts: CredentialAccountOption[] } | null>(null);
+
+  useEffect(() => {
+    const search = new URLSearchParams(window.location.search).get('q');
+    if (search) setSearchTerm(search);
+  }, []);
 
   // Fetch orders from Firebase
   useEffect(() => {
@@ -156,7 +179,7 @@ export default function OrdersPage() {
       );
     } catch (error) {
       console.error('Error updating payment status:', error);
-      setError('Failed to update payment status. Please try again.');
+      setActionMessage({ type: 'error', text: 'Failed to update payment status. Please try again.' });
     } finally {
       setUpdatingOrderId(null);
     }
@@ -183,7 +206,7 @@ export default function OrdersPage() {
       );
     } catch (error) {
       console.error('Error updating challenge status:', error);
-      setError('Failed to update challenge status. Please try again.');
+      setActionMessage({ type: 'error', text: 'Failed to update challenge status. Please try again.' });
     } finally {
       setUpdatingOrderId(null);
     }
@@ -205,11 +228,11 @@ export default function OrdersPage() {
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
       return (
-        order.id.toLowerCase().includes(searchLower) ||
-        order.firstName.toLowerCase().includes(searchLower) ||
-        order.lastName.toLowerCase().includes(searchLower) ||
-        order.customerEmail.toLowerCase().includes(searchLower) ||
-        order.challengeType.toLowerCase().includes(searchLower)
+        (order.id || '').toLowerCase().includes(searchLower) ||
+        (order.firstName || '').toLowerCase().includes(searchLower) ||
+        (order.lastName || '').toLowerCase().includes(searchLower) ||
+        (order.customerEmail || '').toLowerCase().includes(searchLower) ||
+        (order.challengeType || '').toLowerCase().includes(searchLower)
       );
     }
     
@@ -240,9 +263,45 @@ export default function OrdersPage() {
     }
   };
 
-  const handleResendCredentials = async (email: string) => {
-    // TODO: Implement resend credentials functionality
-    alert(`Credentials will be resent to ${email}`);
+  const challengeTypeOptions = ['All', ...Array.from(new Set([...knownChallengeTypes, ...orders.map((order) => order.challengeType).filter(Boolean)]))];
+
+  const handleResendCredentials = async (order: Order, accountId?: string) => {
+    setResendingOrderId(order.id);
+    setActionMessage(null);
+    try {
+      const response = await fetch('/api/admin/resend-credentials', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: order.customerEmail,
+          accountId,
+          challengeAmount: order.challengeAmount,
+          platform: order.platform,
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        if (accountId) setCredentialChoices(null);
+        throw new Error(data.error || 'Failed to resend credentials');
+      }
+      if (data.selectionRequired) {
+        setCredentialChoices({ order, accounts: data.accounts || [] });
+        return;
+      }
+      setCredentialChoices(null);
+      setActionMessage({
+        type: 'success',
+        text: `Login credentials sent to ${data.sentTo} (${data.platform}, login ${data.login}).`,
+      });
+    } catch (resendError) {
+      console.error('Error resending credentials:', resendError);
+      setActionMessage({
+        type: 'error',
+        text: resendError instanceof Error ? resendError.message : 'Failed to resend credentials',
+      });
+    } finally {
+      setResendingOrderId(null);
+    }
   };
 
   const handleExportCSV = () => {
@@ -257,11 +316,10 @@ export default function OrdersPage() {
       order.totalAmount,
       order.paymentStatus,
       order.paymentMethod
-    ]);
+    ].map(csvField));
 
-    // Create CSV content
     const csvContent = [
-      headers.join(','),
+      headers.map(csvField).join(','),
       ...csvData.map(row => row.join(','))
     ].join('\n');
 
@@ -310,7 +368,7 @@ export default function OrdersPage() {
       });
     } catch (error) {
       console.error('Error deleting order:', error);
-      setError('Failed to delete order. Please try again.');
+      setActionMessage({ type: 'error', text: 'Failed to delete order. Please try again.' });
     } finally {
       setIsDeleting(false);
       setShowDeleteConfirm(false);
@@ -336,7 +394,7 @@ export default function OrdersPage() {
       setSelectedOrders(new Set());
     } catch (error) {
       console.error('Error deleting orders:', error);
-      setError('Failed to delete orders. Please try again.');
+      setActionMessage({ type: 'error', text: 'Failed to delete orders. Please try again.' });
     } finally {
       setIsDeleting(false);
       setShowDeleteConfirm(false);
@@ -374,6 +432,18 @@ export default function OrdersPage() {
 
   return (
     <div>
+      {actionMessage && (
+        <div className={`mb-4 p-4 rounded-lg flex items-start justify-between gap-3 text-sm ${
+          actionMessage.type === 'success'
+            ? 'bg-[#0FF1CE]/10 border border-[#0FF1CE]/30 text-[#0FF1CE]'
+            : 'bg-red-500/10 border border-red-500/30 text-red-400'
+        }`}>
+          <span>{actionMessage.text}</span>
+          <button type="button" onClick={() => setActionMessage(null)} className="text-current opacity-70 hover:opacity-100">
+            <X size={16} />
+          </button>
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-5 gap-3">
         <h1 className="text-xl md:text-2xl font-bold text-white">Orders</h1>
         <div className="flex items-center gap-2 md:gap-4">
@@ -421,7 +491,7 @@ export default function OrdersPage() {
               onChange={(e) => setFilterStatus(e.target.value)}
               className="w-full md:w-36 bg-[#151515] border border-[#2F2F2F] rounded-lg px-2 md:px-4 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
             >
-              {filterOptions.status.map((status) => (
+              {statusFilterOptions.map((status) => (
                 <option key={status} value={status}>{status}</option>
               ))}
             </select>
@@ -430,7 +500,7 @@ export default function OrdersPage() {
               onChange={(e) => setFilterType(e.target.value)}
               className="w-full md:w-44 bg-[#151515] border border-[#2F2F2F] rounded-lg px-2 md:px-4 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
             >
-              {filterOptions.type.map((type) => (
+              {challengeTypeOptions.map((type) => (
                 <option key={type} value={type}>{type}</option>
               ))}
             </select>
@@ -534,8 +604,9 @@ export default function OrdersPage() {
                       <button onClick={() => handleUpdatePaymentStatus(order.id, 'failed')} disabled={updatingOrderId === order.id || order.paymentStatus === 'failed'} className="flex-1 flex items-center justify-center gap-1 bg-red-500/10 hover:bg-red-500/20 text-red-500 py-1.5 rounded text-xs font-medium transition-colors disabled:opacity-50">
                         <X size={11} /><span>Fail</span>
                       </button>
-                      <button onClick={() => handleResendCredentials(order.customerEmail)} className="flex-1 flex items-center justify-center gap-1 bg-[#0FF1CE]/10 hover:bg-[#0FF1CE]/20 text-[#0FF1CE] py-1.5 rounded text-xs font-medium transition-colors">
-                        <Mail size={11} /><span>Resend</span>
+                      <button onClick={() => handleResendCredentials(order)} disabled={resendingOrderId === order.id} className="flex-1 flex items-center justify-center gap-1 bg-[#0FF1CE]/10 hover:bg-[#0FF1CE]/20 text-[#0FF1CE] py-1.5 rounded text-xs font-medium transition-colors disabled:opacity-50">
+                        {resendingOrderId === order.id ? <Loader2 size={11} className="animate-spin" /> : <Mail size={11} />}
+                        <span>{resendingOrderId === order.id ? 'Sending' : 'Resend'}</span>
                       </button>
                     </div>
                   </div>
@@ -852,17 +923,20 @@ export default function OrdersPage() {
                                 <div className="flex justify-between">
                                   <span className="text-gray-400">Last Updated:</span>
                                   <span className="text-white">
-                                    {new Date(order.updatedAt.seconds * 1000).toLocaleString()}
+                                    {order.updatedAt?.seconds
+                                      ? new Date(order.updatedAt.seconds * 1000).toLocaleString()
+                                      : '—'}
                                   </span>
                                 </div>
 
                                 {/* Resend Credentials Button */}
                                 <button 
-                                  onClick={() => handleResendCredentials(order.customerEmail)}
-                                  className="w-full flex items-center justify-center gap-2 bg-[#0FF1CE]/10 hover:bg-[#0FF1CE]/20 text-[#0FF1CE] py-2 rounded-lg transition-colors"
+                                  onClick={() => handleResendCredentials(order)}
+                                  disabled={resendingOrderId === order.id}
+                                  className="w-full flex items-center justify-center gap-2 bg-[#0FF1CE]/10 hover:bg-[#0FF1CE]/20 text-[#0FF1CE] py-2 rounded-lg transition-colors disabled:opacity-50"
                                 >
-                                  <Mail size={16} />
-                                  <span>Resend Credentials</span>
+                                  {resendingOrderId === order.id ? <Loader2 size={16} className="animate-spin" /> : <Mail size={16} />}
+                                  <span>{resendingOrderId === order.id ? 'Sending...' : 'Resend Credentials'}</span>
                                 </button>
                               </div>
                               
@@ -974,6 +1048,44 @@ export default function OrdersPage() {
       </div>
 
       {/* Delete Confirmation Modal */}
+      {credentialChoices && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#1A1A1A] rounded-xl p-6 max-w-lg w-full border border-[#2F2F2F]">
+            <h3 className="text-xl font-bold text-white mb-2">Choose an account</h3>
+            <p className="text-gray-400 mb-4 text-sm">
+              {credentialChoices.order.customerEmail} has more than one set of trading credentials. Choose which login to resend.
+            </p>
+            <div className="space-y-2 max-h-72 overflow-y-auto">
+              {credentialChoices.accounts.map((account) => (
+                <button
+                  key={account.accountId}
+                  type="button"
+                  onClick={() => handleResendCredentials(credentialChoices.order, account.accountId)}
+                  disabled={resendingOrderId === credentialChoices.order.id}
+                  className="w-full text-left px-4 py-3 rounded-lg bg-[#151515] border border-[#2F2F2F] hover:border-[#0FF1CE]/40 text-sm disabled:opacity-50"
+                >
+                  <div className="text-white font-medium">
+                    {account.accountType} · ${Number(account.accountSize || 0).toLocaleString()} · {account.platform || 'Platform'}
+                  </div>
+                  <div className="text-gray-400 text-xs mt-1">
+                    Login {account.login} · {account.server} · {account.status}
+                  </div>
+                </button>
+              ))}
+            </div>
+            <div className="flex justify-end mt-4">
+              <button
+                type="button"
+                onClick={() => setCredentialChoices(null)}
+                className="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-[#1A1A1A] rounded-xl border border-[#2F2F2F]/50 p-6 max-w-md w-full mx-4">

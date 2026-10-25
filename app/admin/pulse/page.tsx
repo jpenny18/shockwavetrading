@@ -1,14 +1,12 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import {
-  getFirestore,
   collection,
   getDocs,
   doc,
   deleteDoc,
   query,
   orderBy,
-  where,
   updateDoc,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -41,29 +39,26 @@ export default function PulseManagementPage() {
   const [selectedPoll, setSelectedPoll] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'active' | 'archived' | 'flagged'>('all');
+  const [actionError, setActionError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchPolls();
     fetchComments();
-  }, [filter]);
+  }, []);
 
   const fetchPolls = async () => {
     try {
-      let pollsQuery = query(collection(db, 'polls'), orderBy('createdAt', 'desc'));
-      
-      if (filter !== 'all') {
-        pollsQuery = query(pollsQuery, where('status', '==', filter));
-      }
-      
+      const pollsQuery = query(collection(db, 'polls'), orderBy('createdAt', 'desc'));
       const querySnapshot = await getDocs(pollsQuery);
-      const pollsData = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
+      const pollsData = querySnapshot.docs.map(pollDoc => ({
+        id: pollDoc.id,
+        ...pollDoc.data()
       } as Poll));
       setPolls(pollsData);
       setIsLoading(false);
     } catch (error) {
       console.error('Error fetching polls:', error);
+      setActionError('Failed to load polls. Please refresh the page.');
       setIsLoading(false);
     }
   };
@@ -78,6 +73,7 @@ export default function PulseManagementPage() {
       setComments(commentsData);
     } catch (error) {
       console.error('Error fetching comments:', error);
+      setActionError('Failed to load comments. Please refresh the page.');
     }
   };
 
@@ -99,7 +95,7 @@ export default function PulseManagementPage() {
       await fetchComments();
     } catch (error) {
       console.error('Error deleting poll:', error);
-      alert('Failed to delete poll. Please try again.');
+      setActionError('Failed to delete poll. Please try again.');
     }
   };
 
@@ -109,7 +105,7 @@ export default function PulseManagementPage() {
       await fetchPolls();
     } catch (error) {
       console.error('Error updating poll status:', error);
-      alert('Failed to update poll status. Please try again.');
+      setActionError('Failed to update poll status. Please try again.');
     }
   };
 
@@ -121,7 +117,7 @@ export default function PulseManagementPage() {
       await fetchComments();
     } catch (error) {
       console.error('Error deleting comment:', error);
-      alert('Failed to delete comment. Please try again.');
+      setActionError('Failed to delete comment. Please try again.');
     }
   };
 
@@ -132,7 +128,7 @@ export default function PulseManagementPage() {
       await fetchComments();
     } catch (error) {
       console.error('Error updating comment visibility:', error);
-      alert('Failed to update comment visibility. Please try again.');
+      setActionError('Failed to update comment visibility. Please try again.');
     }
   };
 
@@ -143,6 +139,10 @@ export default function PulseManagementPage() {
       </div>
     );
   }
+
+  const visiblePolls = filter === 'all'
+    ? polls
+    : polls.filter((poll) => (poll.status || 'active') === filter);
 
   return (
     <div>
@@ -161,8 +161,16 @@ export default function PulseManagementPage() {
         </div>
       </div>
 
+      {actionError && (
+        <div className="mb-4 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+          {actionError}
+        </div>
+      )}
+
       <div className="space-y-4 md:space-y-6">
-        {polls.map((poll) => (
+        {visiblePolls.length === 0 ? (
+          <div className="text-gray-400 text-sm">No polls in this view.</div>
+        ) : visiblePolls.map((poll) => (
           <div key={poll.id} className="bg-[#0D0D0D] rounded-xl p-4 md:p-6 border border-[#2F2F2F]">
             <div className="flex justify-between items-start mb-3 md:mb-4 gap-3">
               <div className="min-w-0">
@@ -214,6 +222,9 @@ export default function PulseManagementPage() {
 
             {selectedPoll === poll.id && (
               <div className="mt-3 space-y-3">
+                {comments.filter(comment => comment.pollId === poll.id).length === 0 && (
+                  <p className="text-sm text-gray-500">No comments on this poll.</p>
+                )}
                 {comments
                   .filter(comment => comment.pollId === poll.id)
                   .map(comment => (
@@ -222,7 +233,7 @@ export default function PulseManagementPage() {
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <span className="text-[#0FF1CE] text-sm font-medium">{comment.username}</span>
                           <span className="text-xs text-gray-400">
-                            {comment.createdAt?.toDate().toLocaleDateString()}
+                            {comment.createdAt?.toDate ? comment.createdAt.toDate().toLocaleDateString() : ''}
                           </span>
                           {comment.status === 'hidden' && (
                             <span className="text-xs text-yellow-500 bg-yellow-500/10 px-1.5 py-0.5 rounded">Hidden</span>

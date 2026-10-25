@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { collection, query, where, getDocs, orderBy, limit, onSnapshot, doc, updateDoc, deleteDoc, setDoc, getDoc } from 'firebase/firestore';
 import { db, getAllUsers, setUserMetaApiAccount, getUserMetaApiAccount, UserData, UserMetaApiAccount, Timestamp, getCachedMetrics } from '../../../lib/firebase';
+import { isVipMetaApiAccount } from '../../../lib/vip-accounts';
 import { 
   Search, 
   User, 
@@ -33,7 +34,8 @@ import {
   X,
   Plus,
   Clock,
-  Mail
+  Mail,
+  KeyRound
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -145,6 +147,8 @@ export default function AdminAccountsPage() {
   });
   const [connectingToMetaAPI, setConnectingToMetaAPI] = useState(false);
   const [sendingCredentialsEmail, setSendingCredentialsEmail] = useState(false);
+  const [credentialsAccount, setCredentialsAccount] = useState<UserWithAccount | null>(null);
+  const [credentialForm, setCredentialForm] = useState({ login: '', password: '', server: '' });
   const [nextAutoRefreshTime, setNextAutoRefreshTime] = useState<Date | null>(null);
 
   // Helper functions for Firebase auto-refresh timing
@@ -186,6 +190,8 @@ export default function AdminAccountsPage() {
       
       const accountPromises = accountsSnapshot.docs.map(async (doc) => {
         const accountData = doc.data() as UserMetaApiAccount;
+        // VIP accounts are managed on /admin/vip-accounts
+        if (isVipMetaApiAccount(accountData)) return null;
         
         // Get user data for this account
         const userRef = collection(db, 'users');
@@ -1178,16 +1184,19 @@ export default function AdminAccountsPage() {
           where('status', 'in', ['active', 'inactive']) // Don't count failed/passed accounts
         );
         const accountSnapshot = await getDocs(accountQuery);
+        const challengeAccountCount = accountSnapshot.docs.filter(
+          (accountDoc) => !isVipMetaApiAccount(accountDoc.data() as UserMetaApiAccount)
+        ).length;
         
-        if (accountSnapshot.size >= 5) {
+        if (challengeAccountCount >= 5) {
           setMessage({ type: 'error', text: 'This user already has 5 active challenge accounts (maximum allowed)' });
           setSearchedUser(null);
         } else {
           setSearchedUser(userData);
-          const remainingSlots = 5 - accountSnapshot.size;
+          const remainingSlots = 5 - challengeAccountCount;
           setMessage({ 
             type: 'success', 
-            text: `User found! They have ${accountSnapshot.size} active account(s) and can add ${remainingSlots} more.` 
+            text: `User found! They have ${challengeAccountCount} active account(s) and can add ${remainingSlots} more.` 
           });
         }
       } else {
@@ -1223,7 +1232,10 @@ export default function AdminAccountsPage() {
         platform: accountForm.platform,
         status: accountForm.status,
         step: accountForm.step,
-        startDate: selectedUser.metaApiAccount?.startDate || Timestamp.now()
+        startDate: selectedUser.metaApiAccount?.startDate || Timestamp.now(),
+        ...(selectedUser.metaApiAccount?.loginCredentials
+          ? { loginCredentials: selectedUser.metaApiAccount.loginCredentials }
+          : {})
       });
 
       setMessage({ type: 'success', text: 'Account configuration saved successfully!' });
@@ -1581,12 +1593,15 @@ export default function AdminAccountsPage() {
       });
 
       if (!createAccountResponse.ok) {
-        const errorData = await createAccountResponse.json();
-        throw new Error(errorData.message || 'Failed to create MetaAPI account');
+        const errorData = await createAccountResponse.json().catch(() => ({}));
+        throw new Error(errorData.error || errorData.message || 'Failed to create MetaAPI account');
       }
 
       const createAccountData = await createAccountResponse.json();
       const { accountId } = createAccountData;
+      if (!accountId) {
+        throw new Error(createAccountData.message || 'MetaAPI did not return an account ID. Please retry in a minute.');
+      }
 
       // Check for warnings (e.g., mock responses)
       if (createAccountData.warning) {
@@ -1636,16 +1651,20 @@ export default function AdminAccountsPage() {
     setMessage({ type: '', text: '' });
 
     try {
+      const { login, password, server, platform } = connectModalData.step1;
       await setUserMetaApiAccount({
         userId: searchedUser.uid,
         accountId: connectModalData.accountId,
         accountToken: 'main-token', // We use the main METAAPI_AUTH_TOKEN for all operations
         accountType: accountForm.accountType,
         accountSize: accountForm.accountSize,
-        platform: connectModalData.step1.platform,
+        platform,
         status: accountForm.status,
         step: accountForm.step,
-        startDate: Timestamp.now()
+        startDate: Timestamp.now(),
+        ...(login && password && server
+          ? { loginCredentials: { login, password, server } }
+          : {})
       });
 
       setMessage({ type: 'success', text: 'Challenge account created successfully!' });
@@ -1665,8 +1684,25 @@ export default function AdminAccountsPage() {
   };
 
   // Send login credentials email
-  const sendLoginCredentialsEmail = async () => {
-    if (!searchedUser) return;
+  const sendLoginCredentialsEmail = async (options?: {
+    user?: UserData;
+    platform?: 'mt4' | 'mt5';
+    login?: string;
+    password?: string;
+    server?: string;
+    accountType?: string;
+    accountSize?: number;
+    skipModalReset?: boolean;
+  }) => {
+    const user = options?.user || searchedUser;
+    if (!user) return;
+
+    const platform = options?.platform || connectModalData.step1.platform;
+    const login = options?.login ?? connectModalData.step1.login;
+    const password = options?.password ?? connectModalData.step1.password;
+    const server = options?.server ?? connectModalData.step1.server;
+    const accountType = options?.accountType || accountForm.accountType;
+    const accountSize = options?.accountSize ?? accountForm.accountSize;
     
     setSendingCredentialsEmail(true);
     
@@ -1740,13 +1776,14 @@ export default function AdminAccountsPage() {
               </table>
               
               <div style="text-align: center; margin: 40px 0;">
-                <a href="https://shockwave-capital.com" style="display: inline-block; background-color: #1a1a1a; color: #0FF1CE; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">START TRADING</a>
+                <a href="https://shockwave-capital.com/dashboard/accounts" style="display: inline-block; background-color: #1a1a1a; color: #0FF1CE; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">OPEN MY ACCOUNTS</a>
               </div>
               
               <h3 style="color: #444; font-size: 20px; font-weight: 600; margin: 0 0 20px 0;">Getting Started</h3>
               <ol style="margin: 0; padding-left: 20px; color: #444;">
                 <li style="margin-bottom: 12px;">Download and install the {{platform}} trading platform</li>
                 <li style="margin-bottom: 12px;">Use the credentials above to log in</li>
+                <li style="margin-bottom: 12px;">You can also copy these credentials from your My Accounts page</li>
                 <li style="margin-bottom: 12px;">Review the challenge rules thoroughly</li>
                 <li style="margin-bottom: 12px;">Start trading with your defined strategy</li>
               </ol>
@@ -1766,11 +1803,11 @@ export default function AdminAccountsPage() {
       
       // Prepare test values with the actual login credentials
       const testValues = {
-        firstName: searchedUser.firstName || searchedUser.displayName?.split(' ')[0] || searchedUser.email.split('@')[0],
-        platform: connectModalData.step1.platform === 'mt5' ? 'MetaTrader 5' : 'MetaTrader 4',
-        loginId: connectModalData.step1.login,
-        password: connectModalData.step1.password,
-        server: connectModalData.step1.server
+        firstName: user.firstName || user.displayName?.split(' ')[0] || user.email.split('@')[0],
+        platform: platform === 'mt5' ? 'MetaTrader 5' : 'MetaTrader 4',
+        loginId: login,
+        password,
+        server
       };
       
       const response = await fetch('/api/send-template-email', {
@@ -1780,7 +1817,7 @@ export default function AdminAccountsPage() {
         },
         body: JSON.stringify({
           template: loginTemplate,
-          user: searchedUser,
+          user,
           testValues
         }),
       });
@@ -1789,24 +1826,26 @@ export default function AdminAccountsPage() {
         throw new Error('Failed to send email');
       }
 
-      setConnectModalData(prev => ({
-        ...prev,
-        emailSent: true
-      }));
+      if (!options?.skipModalReset) {
+        setConnectModalData(prev => ({
+          ...prev,
+          emailSent: true
+        }));
+      }
       
-      setMessage({ type: 'success', text: `Login credentials email sent to ${searchedUser.email}` });
+      setMessage({ type: 'success', text: `Login credentials email sent to ${user.email}` });
       
       // Send admin notification with custom email
       try {
         const adminNotificationBody = `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
             <h2 style="color: #0FF1CE;">Login Credentials Sent</h2>
-            <p><strong>User Email:</strong> ${searchedUser.email}</p>
-            <p><strong>Name:</strong> ${searchedUser.firstName || searchedUser.displayName || 'N/A'}</p>
-            <p><strong>Challenge Type:</strong> ${accountForm.accountType}</p>
-            <p><strong>Account Size:</strong> $${accountForm.accountSize.toLocaleString()}</p>
-            <p><strong>Platform:</strong> ${connectModalData.step1.platform.toUpperCase()}</p>
-            <p><strong>Server:</strong> ${connectModalData.step1.server}</p>
+            <p><strong>User Email:</strong> ${user.email}</p>
+            <p><strong>Name:</strong> ${user.firstName || user.displayName || 'N/A'}</p>
+            <p><strong>Challenge Type:</strong> ${accountType}</p>
+            <p><strong>Account Size:</strong> $${accountSize.toLocaleString()}</p>
+            <p><strong>Platform:</strong> ${platform.toUpperCase()}</p>
+            <p><strong>Server:</strong> ${server}</p>
             <p style="margin-top: 20px; padding: 15px; background-color: #e7f5ff; border: 1px solid #bee3f8; border-radius: 5px;">
               Login credentials have been successfully sent to the user. The account is now ready for trading.
             </p>
@@ -1823,7 +1862,7 @@ export default function AdminAccountsPage() {
             template: {
               id: Date.now(),
               name: 'Admin Notification',
-              subject: `Login Credentials Sent: ${searchedUser.email}`,
+              subject: `Login Credentials Sent: ${user.email}`,
               body: adminNotificationBody,
               variables: []
             },
@@ -1839,34 +1878,95 @@ export default function AdminAccountsPage() {
         console.error('Error sending admin notification:', error);
       }
       
-      // Close modal and reset after 2 seconds
-      setTimeout(() => {
-        setShowConnectModal(false);
-        setConnectModalStep(1);
-        setConnectModalData({
-          step1: {
-            login: '',
-            password: '',
-            server: '',
-            platform: 'mt5',
-            nickname: ''
-          },
-          accountId: '',
-          authToken: '',
-          sendEmail: false,
-          emailSent: false
-        });
-        setSearchedUser(null);
-        setSearchUserEmail('');
-        
-        // Reload accounts
-        loadAllAccounts();
-      }, 2000);
+      if (!options?.skipModalReset) {
+        // Close modal and reset after 2 seconds
+        setTimeout(() => {
+          setShowConnectModal(false);
+          setConnectModalStep(1);
+          setConnectModalData({
+            step1: {
+              login: '',
+              password: '',
+              server: '',
+              platform: 'mt5',
+              nickname: ''
+            },
+            accountId: '',
+            authToken: '',
+            sendEmail: false,
+            emailSent: false
+          });
+          setSearchedUser(null);
+          setSearchUserEmail('');
+          
+          // Reload accounts
+          loadAllAccounts();
+        }, 2000);
+      }
     } catch (error) {
       console.error('Error sending login credentials email:', error);
       setMessage({ type: 'error', text: 'Failed to send login credentials email' });
     } finally {
       setSendingCredentialsEmail(false);
+    }
+  };
+
+  const openLoginDetails = (account: UserWithAccount) => {
+    setCredentialsAccount(account);
+    setCredentialForm({
+      login: account.metaApiAccount?.loginCredentials?.login || '',
+      password: account.metaApiAccount?.loginCredentials?.password || '',
+      server: account.metaApiAccount?.loginCredentials?.server || ''
+    });
+  };
+
+  const saveExistingCredentials = async () => {
+    if (!credentialsAccount?.metaApiAccount) return;
+    if (!credentialForm.login.trim() || !credentialForm.password || !credentialForm.server.trim()) {
+      setMessage({ type: 'error', text: 'Login, password, and server are required.' });
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const accountsRef = collection(db, 'userMetaApiAccounts');
+      const snapshot = await getDocs(query(
+        accountsRef,
+        where('userId', '==', credentialsAccount.uid),
+        where('accountId', '==', credentialsAccount.metaApiAccount.accountId)
+      ));
+      if (snapshot.empty) {
+        setMessage({ type: 'error', text: 'Account not found' });
+        return;
+      }
+
+      await updateDoc(doc(db, 'userMetaApiAccounts', snapshot.docs[0].id), {
+        loginCredentials: {
+          login: credentialForm.login.trim(),
+          password: credentialForm.password,
+          server: credentialForm.server.trim()
+        },
+        updatedAt: Timestamp.now()
+      });
+
+      await sendLoginCredentialsEmail({
+        user: credentialsAccount,
+        platform: credentialsAccount.metaApiAccount.platform,
+        login: credentialForm.login.trim(),
+        password: credentialForm.password,
+        server: credentialForm.server.trim(),
+        accountType: credentialsAccount.metaApiAccount.accountType,
+        accountSize: credentialsAccount.metaApiAccount.accountSize,
+        skipModalReset: true
+      });
+
+      setCredentialsAccount(null);
+      await loadAllAccounts();
+    } catch (error) {
+      console.error('Error saving login details:', error);
+      setMessage({ type: 'error', text: 'Failed to save login details or send email.' });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -2599,7 +2699,7 @@ export default function AdminAccountsPage() {
                           setAccountForm({
                             accountId: config?.accountId || '',
                             accountToken: config?.accountToken || '',
-                            accountType: config?.accountType || 'standard',
+                            accountType: config?.accountType && config.accountType !== 'vip' ? config.accountType : 'standard',
                             accountSize: config?.accountSize || 10000,
                             platform: config?.platform || 'mt5',
                             status: config?.status || 'active',
@@ -2611,6 +2711,13 @@ export default function AdminAccountsPage() {
                         title="Edit Configuration"
                       >
                         <Edit2 size={15} />
+                      </button>
+                      <button
+                        onClick={() => openLoginDetails(account)}
+                        className="p-1.5 text-gray-400 hover:text-[#0FF1CE] hover:bg-[#0FF1CE]/10 rounded transition-all"
+                        title="Login details"
+                      >
+                        <KeyRound size={15} />
                       </button>
                     </div>
 
@@ -3009,7 +3116,7 @@ export default function AdminAccountsPage() {
                               setAccountForm({
                                 accountId: config?.accountId || '',
                                 accountToken: config?.accountToken || '',
-                                accountType: config?.accountType || 'standard',
+                                accountType: config?.accountType && config.accountType !== 'vip' ? config.accountType : 'standard',
                                 accountSize: config?.accountSize || 10000,
                                 platform: config?.platform || 'mt5',
                                 status: config?.status || 'active',
@@ -3021,6 +3128,13 @@ export default function AdminAccountsPage() {
                               title="Edit Configuration"
                           >
                               <Edit2 size={15} />
+                          </button>
+                          <button
+                            onClick={() => openLoginDetails(account)}
+                            className="p-1.5 text-gray-400 hover:text-[#0FF1CE] hover:bg-[#0FF1CE]/10 rounded transition-all"
+                            title="Login details"
+                          >
+                            <KeyRound size={15} />
                           </button>
                           </div>
                           
@@ -4220,7 +4334,7 @@ export default function AdminAccountsPage() {
                     <>
                       {!connectModalData.emailSent ? (
                         <button
-                          onClick={sendLoginCredentialsEmail}
+                          onClick={() => sendLoginCredentialsEmail()}
                           disabled={sendingCredentialsEmail}
                           className="bg-[#0FF1CE] text-black font-semibold px-6 py-3 rounded-lg hover:bg-[#0FF1CE]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                         >
@@ -4295,6 +4409,64 @@ export default function AdminAccountsPage() {
                   <p className="text-gray-400 text-sm text-center">{emailSendingMessage}</p>
                 </>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {credentialsAccount && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#0D0D0D] border border-[#2F2F2F] rounded-xl max-w-md w-full">
+            <div className="flex items-center justify-between p-6 border-b border-[#2F2F2F]">
+              <h2 className="text-xl font-semibold text-white">Login details</h2>
+              <button onClick={() => setCredentialsAccount(null)} className="text-gray-400 hover:text-white">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <p className="text-sm text-gray-400">
+                These credentials appear on the user My Accounts page and are emailed to {credentialsAccount.email} plus support@shockwave-capital.com.
+              </p>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">Broker login</label>
+                <input
+                  type="text"
+                  value={credentialForm.login}
+                  onChange={(e) => setCredentialForm((prev) => ({ ...prev, login: e.target.value }))}
+                  className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">Password</label>
+                <input
+                  type="password"
+                  value={credentialForm.password}
+                  onChange={(e) => setCredentialForm((prev) => ({ ...prev, password: e.target.value }))}
+                  className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-2">Server</label>
+                <input
+                  type="text"
+                  value={credentialForm.server}
+                  onChange={(e) => setCredentialForm((prev) => ({ ...prev, server: e.target.value }))}
+                  className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                />
+              </div>
+            </div>
+            <div className="p-6 border-t border-[#2F2F2F] flex justify-end gap-3">
+              <button onClick={() => setCredentialsAccount(null)} className="px-6 py-3 text-gray-400 hover:text-white transition-colors">
+                Cancel
+              </button>
+              <button
+                onClick={saveExistingCredentials}
+                disabled={saving || sendingCredentialsEmail}
+                className="bg-[#0FF1CE] text-black font-semibold px-6 py-3 rounded-lg hover:bg-[#0FF1CE]/90 transition-colors disabled:opacity-50 inline-flex items-center gap-2"
+              >
+                <Mail size={16} />
+                {saving || sendingCredentialsEmail ? 'Saving...' : 'Save and email'}
+              </button>
             </div>
           </div>
         </div>

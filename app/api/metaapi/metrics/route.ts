@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth as adminAuth, db as adminDb } from '@/lib/firebase-admin';
+import { isVipMetaApiAccount, normalizeVipAccountSize } from '@/lib/vip-accounts';
 
 // For now, we'll use mock data to test the system
 // Once MetaAPI connectivity is resolved, we can switch back
@@ -16,7 +17,17 @@ const METAAPI_AUTH_TOKEN = process.env.METAAPI_AUTH_TOKEN || 'your-metaapi-auth-
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { accountId, accountToken, accountType, accountSize, step, isAdmin } = body;
+    const { accountId, accountToken, step, isAdmin } = body;
+    const accountType = isVipMetaApiAccount({
+      accountType: body.accountType,
+      accountSize: body.accountSize,
+      profitSplit: body.profitSplit
+    })
+      ? 'vip'
+      : body.accountType;
+    const accountSize = accountType === 'vip'
+      ? normalizeVipAccountSize(body.accountSize)
+      : Number(body.accountSize);
     
     console.log('Request body:', { 
       accountId, 
@@ -565,7 +576,27 @@ export async function POST(req: NextRequest) {
 }
 
 // Enhanced function to set up automated risk trackers
-async function setupRiskTrackers(riskApi: any, accountId: string, accountType: 'standard' | 'instant' | '1-step' | 'gauntlet', accountSize: number, step: number = 1) {
+function isVipProfitTargetTracker(tracker: any): boolean {
+  const name = String(tracker?.name || '').toLowerCase();
+  if (name.includes('profit')) return true;
+  const hasProfitThreshold =
+    tracker?.relativeProfitThreshold != null || tracker?.absoluteProfitThreshold != null;
+  const hasDrawdownThreshold =
+    tracker?.relativeDrawdownThreshold != null || tracker?.absoluteDrawdownThreshold != null;
+  return hasProfitThreshold && !hasDrawdownThreshold;
+}
+
+function trackerNeedsThresholdUpdate(existing: any, required: any): boolean {
+  const existingAbs = Number(existing?.absoluteDrawdownThreshold);
+  const requiredAbs = Number(required?.absoluteDrawdownThreshold);
+  if (!Number.isFinite(existingAbs) || !Number.isFinite(requiredAbs) || requiredAbs <= 0) {
+    return false;
+  }
+  const tolerance = Math.max(1, requiredAbs * 0.005);
+  return Math.abs(existingAbs - requiredAbs) > tolerance;
+}
+
+async function setupRiskTrackers(riskApi: any, accountId: string, accountType: 'standard' | 'instant' | '1-step' | 'gauntlet' | 'vip', accountSize: number, step: number = 1) {
   try {
     // Check if riskApi is available
     if (!riskApi) {
@@ -594,6 +625,10 @@ async function setupRiskTrackers(riskApi: any, accountId: string, accountType: '
       // Gauntlet challenge: 15% max, 8% daily (single phase)
       targetDrawdown = 15;
       targetDailyDrawdown = 8;
+    } else if (accountType === 'vip') {
+      // VIP is a funded allocation: 15% max, 8% daily, no profit target
+      targetDrawdown = 15;
+      targetDailyDrawdown = 8;
     } else if (accountType === 'instant') {
       // Updated instant: 4% max trailing loss, no daily
       targetDrawdown = 4;
@@ -613,7 +648,7 @@ async function setupRiskTrackers(riskApi: any, accountId: string, accountType: '
               accountType === 'instant' ? 'Trailing Max Loss Monitor' : 'Max Drawdown Monitor',
         period: 'lifetime',
         relativeDrawdownThreshold: targetDrawdown / 100,
-        absoluteDrawdownThreshold: (accountSize * targetDrawdown) / 100
+        absoluteDrawdownThreshold: Math.round((accountSize * targetDrawdown) / 100)
       }
     ];
     
@@ -623,22 +658,40 @@ async function setupRiskTrackers(riskApi: any, accountId: string, accountType: '
         name: isFunded ? 'Funded Risk Limit Monitor' : 'Daily Drawdown Monitor', 
         period: 'day',
         relativeDrawdownThreshold: targetDailyDrawdown / 100,
-        absoluteDrawdownThreshold: (accountSize * targetDailyDrawdown) / 100
+        absoluteDrawdownThreshold: Math.round((accountSize * targetDailyDrawdown) / 100)
       });
     }
     
-    // Create missing trackers; migrate existing ones whose period is wrong
-    // (older versions created the max-DD tracker with period 'day')
+    // Create missing trackers; migrate existing ones whose period or VIP dollar
+    // thresholds are wrong (custom VIP sizes like $1.5M must use that size).
     for (const requiredTracker of requiredTrackers) {
       const existingTracker = existingTrackers.find((t: any) => t.name === requiredTracker.name);
+      const existingId = existingTracker?._id || existingTracker?.id;
+      const periodWrong = !!existingTracker && existingTracker.period !== requiredTracker.period;
+      const vipThresholdsWrong = accountType === 'vip'
+        && !!existingTracker
+        && trackerNeedsThresholdUpdate(existingTracker, requiredTracker);
       
-      if (existingTracker && existingTracker.period !== requiredTracker.period) {
-        const existingId = existingTracker._id || existingTracker.id;
-        console.log(`Tracker ${requiredTracker.name} has wrong period '${existingTracker.period}' (expected '${requiredTracker.period}') - recreating`);
+      if (existingTracker && (periodWrong || vipThresholdsWrong)) {
+        console.log(`Tracker ${requiredTracker.name} needs update (periodWrong=${periodWrong}, vipThresholdsWrong=${vipThresholdsWrong})`);
         try {
-          await riskApi.deleteTracker(accountId, existingId);
-          await riskApi.createTracker(accountId, requiredTracker);
-          console.log(`Successfully migrated tracker: ${requiredTracker.name}`);
+          if (periodWrong) {
+            await riskApi.deleteTracker(accountId, existingId);
+            await riskApi.createTracker(accountId, requiredTracker);
+            console.log(`Successfully migrated tracker: ${requiredTracker.name}`);
+          } else {
+            try {
+              await riskApi.updateTracker(accountId, existingId, {
+                absoluteDrawdownThreshold: requiredTracker.absoluteDrawdownThreshold,
+                relativeDrawdownThreshold: requiredTracker.relativeDrawdownThreshold
+              });
+              console.log(`Successfully updated VIP tracker thresholds: ${requiredTracker.name}`);
+            } catch (updateError: any) {
+              console.log(`updateTracker failed for ${requiredTracker.name}, recreating: ${updateError.message}`);
+              await riskApi.deleteTracker(accountId, existingId);
+              await riskApi.createTracker(accountId, requiredTracker);
+            }
+          }
         } catch (migrateError: any) {
           console.error(`Failed to migrate tracker ${requiredTracker.name}:`, migrateError.message);
         }
@@ -653,6 +706,21 @@ async function setupRiskTrackers(riskApi: any, accountId: string, accountType: '
         }
       } else {
         console.log(`Tracker already exists: ${requiredTracker.name}`);
+      }
+    }
+
+    if (accountType === 'vip') {
+      const latestTrackers = await riskApi.getTrackers(accountId);
+      for (const tracker of latestTrackers) {
+        if (!isVipProfitTargetTracker(tracker)) continue;
+        const trackerId = tracker._id || tracker.id;
+        if (!trackerId) continue;
+        try {
+          await riskApi.deleteTracker(accountId, trackerId);
+          console.log(`Removed VIP profit target tracker: ${tracker.name}`);
+        } catch (deleteError: any) {
+          console.error(`Failed to remove VIP profit tracker ${tracker.name}:`, deleteError.message);
+        }
       }
     }
     
@@ -1033,7 +1101,7 @@ async function getCachedMaxDailyDrawdown(accountId: string): Promise<number | un
 
 function calculateTradingObjectives(
   metrics: any,
-  challengeType: 'standard' | 'instant' | '1-step' | 'gauntlet',
+  challengeType: 'standard' | 'instant' | '1-step' | 'gauntlet' | 'vip',
   accountStartBalance: number,
   step: number = 1,
   currentDailyDrawdown?: number,
@@ -1087,6 +1155,13 @@ function calculateTradingObjectives(
       maxDailyDrawdown: 8, // Gauntlet: 8% daily drawdown
       profitTargetStep1: 10, // Gauntlet: 10% profit target (single phase)
       profitTargetStep2: 0 // No step 2 for gauntlet challenge
+    },
+    vip: {
+      minTradingDays: 0,
+      maxDrawdown: 15,
+      maxDailyDrawdown: 8,
+      profitTargetStep1: 0,
+      profitTargetStep2: 0
     },
     funded: {
       minTradingDays: 5, // 5 days with 0.5% gain required for payout eligibility
@@ -1213,13 +1288,19 @@ function calculateTradingObjectives(
       recentBreach: recentBreaches.maxDrawdown,
       isTrailing: challengeType === 'instant' // Flag for instant challenge trailing loss
     },
-    profitTarget: {
-      target: step === 2 && 'profitTargetStep2' in target ? target.profitTargetStep2 : ('profitTargetStep1' in target ? target.profitTargetStep1 : 0),
-      current: profitPercentage,
-      passed: step === 2 && 'profitTargetStep2' in target 
-        ? profitPercentage >= target.profitTargetStep2 
-        : ('profitTargetStep1' in target ? profitPercentage >= target.profitTargetStep1 : true)
-    }
+    profitTarget: challengeType === 'vip'
+      ? {
+          target: 0,
+          current: profitPercentage,
+          passed: true
+        }
+      : {
+          target: step === 2 && 'profitTargetStep2' in target ? target.profitTargetStep2 : ('profitTargetStep1' in target ? target.profitTargetStep1 : 0),
+          current: profitPercentage,
+          passed: step === 2 && 'profitTargetStep2' in target 
+            ? profitPercentage >= target.profitTargetStep2 
+            : ('profitTargetStep1' in target ? profitPercentage >= target.profitTargetStep1 : true)
+        }
   };
   
   // Only add daily drawdown objective if it exists for this challenge type
@@ -1398,6 +1479,9 @@ function generateMockTrackers(accountType: string, accountSize: number, step: nu
   } else if (accountType === 'gauntlet') {
     maxDD = 15;
     dailyDD = 8;
+  } else if (accountType === 'vip') {
+    maxDD = 15;
+    dailyDD = 8;
   } else if (accountType === 'instant') {
     maxDD = 4;
     dailyDD = null;
@@ -1413,7 +1497,7 @@ function generateMockTrackers(accountType: string, accountSize: number, step: nu
             accountType === 'instant' ? 'Trailing Max Loss Monitor' : 'Max Drawdown Monitor',
       period: 'day',
       relativeDrawdownThreshold: maxDD / 100,
-      absoluteDrawdownThreshold: (accountSize * maxDD) / 100
+      absoluteDrawdownThreshold: Math.round((accountSize * maxDD) / 100)
     }
   ];
   
@@ -1423,7 +1507,7 @@ function generateMockTrackers(accountType: string, accountSize: number, step: nu
       name: isFunded ? 'Funded Risk Limit Monitor' : 'Daily Drawdown Monitor',
       period: 'day',
       relativeDrawdownThreshold: dailyDD / 100,
-      absoluteDrawdownThreshold: (accountSize * dailyDD) / 100
+      absoluteDrawdownThreshold: Math.round((accountSize * dailyDD) / 100)
     });
   }
   
@@ -1466,6 +1550,13 @@ function calculateMockObjectives(accountType: string, accountSize: number, curre
       maxDailyDrawdown: 8,
       profitTarget: 10
     };
+  } else if (accountType === 'vip') {
+    targets = {
+      minTradingDays: 0,
+      maxDrawdown: 15,
+      maxDailyDrawdown: 8,
+      profitTarget: 0
+    };
   } else if (accountType === 'instant') {
     targets = {
       minTradingDays: 5,
@@ -1497,7 +1588,7 @@ function calculateMockObjectives(accountType: string, accountSize: number, curre
     profitTarget: { 
       target: targets.profitTarget, 
       current: profitPercent, 
-      passed: profitPercent >= targets.profitTarget 
+      passed: accountType === 'vip' || !targets.profitTarget ? true : profitPercent >= targets.profitTarget 
     }
   };
   

@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Mail, 
   Plus, 
@@ -15,13 +15,26 @@ import {
   Users,
   Eye,
   ChevronDown,
-  RefreshCw
+  RefreshCw,
+  AlertTriangle
 } from 'lucide-react';
-import { getAllUsers, UserData, db } from '@/lib/firebase';
+import { getAllUsers, UserData, db, getCachedMetrics } from '@/lib/firebase';
+import { isVipMetaApiAccount } from '@/lib/vip-accounts';
 import { collection, query, orderBy, limit, getDocs, where } from 'firebase/firestore';
 
+interface EmailTemplate {
+  id: number;
+  name: string;
+  subject: string;
+  body: string;
+  variables: string[];
+  lastUpdated: string;
+  isBulkTemplate?: boolean;
+  bulkSource?: 'gauntlet-activation' | 'active-accounts';
+}
+
 // Enhanced email templates with improved login credentials template
-const initialTemplates = [
+const initialTemplates: EmailTemplate[] = [
   {
     id: 1,
     name: 'Welcome Email',
@@ -686,19 +699,116 @@ const initialTemplates = [
 </html>`,
     variables: ['firstName'],
     lastUpdated: new Date().toISOString().split('T')[0],
-    isBulkTemplate: true
+    isBulkTemplate: true,
+    bulkSource: 'gauntlet-activation'
+  },
+  {
+    id: 7,
+    name: 'Drawdown Reset',
+    subject: 'Your {{challengeType}} account is in drawdown — reset available',
+    body: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Account Drawdown Reset - Shockwave Capital</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <style>
+    body { margin: 0; padding: 0; background-color: #f4f4f4; }
+    img { border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+    @media only screen and (max-width: 620px) {
+      .email-container { width: 100% !important; }
+      .mobile-pad { padding: 24px 18px !important; }
+      .mobile-title { font-size: 22px !important; line-height: 28px !important; }
+      .mobile-btn { display: block !important; width: 100% !important; box-sizing: border-box !important; }
+    }
+  </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f4f4; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
+  <span style="display: none !important; font-size: 0; line-height: 0; max-height: 0; max-width: 0; opacity: 0; overflow: hidden;">Your {{challengeType}} account is in drawdown — you can reset it in a few clicks.</span>
+  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; margin: 0; padding: 0; background-color: #f4f4f4;">
+    <tr>
+      <td align="center" style="padding: 0;">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; max-width: 600px;" class="email-container">
+          <tr>
+            <td align="center" bgcolor="#0FF1CE" class="mobile-pad" style="padding: 28px 24px;">
+              <p style="margin: 0; font-family: Arial, Helvetica, sans-serif; font-size: 13px; letter-spacing: 2px; color: #0D0D0D; font-weight: 700;">SHOCKWAVE CAPITAL</p>
+              <p style="margin: 6px 0 0 0; font-family: Arial, Helvetica, sans-serif; font-size: 11px; letter-spacing: 1.5px; color: #0D0D0D;">PERSONAL ACCOUNT MANAGEMENT</p>
+            </td>
+          </tr>
+          <tr>
+            <td bgcolor="#ffffff" class="mobile-pad" style="padding: 40px 36px 16px 36px; font-family: Arial, Helvetica, sans-serif;">
+              <h1 class="mobile-title" style="margin: 0 0 20px 0; font-size: 26px; line-height: 32px; color: #1a1a1a; font-weight: 700;">A quick note about your account</h1>
+              <p style="margin: 0 0 18px 0; font-size: 16px; line-height: 26px; color: #333;">Hi {{firstName}},</p>
+              <p style="margin: 0 0 18px 0; font-size: 16px; line-height: 26px; color: #444;">
+                I wanted to reach out personally because we noticed your
+                <strong style="color: #1a1a1a;">{{accountSize}} {{challengeType}}</strong>
+                account is currently in drawdown.
+              </p>
+              <p style="margin: 0 0 8px 0; font-size: 16px; line-height: 26px; color: #444;">
+                You can reset the account and start fresh whenever you're ready. The process is simple and only takes a few minutes.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td bgcolor="#ffffff" class="mobile-pad" style="padding: 8px 36px 8px 36px;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse; background-color: #f6fffd; border: 1px solid #b7f7ea; border-radius: 12px;">
+                <tr>
+                  <td align="center" style="padding: 24px 20px;">
+                    <p style="margin: 0 0 6px 0; font-family: Arial, Helvetica, sans-serif; font-size: 13px; letter-spacing: 1px; color: #0a8f7a; font-weight: 700;">RESET YOUR ACCOUNT</p>
+                    <p style="margin: 0 0 20px 0; font-family: Arial, Helvetica, sans-serif; font-size: 15px; line-height: 22px; color: #333;">
+                      Get back to trading on a clean {{challengeType}} account.
+                    </p>
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+                      <tr>
+                        <td align="center" bgcolor="#0FF1CE" style="border-radius: 8px;">
+                          <a class="mobile-btn" href="https://www.shockwavetrading.com/gauntlet-activation" target="_blank" style="display: inline-block; font-family: Arial, Helvetica, sans-serif; font-size: 16px; font-weight: 700; color: #0D0D0D; text-decoration: none; padding: 14px 28px; border-radius: 8px;">
+                            Reset Your Account
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                    <p style="margin: 16px 0 0 0; font-family: Arial, Helvetica, sans-serif; font-size: 12px; line-height: 18px; color: #777;">
+                      Or copy this link:<br>
+                      <a href="https://www.shockwavetrading.com/gauntlet-activation" style="color: #0a8f7a; word-break: break-all;">https://www.shockwavetrading.com/gauntlet-activation</a>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td bgcolor="#ffffff" class="mobile-pad" style="padding: 28px 36px 40px 36px; font-family: Arial, Helvetica, sans-serif;">
+              <p style="margin: 0 0 28px 0; font-size: 16px; line-height: 26px; color: #444;">
+                If you have any questions about the reset or your account, I'm here to help.
+              </p>
+              <p style="margin: 0; font-size: 16px; line-height: 24px; color: #1a1a1a;">
+                Warm regards,<br><br>
+                <strong>Emily Carter</strong><br>
+                <span style="font-size: 14px; color: #666;">Personal Account Manager</span><br>
+                <span style="font-size: 14px; color: #666;">Shockwave Capital</span>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding: 20px 24px 28px 24px; font-family: Arial, Helvetica, sans-serif;">
+              <p style="margin: 0; font-size: 12px; line-height: 18px; color: #888;">
+                © ${new Date().getFullYear()} Shockwave Capital. All rights reserved.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`,
+    variables: ['firstName', 'challengeType', 'accountSize'],
+    lastUpdated: new Date().toISOString().split('T')[0],
+    isBulkTemplate: true,
+    bulkSource: 'active-accounts'
   }
 ];
-
-interface EmailTemplate {
-  id: number;
-  name: string;
-  subject: string;
-  body: string;
-  variables: string[];
-  lastUpdated: string;
-  isBulkTemplate?: boolean;
-}
 
 interface TestValues {
   [key: string]: string;
@@ -716,8 +826,47 @@ interface Customer {
   [key: string]: any;
 }
 
+function getBulkRecipientKey(recipient: { recipientKey?: string; email?: string }): string {
+  return recipient.recipientKey || recipient.email || '';
+}
+
+function formatAccountChallengeType(accountType?: string, isFunded?: boolean): string {
+  if (isFunded) return 'Funded';
+  switch (accountType) {
+    case '1-step':
+      return '1-Step';
+    case 'standard':
+      return '2-Step';
+    case 'gauntlet':
+      return 'Gauntlet';
+    case 'vip':
+      return 'VIP';
+    case 'instant':
+      return 'Instant';
+    default:
+      return 'Challenge';
+  }
+}
+
+function getMaxDrawdownLimit(accountType?: string, isFunded?: boolean): number {
+  if (isFunded) return 15;
+  if (accountType === '1-step') return 8;
+  if (accountType === 'instant') return 4;
+  return 15;
+}
+
+function formatAccountSize(accountSize: unknown): string {
+  if (typeof accountSize === 'number' && !isNaN(accountSize)) {
+    return `$${accountSize.toLocaleString()}`;
+  }
+  if (typeof accountSize === 'string' && accountSize.trim()) {
+    return accountSize.startsWith('$') ? accountSize : `$${accountSize}`;
+  }
+  return '';
+}
+
 export default function EmailTemplatesPage() {
-  const [templates, setTemplates] = useState(initialTemplates);
+  const [templates, setTemplates] = useState<EmailTemplate[]>(initialTemplates);
   const [isEditing, setIsEditing] = useState(false);
   const [currentTemplate, setCurrentTemplate] = useState<EmailTemplate | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -748,6 +897,9 @@ export default function EmailTemplatesPage() {
   const [showBulkConfirm, setShowBulkConfirm] = useState(false);
   const [bulkUserSearch, setBulkUserSearch] = useState('');
   const [showBulkUserSearch, setShowBulkUserSearch] = useState(false);
+  const [bulkListFilter, setBulkListFilter] = useState<'all' | 'drawdown'>('all');
+  const [bulkListSearch, setBulkListSearch] = useState('');
+  const preselectedRecipient = useRef(false);
   
   // Load customers on component mount
   useEffect(() => {
@@ -795,6 +947,24 @@ export default function EmailTemplatesPage() {
     orderCount: user.orderCount || 0
   }));
       setCustomers(transformedCustomers);
+      if (!preselectedRecipient.current && typeof window !== 'undefined') {
+        const requestedEmail = new URLSearchParams(window.location.search).get('to');
+        if (requestedEmail) {
+          const match = transformedCustomers.find(
+            (customer) => customer.email.toLowerCase() === requestedEmail.toLowerCase()
+          );
+          preselectedRecipient.current = true;
+          const welcome = initialTemplates.find((template) => template.name === 'Welcome Email');
+          if (welcome) setCurrentTemplate(welcome);
+          setIsEditing(true);
+          if (match) {
+            setSelectedUser(match);
+            setUserSearchTerm(match.displayName || match.email || 'Unknown User');
+          } else {
+            setUserSearchTerm(requestedEmail);
+          }
+        }
+      }
     } catch (error) {
       console.error('Error loading customers:', error);
     } finally {
@@ -817,6 +987,7 @@ export default function EmailTemplatesPage() {
       
       accountsSnapshot.forEach((doc) => {
         const data = doc.data();
+        if (isVipMetaApiAccount(data)) return;
         const userId = data.userId;
         userIds.add(userId);
         if (!accountsByUser[userId]) {
@@ -946,7 +1117,7 @@ export default function EmailTemplatesPage() {
   }).slice(0, 10); // Limit to 10 results
 
   const handleCreateNew = () => {
-    const newTemplate = {
+    const newTemplate: EmailTemplate = {
       id: Date.now(),
       name: 'New Template',
       subject: 'New Email Subject',
@@ -971,6 +1142,9 @@ export default function EmailTemplatesPage() {
     } else if (template.name === 'Login Credentials') {
       setRecentOrdersType('crypto');
     }
+
+    setBulkListFilter('all');
+    setBulkListSearch('');
     
     // Initialize test values with more comprehensive defaults
     const values: Record<string, string> = {};
@@ -979,7 +1153,7 @@ export default function EmailTemplatesPage() {
                          variable === 'lastName' ? 'Doe' : 
                          variable === 'email' ? 'john@example.com' :
                          variable === 'displayName' ? 'John Doe' :
-                         variable === 'challengeType' ? 'Standard Challenge' :
+                         variable === 'challengeType' ? (template.bulkSource === 'active-accounts' ? '2-Step' : 'Standard Challenge') :
                          variable === 'accountSize' ? '$10,000' :
                          variable === 'orderNumber' ? 'OSK1234' :
                          variable === 'platform' ? 'MetaTrader 4' :
@@ -1000,7 +1174,7 @@ export default function EmailTemplatesPage() {
   const handleSave = () => {
     if (!currentTemplate) return;
     
-    const updatedTemplate = {
+    const updatedTemplate: EmailTemplate = {
       ...currentTemplate,
       lastUpdated: new Date().toISOString().split('T')[0]
     };
@@ -1253,21 +1427,114 @@ export default function EmailTemplatesPage() {
     }
   };
 
+  const loadActiveAccountHolders = async () => {
+    try {
+      setLoadingBulkRecipients(true);
+      const accountsRef = collection(db, 'userMetaApiAccounts');
+      const accountsQuery = query(accountsRef, where('status', '==', 'active'));
+      const accountsSnapshot = await getDocs(accountsQuery);
+
+      const recipientResults = await Promise.all(accountsSnapshot.docs.map(async (accountDoc) => {
+        const data = accountDoc.data();
+        if (!data.userId || isVipMetaApiAccount(data)) return null;
+
+        try {
+          const userSnapshot = await getDocs(query(collection(db, 'users'), where('uid', '==', data.userId), limit(1)));
+          if (userSnapshot.empty) return null;
+
+          const userData = userSnapshot.docs[0].data();
+          const email = (userData.email || '').trim();
+          if (!email) return null;
+
+          let metrics: { maxDrawdown?: number; maxDailyDrawdown?: number; dailyDrawdown?: number } | null = null;
+          try {
+            if (data.accountId) {
+              metrics = await getCachedMetrics(data.accountId);
+            }
+          } catch (metricsError) {
+            console.warn(`Could not load metrics for account ${data.accountId}:`, metricsError);
+          }
+
+          const isFunded = data.step === 3 || data.status === 'funded';
+          const challengeType = formatAccountChallengeType(data.accountType, isFunded);
+          const maxDrawdown = typeof metrics?.maxDrawdown === 'number' ? metrics.maxDrawdown : 0;
+          const maxDrawdownLimit = getMaxDrawdownLimit(data.accountType, isFunded);
+          const inDrawdown = maxDrawdown > 0;
+          const drawdownBreached = maxDrawdown >= maxDrawdownLimit;
+
+          return {
+            id: accountDoc.id,
+            recipientKey: accountDoc.id,
+            email,
+            firstName: userData.firstName || userData.displayName?.split(' ')[0] || email.split('@')[0] || 'Valued Customer',
+            lastName: userData.lastName || '',
+            displayName: userData.displayName || `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || email,
+            accountSize: formatAccountSize(data.accountSize),
+            challengeType,
+            accountType: data.accountType,
+            isFunded,
+            step: data.step,
+            maxDrawdown,
+            maxDrawdownLimit,
+            inDrawdown,
+            drawdownBreached,
+            createdAt: data.createdAt || null
+          };
+        } catch (userError) {
+          console.error(`Error loading user ${data.userId}:`, userError);
+          return null;
+        }
+      }));
+
+      const recipients = recipientResults.filter(Boolean) as any[];
+      recipients.sort((a, b) => {
+        if (Boolean(a.inDrawdown) !== Boolean(b.inDrawdown)) return a.inDrawdown ? -1 : 1;
+        return (b.maxDrawdown || 0) - (a.maxDrawdown || 0);
+      });
+
+      setBulkRecipients(recipients);
+      setSelectedRecipients(new Set(
+        recipients.filter(r => r.inDrawdown).map(r => getBulkRecipientKey(r))
+      ));
+
+      console.log(`Loaded ${recipients.length} active account holders`);
+      return recipients;
+    } catch (error) {
+      console.error('Error loading active account holders:', error);
+      alert('Failed to load active accounts. Please try again.');
+      return [];
+    } finally {
+      setLoadingBulkRecipients(false);
+    }
+  };
+
+  const refreshBulkRecipients = () => {
+    if (currentTemplate?.bulkSource === 'active-accounts') {
+      return loadActiveAccountHolders();
+    }
+    return loadGauntletActivationRecipients();
+  };
+
   // Toggle individual recipient selection
-  const toggleRecipient = (email: string) => {
+  const toggleRecipient = (key: string) => {
     const newSelected = new Set(selectedRecipients);
-    if (newSelected.has(email)) {
-      newSelected.delete(email);
+    if (newSelected.has(key)) {
+      newSelected.delete(key);
     } else {
-      newSelected.add(email);
+      newSelected.add(key);
     }
     setSelectedRecipients(newSelected);
   };
 
   // Select all recipients
   const selectAllRecipients = () => {
-    const allEmails = new Set(bulkRecipients.map(r => r.email));
-    setSelectedRecipients(allEmails);
+    setSelectedRecipients(new Set(bulkRecipients.map(r => getBulkRecipientKey(r))));
+  };
+
+  const selectDrawdownRecipients = () => {
+    setSelectedRecipients(new Set(
+      bulkRecipients.filter(r => r.inDrawdown).map(r => getBulkRecipientKey(r))
+    ));
   };
 
   // Deselect all recipients
@@ -1291,6 +1558,7 @@ export default function EmailTemplatesPage() {
       lastName: user.lastName || user.displayName?.split(' ').slice(1).join(' ') || '',
       displayName: user.displayName || `${user.firstName} ${user.lastName}`.trim() || user.email || 'Valued Customer',
       accountSize: '$10,000', // Default account size
+      challengeType: 'Challenge',
       createdAt: new Date().toISOString(),
       addedManually: true
     };
@@ -1307,10 +1575,10 @@ export default function EmailTemplatesPage() {
   };
 
   // Remove recipient from bulk list
-  const removeRecipient = (email: string) => {
-    setBulkRecipients(bulkRecipients.filter(r => r.email !== email));
+  const removeRecipient = (key: string) => {
+    setBulkRecipients(bulkRecipients.filter(r => getBulkRecipientKey(r) !== key));
     const newSelected = new Set(selectedRecipients);
-    newSelected.delete(email);
+    newSelected.delete(key);
     setSelectedRecipients(newSelected);
   };
 
@@ -1322,7 +1590,7 @@ export default function EmailTemplatesPage() {
     }
 
     // Filter to only selected recipients
-    const recipientsToSend = bulkRecipients.filter(r => selectedRecipients.has(r.email));
+    const recipientsToSend = bulkRecipients.filter(r => selectedRecipients.has(getBulkRecipientKey(r)));
 
     try {
       setSendingBulk(true);
@@ -1344,11 +1612,12 @@ export default function EmailTemplatesPage() {
               lastName: recipient.lastName || '',
               email: recipient.email,
               displayName: recipient.displayName || recipient.firstName || 'Valued Customer',
-              accountSize: recipient.accountSize || '$10,000'
+              accountSize: recipient.accountSize || '$10,000',
+              challengeType: recipient.challengeType || ''
             };
 
-            // Merge with testValues if any custom variables
-            const finalValues = { ...values, ...testValues };
+            // Recipient values win over preview placeholders so bulk sends stay personalized
+            const finalValues = { ...testValues, ...values };
 
             const response = await fetch('/api/send-template-email', {
               method: 'POST',
@@ -1399,9 +1668,29 @@ export default function EmailTemplatesPage() {
   // Load bulk recipients when template with bulk flag is selected
   useEffect(() => {
     if (currentTemplate?.isBulkTemplate && isEditing) {
-      loadGauntletActivationRecipients();
+      if (currentTemplate.bulkSource === 'active-accounts') {
+        loadActiveAccountHolders();
+      } else {
+        loadGauntletActivationRecipients();
+      }
     }
   }, [currentTemplate?.id, isEditing]);
+
+  const isActiveAccountsBulk = currentTemplate?.bulkSource === 'active-accounts';
+  const visibleBulkRecipients = bulkRecipients.filter((recipient) => {
+    if (isActiveAccountsBulk && bulkListFilter === 'drawdown' && !recipient.inDrawdown) {
+      return false;
+    }
+    if (!bulkListSearch.trim()) return true;
+    const queryText = bulkListSearch.toLowerCase();
+    return (
+      recipient.email?.toLowerCase().includes(queryText) ||
+      recipient.displayName?.toLowerCase().includes(queryText) ||
+      recipient.firstName?.toLowerCase().includes(queryText) ||
+      recipient.challengeType?.toLowerCase().includes(queryText)
+    );
+  });
+  const drawdownCount = bulkRecipients.filter((r) => r.inDrawdown).length;
 
   return (
     <div>
@@ -1421,13 +1710,21 @@ export default function EmailTemplatesPage() {
 
       {/* Bulk Send Section */}
       {isEditing && currentTemplate && currentTemplate.isBulkTemplate && (
-        <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 rounded-lg p-6 mb-6 border border-[#0FF1CE]/30">
+        <div className={`rounded-lg p-6 mb-6 border ${
+          isActiveAccountsBulk
+            ? 'bg-gradient-to-br from-amber-500/10 to-red-500/5 border-amber-500/30'
+            : 'bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 border-[#0FF1CE]/30'
+        }`}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <Users size={24} className="text-[#0FF1CE]" />
+              <Users size={24} className={isActiveAccountsBulk ? 'text-amber-400' : 'text-[#0FF1CE]'} />
               <div>
                 <h3 className="text-white font-bold text-lg">Bulk Email Campaign</h3>
-                <p className="text-gray-400 text-sm">Send to all gauntlet activation users</p>
+                <p className="text-gray-400 text-sm">
+                  {isActiveAccountsBulk
+                    ? 'Active account holders — drawdown accounts are highlighted'
+                    : 'Send to all gauntlet activation users'}
+                </p>
               </div>
             </div>
             {loadingBulkRecipients && (
@@ -1444,10 +1741,17 @@ export default function EmailTemplatesPage() {
               <div className="text-gray-400 text-sm mb-1">Selected</div>
               <div className="text-2xl font-bold text-[#0FF1CE]">{selectedRecipients.size}</div>
             </div>
-            <div className="bg-[#0D0D0D]/50 rounded-lg p-4 border border-[#2F2F2F]">
-              <div className="text-gray-400 text-sm mb-1">Unique Emails</div>
-              <div className="text-2xl font-bold text-white">{new Set(bulkRecipients.map(r => r.email)).size}</div>
-            </div>
+            {isActiveAccountsBulk ? (
+              <div className="bg-[#0D0D0D]/50 rounded-lg p-4 border border-[#2F2F2F]">
+                <div className="text-gray-400 text-sm mb-1">In Drawdown</div>
+                <div className="text-2xl font-bold text-red-400">{drawdownCount}</div>
+              </div>
+            ) : (
+              <div className="bg-[#0D0D0D]/50 rounded-lg p-4 border border-[#2F2F2F]">
+                <div className="text-gray-400 text-sm mb-1">Unique Emails</div>
+                <div className="text-2xl font-bold text-white">{new Set(bulkRecipients.map(r => r.email)).size}</div>
+              </div>
+            )}
             <div className="bg-[#0D0D0D]/50 rounded-lg p-4 border border-[#2F2F2F]">
               <div className="text-gray-400 text-sm mb-1">Status</div>
               <div className="text-sm font-medium text-green-400">
@@ -1488,7 +1792,7 @@ export default function EmailTemplatesPage() {
               <span>Send to {selectedRecipients.size} Selected Recipient{selectedRecipients.size !== 1 ? 's' : ''}</span>
             </button>
             <button
-              onClick={loadGauntletActivationRecipients}
+              onClick={refreshBulkRecipients}
               disabled={loadingBulkRecipients || sendingBulk}
               className="px-4 py-3 bg-[#151515] text-white rounded-lg hover:bg-[#2F2F2F] transition-colors disabled:opacity-50"
               title="Refresh recipients list"
@@ -1499,9 +1803,18 @@ export default function EmailTemplatesPage() {
 
           {/* Recipient Management Section */}
           <div className="bg-[#0D0D0D]/50 rounded-lg p-4 border border-[#2F2F2F]">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
               <h4 className="text-white font-medium">Manage Recipients</h4>
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
+                {isActiveAccountsBulk && (
+                  <button
+                    onClick={selectDrawdownRecipients}
+                    disabled={drawdownCount === 0}
+                    className="text-xs px-3 py-1.5 bg-red-500/20 text-red-400 rounded hover:bg-red-500/30 transition-colors disabled:opacity-50"
+                  >
+                    Select In Drawdown
+                  </button>
+                )}
                 <button
                   onClick={selectAllRecipients}
                   disabled={bulkRecipients.length === 0}
@@ -1577,22 +1890,62 @@ export default function EmailTemplatesPage() {
               </div>
             )}
 
+            {isActiveAccountsBulk && (
+              <div className="mb-4 flex flex-col sm:flex-row gap-2">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+                  <input
+                    type="text"
+                    placeholder="Filter by name, email, or account type..."
+                    value={bulkListSearch}
+                    onChange={(e) => setBulkListSearch(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 bg-[#151515] border border-[#2F2F2F] rounded-lg text-white text-sm placeholder-gray-400 focus:outline-none focus:border-[#0FF1CE]/50"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setBulkListFilter('all')}
+                    className={`text-xs px-3 py-2 rounded transition-colors ${
+                      bulkListFilter === 'all' ? 'bg-[#0FF1CE] text-black' : 'bg-[#151515] text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    All Active
+                  </button>
+                  <button
+                    onClick={() => setBulkListFilter('drawdown')}
+                    className={`text-xs px-3 py-2 rounded transition-colors flex items-center gap-1 ${
+                      bulkListFilter === 'drawdown' ? 'bg-red-500 text-white' : 'bg-[#151515] text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    <AlertTriangle size={12} />
+                    In Drawdown ({drawdownCount})
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Recipients List with Checkboxes */}
-            {bulkRecipients.length > 0 ? (
+            {visibleBulkRecipients.length > 0 ? (
               <div className="max-h-96 overflow-y-auto space-y-2">
-                {bulkRecipients.map((recipient) => (
+                {visibleBulkRecipients.map((recipient) => (
                   <div
                     key={recipient.id}
-                    className="flex items-center gap-3 p-3 bg-[#151515] rounded-lg hover:bg-[#1F1F1F] transition-colors group"
+                    className={`flex items-center gap-3 p-3 rounded-lg hover:bg-[#1F1F1F] transition-colors group ${
+                      recipient.inDrawdown
+                        ? recipient.drawdownBreached
+                          ? 'bg-red-500/10 border border-red-500/40'
+                          : 'bg-amber-500/10 border border-amber-500/30'
+                        : 'bg-[#151515]'
+                    }`}
                   >
                     <input
                       type="checkbox"
-                      checked={selectedRecipients.has(recipient.email)}
-                      onChange={() => toggleRecipient(recipient.email)}
+                      checked={selectedRecipients.has(getBulkRecipientKey(recipient))}
+                      onChange={() => toggleRecipient(getBulkRecipientKey(recipient))}
                       className="w-4 h-4 rounded border-[#2F2F2F] text-[#0FF1CE] focus:ring-[#0FF1CE] focus:ring-offset-0 cursor-pointer"
                     />
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <div className="text-white font-medium text-sm truncate">
                           {recipient.displayName}
                         </div>
@@ -1601,11 +1954,31 @@ export default function EmailTemplatesPage() {
                             Manual
                           </span>
                         )}
+                        {recipient.challengeType && (
+                          <span className={`text-xs px-2 py-0.5 rounded-full ${
+                            recipient.isFunded
+                              ? 'bg-[#0FF1CE]/20 text-[#0FF1CE]'
+                              : 'bg-[#2F2F2F] text-gray-300'
+                          }`}>
+                            {recipient.challengeType}
+                            {recipient.accountSize ? ` · ${recipient.accountSize}` : ''}
+                          </span>
+                        )}
+                        {recipient.inDrawdown && (
+                          <span className={`text-xs px-2 py-0.5 rounded-full flex items-center gap-1 ${
+                            recipient.drawdownBreached
+                              ? 'bg-red-500/20 text-red-400'
+                              : 'bg-amber-500/20 text-amber-400'
+                          }`}>
+                            <AlertTriangle size={10} />
+                            {recipient.drawdownBreached ? 'Breached' : 'In Drawdown'} {Number(recipient.maxDrawdown || 0).toFixed(1)}%
+                          </span>
+                        )}
                       </div>
                       <div className="text-gray-400 text-xs truncate">{recipient.email}</div>
                     </div>
                     <button
-                      onClick={() => removeRecipient(recipient.email)}
+                      onClick={() => removeRecipient(getBulkRecipientKey(recipient))}
                       className="opacity-0 group-hover:opacity-100 p-1 text-red-400 hover:bg-red-400/10 rounded transition-all"
                       title="Remove from list"
                     >
@@ -1616,7 +1989,11 @@ export default function EmailTemplatesPage() {
               </div>
             ) : (
               <div className="text-center py-8 text-gray-400">
-                No recipients loaded yet
+                {loadingBulkRecipients
+                  ? 'Loading recipients...'
+                  : isActiveAccountsBulk && bulkListFilter === 'drawdown'
+                    ? 'No accounts currently in drawdown'
+                    : 'No recipients loaded yet'}
               </div>
             )}
           </div>
@@ -1875,6 +2252,11 @@ export default function EmailTemplatesPage() {
                         {template.isBulkTemplate && (
                           <span className="px-2 py-0.5 text-xs font-bold bg-[#0FF1CE]/20 text-[#0FF1CE] rounded-full border border-[#0FF1CE]/30">
                             BULK
+                          </span>
+                        )}
+                        {template.bulkSource === 'active-accounts' && (
+                          <span className="px-2 py-0.5 text-xs font-bold bg-red-500/20 text-red-400 rounded-full border border-red-500/30">
+                            DRAWDOWN
                           </span>
                         )}
                       </div>

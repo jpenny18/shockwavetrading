@@ -1,8 +1,10 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { collection, getCountFromServer, query, Timestamp, where } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import { 
   BarChart2, 
   Users, 
@@ -23,7 +25,9 @@ import {
   DollarSign,
   CreditCard,
   FlaskConical,
-  ToggleLeft
+  ToggleLeft,
+  Crown,
+  LineChart
 } from 'lucide-react';
 
 const navItems = [
@@ -33,6 +37,8 @@ const navItems = [
   { name: 'Card Orders', href: '/admin/card-orders', icon: CreditCard },
   { name: 'Customers', href: '/admin/customers', icon: Users },
   { name: 'KYC Management', href: '/admin/kyc', icon: Shield },
+  { name: 'VIP Portal', href: '/admin/vip', icon: Crown },
+  { name: 'VIP Accounts', href: '/admin/vip-accounts', icon: LineChart },
   { name: 'Withdrawals', href: '/admin/withdrawals', icon: DollarSign },
   { name: 'MetaAPI Accounts', href: '/admin/accounts', icon: Server },
   { name: 'Email Templates', href: '/admin/emails', icon: Mail },
@@ -47,18 +53,139 @@ const devNavItems = process.env.NODE_ENV === 'development'
   ? [{ name: 'Dev Tools', href: '/admin/dev-tools', icon: FlaskConical, isDevOnly: true }]
   : [];
 
+function isNavActive(pathname: string, href: string) {
+  if (href === '/admin') return pathname === '/admin';
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function initials(name: string, email: string) {
+  const source = name && name !== 'Admin' ? name : email;
+  const parts = source.split(/[\s@._-]+/).filter(Boolean);
+  const first = parts[0]?.[0] || 'A';
+  const second = parts[1]?.[0] || '';
+  return `${first}${second}`.toUpperCase();
+}
+
+async function countDocs(countQuery: ReturnType<typeof query>) {
+  try {
+    const snapshot = await getCountFromServer(countQuery);
+    return snapshot.data().count;
+  } catch (error) {
+    console.error('Error counting admin alerts:', error);
+    return 0;
+  }
+}
+
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchRef = useRef<HTMLDivElement>(null);
+  const alertsRef = useRef<HTMLDivElement>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [logoutError, setLogoutError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [alertsOpen, setAlertsOpen] = useState(false);
+  const [siteName, setSiteName] = useState('Shockwave Capital');
+  const [adminProfile, setAdminProfile] = useState({ name: 'Admin', email: '' });
+  const [alerts, setAlerts] = useState<{ label: string; href: string; count: number }[]>([]);
+
+  const searchableItems = [...navItems, ...devNavItems];
+  const normalizedSearch = searchQuery.trim().toLowerCase();
+  const searchResults = searchableItems.filter((item) =>
+    !normalizedSearch || item.name.toLowerCase().includes(normalizedSearch)
+  );
+
+  useEffect(() => {
+    const handlePointerDown = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (searchRef.current && !searchRef.current.contains(target)) setSearchOpen(false);
+      if (alertsRef.current && !alertsRef.current.contains(target)) setAlertsOpen(false);
+    };
+    document.addEventListener('mousedown', handlePointerDown);
+    return () => document.removeEventListener('mousedown', handlePointerDown);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadShell = async () => {
+      const [profileResult, settingsResult] = await Promise.allSettled([
+        fetch('/api/auth/admin-profile').then((response) => (response.ok ? response.json() : null)),
+        fetch('/api/admin/settings').then((response) => (response.ok ? response.json() : null)),
+      ]);
+
+      if (cancelled) return;
+
+      const profile = profileResult.status === 'fulfilled' ? profileResult.value : null;
+      const settings = settingsResult.status === 'fulfilled' ? settingsResult.value : null;
+      if (profile?.email || profile?.name) {
+        setAdminProfile({
+          name: profile.name || 'Admin',
+          email: profile.email || '',
+        });
+      }
+      if (settings?.general?.siteName) setSiteName(settings.general.siteName);
+
+      const notifications = settings?.notifications || {
+        emailNotifications: true,
+        orderNotifications: true,
+        customerSignups: true,
+        paymentFailures: true,
+        dailySummary: true,
+      };
+      const showEmailAlerts = notifications.emailNotifications !== false;
+      const since = Timestamp.fromDate(new Date(Date.now() - 24 * 60 * 60 * 1000));
+      const [pendingOrders, pendingCrypto, failedPayments, newSignups, pendingWithdrawals, pendingKyc] = await Promise.all([
+        showEmailAlerts && notifications.orderNotifications !== false
+          ? countDocs(query(collection(db, 'orders'), where('paymentStatus', '==', 'pending')))
+          : 0,
+        showEmailAlerts && notifications.orderNotifications !== false
+          ? countDocs(query(collection(db, 'crypto-orders'), where('status', '==', 'PENDING')))
+          : 0,
+        showEmailAlerts && notifications.paymentFailures !== false
+          ? countDocs(query(collection(db, 'orders'), where('paymentStatus', '==', 'failed')))
+          : 0,
+        showEmailAlerts && notifications.customerSignups !== false
+          ? countDocs(query(collection(db, 'users'), where('createdAt', '>=', since)))
+          : 0,
+        countDocs(query(collection(db, 'withdrawalRequests'), where('status', '==', 'pending'))),
+        countDocs(query(collection(db, 'kycSubmissions'), where('status', '==', 'pending'))),
+      ]);
+
+      if (cancelled) return;
+
+      const nextAlerts = [
+        { label: 'Pending card orders', href: '/admin/orders', count: pendingOrders },
+        { label: 'Pending crypto orders', href: '/admin/crypto-orders', count: pendingCrypto },
+        { label: 'Failed card payments', href: '/admin/orders', count: failedPayments },
+        { label: 'New signups (24h)', href: '/admin/customers?joined=24h', count: newSignups },
+        { label: 'Pending withdrawals', href: '/admin/withdrawals', count: pendingWithdrawals },
+        { label: 'Pending KYC', href: '/admin/kyc', count: pendingKyc },
+      ].filter((item) => item.count > 0);
+
+      if (showEmailAlerts && notifications.dailySummary !== false) {
+        nextAlerts.push({ label: 'Open dashboard summary', href: '/admin', count: 0 });
+      }
+
+      setAlerts(nextAlerts);
+    };
+
+    loadShell();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
+      setLogoutError(null);
       
       const response = await fetch('/api/auth/logout', {
         method: 'POST',
@@ -71,14 +198,22 @@ export default function AdminLayout({
         throw new Error('Logout failed');
       }
 
-      // Redirect to admin login page
       router.push('/admin-auth');
     } catch (error) {
       console.error('Logout error:', error);
-      // You might want to show an error message to the user here
+      setLogoutError('Logout failed. Please try again.');
     } finally {
       setIsLoggingOut(false);
     }
+  };
+
+  const alertCount = alerts.reduce((sum, item) => sum + item.count, 0);
+  const adminInitials = initials(adminProfile.name, adminProfile.email);
+
+  const goToSearchResult = (href: string) => {
+    setSearchOpen(false);
+    setSearchQuery('');
+    router.push(href);
   };
 
   return (
@@ -140,7 +275,7 @@ export default function AdminLayout({
               className="h-8 w-auto"
             />
             <div className="ml-2.5">
-              <div className="text-white font-bold text-sm">Shockwave Capital</div>
+              <div className="text-white font-bold text-sm">{siteName}</div>
               <div className="text-[#0FF1CE] text-xs font-medium tracking-wider uppercase">Admin Panel</div>
             </div>
           </div>
@@ -150,14 +285,19 @@ export default function AdminLayout({
           <nav className="flex-1 space-y-0.5 overflow-y-auto">
             {navItems.map((item) => {
               const Icon = item.icon;
+              const active = isNavActive(pathname, item.href);
               return (
                 <Link
                   key={item.name}
                   href={item.href}
                   onClick={() => setIsSidebarOpen(false)}
-                  className="flex items-center gap-3 px-3 py-2.5 md:py-2 text-gray-400 hover:text-[#0FF1CE] rounded-lg hover:bg-[#0FF1CE]/10 transition-all group active:bg-[#0FF1CE]/15"
+                  className={`flex items-center gap-3 px-3 py-2.5 md:py-2 rounded-lg transition-all group active:bg-[#0FF1CE]/15 ${
+                    active
+                      ? 'text-[#0FF1CE] bg-[#0FF1CE]/10'
+                      : 'text-gray-400 hover:text-[#0FF1CE] hover:bg-[#0FF1CE]/10'
+                  }`}
                 >
-                  <Icon size={18} className="group-hover:text-[#0FF1CE] flex-shrink-0" />
+                  <Icon size={18} className={`flex-shrink-0 ${active ? 'text-[#0FF1CE]' : 'group-hover:text-[#0FF1CE]'}`} />
                   <span className="text-sm font-medium">{item.name}</span>
                 </Link>
               );
@@ -171,12 +311,17 @@ export default function AdminLayout({
                 </div>
                 {devNavItems.map((item) => {
                   const Icon = item.icon;
+                  const active = isNavActive(pathname, item.href);
                   return (
                     <Link
                       key={item.name}
                       href={item.href}
                       onClick={() => setIsSidebarOpen(false)}
-                      className="flex items-center gap-3 px-3 py-2.5 md:py-2 text-orange-400/70 hover:text-orange-400 rounded-lg hover:bg-orange-400/10 transition-all group active:bg-orange-400/15"
+                      className={`flex items-center gap-3 px-3 py-2.5 md:py-2 rounded-lg transition-all group active:bg-orange-400/15 ${
+                        active
+                          ? 'text-orange-400 bg-orange-400/10'
+                          : 'text-orange-400/70 hover:text-orange-400 hover:bg-orange-400/10'
+                      }`}
                     >
                       <Icon size={18} className="group-hover:text-orange-400 flex-shrink-0" />
                       <span className="text-sm font-medium">{item.name}</span>
@@ -191,11 +336,11 @@ export default function AdminLayout({
           <div className="border-t border-[#2F2F2F] pt-4 mt-4">
             <div className="flex items-center gap-3 px-3 py-2">
               <div className="w-8 h-8 rounded-full bg-[#0FF1CE]/20 flex items-center justify-center">
-                <span className="text-[#0FF1CE] font-medium text-sm">AD</span>
+                <span className="text-[#0FF1CE] font-medium text-sm">{adminInitials}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-white text-sm font-medium truncate">Admin User</div>
-                <div className="text-gray-400 text-xs truncate">admin@shockwave.capital</div>
+                <div className="text-white text-sm font-medium truncate">{adminProfile.name}</div>
+                <div className="text-gray-400 text-xs truncate">{adminProfile.email || 'Signed in'}</div>
               </div>
               <button 
                 onClick={handleLogout}
@@ -213,31 +358,101 @@ export default function AdminLayout({
       <div className="flex-1 flex flex-col min-w-0 pt-[58px] md:pt-0">
         {/* Desktop Header */}
         <header className="hidden md:flex h-16 bg-[#0D0D0D] border-b border-[#2F2F2F] items-center justify-between px-8">
-          <div className="flex-1 max-w-md">
+          <div className="flex-1 max-w-md" ref={searchRef}>
             <div className="relative">
               <input 
                 type="text"
-                placeholder="Search..."
+                value={searchQuery}
+                placeholder="Search admin pages..."
+                onChange={(event) => {
+                  setSearchQuery(event.target.value);
+                  setSearchOpen(true);
+                }}
+                onFocus={() => setSearchOpen(true)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Escape') setSearchOpen(false);
+                  if (event.key === 'Enter' && searchResults[0]) {
+                    event.preventDefault();
+                    goToSearchResult(searchResults[0].href);
+                  }
+                }}
                 className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:border-[#0FF1CE]/50"
               />
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+              {searchOpen && (
+                <div className="absolute z-50 mt-2 w-full bg-[#151515] border border-[#2F2F2F] rounded-lg shadow-xl overflow-hidden">
+                  {searchResults.length === 0 ? (
+                    <div className="px-4 py-3 text-sm text-gray-400">No matching pages</div>
+                  ) : (
+                    searchResults.map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <button
+                          key={item.href}
+                          type="button"
+                          onClick={() => goToSearchResult(item.href)}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-300 hover:bg-[#0FF1CE]/10 hover:text-[#0FF1CE]"
+                        >
+                          <Icon size={16} />
+                          <span>{item.name}</span>
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+              )}
             </div>
           </div>
           
           <div className="flex items-center gap-4">
-            <button className="p-2 text-gray-400 hover:text-[#0FF1CE] rounded-lg hover:bg-[#0FF1CE]/10 transition-all relative">
-              <Bell size={20} />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-[#0FF1CE] rounded-full"></span>
-            </button>
-            <button className="p-2 text-gray-400 hover:text-[#0FF1CE] rounded-lg hover:bg-[#0FF1CE]/10 transition-all">
+            <div className="relative" ref={alertsRef}>
+              <button
+                type="button"
+                onClick={() => setAlertsOpen((open) => !open)}
+                className="p-2 text-gray-400 hover:text-[#0FF1CE] rounded-lg hover:bg-[#0FF1CE]/10 transition-all relative"
+                aria-label="Open alerts"
+              >
+                <Bell size={20} />
+                {alertCount > 0 && (
+                  <span className="absolute top-1 right-1 min-w-[16px] h-4 px-1 bg-[#0FF1CE] text-black text-[10px] font-bold rounded-full flex items-center justify-center">
+                    {alertCount > 99 ? '99+' : alertCount}
+                  </span>
+                )}
+              </button>
+              {alertsOpen && (
+                <div className="absolute right-0 z-50 mt-2 w-72 bg-[#151515] border border-[#2F2F2F] rounded-lg shadow-xl overflow-hidden">
+                  <div className="px-4 py-3 border-b border-[#2F2F2F] text-sm font-medium text-white">Needs attention</div>
+                  {alerts.length === 0 ? (
+                    <div className="px-4 py-3 text-sm text-gray-400">Nothing waiting right now</div>
+                  ) : (
+                    alerts.map((item) => (
+                      <Link
+                        key={item.label}
+                        href={item.href}
+                        onClick={() => setAlertsOpen(false)}
+                        className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-[#0FF1CE]/10 hover:text-[#0FF1CE]"
+                      >
+                        <span>{item.label}</span>
+                        {item.count > 0 && <span className="text-[#0FF1CE] font-medium">{item.count}</span>}
+                      </Link>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+            <Link
+              href="/admin/feature-toggles"
+              className="p-2 text-gray-400 hover:text-[#0FF1CE] rounded-lg hover:bg-[#0FF1CE]/10 transition-all"
+              aria-label="Feature toggles"
+            >
               <Sliders size={20} />
-            </button>
+            </Link>
             <div className="w-px h-6 bg-[#2F2F2F]"></div>
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-[#0FF1CE]/20 flex items-center justify-center">
-                <span className="text-[#0FF1CE] font-medium text-sm">AD</span>
+                <span className="text-[#0FF1CE] font-medium text-sm">{adminInitials}</span>
               </div>
-              <span className="text-white text-sm">Admin</span>
+              <span className="text-white text-sm">{adminProfile.name}</span>
             </div>
             <button 
               onClick={handleLogout}
@@ -250,6 +465,11 @@ export default function AdminLayout({
         </header>
         
         {/* Page Content */}
+        {logoutError && (
+          <div className="mx-4 md:mx-8 mt-4 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+            {logoutError}
+          </div>
+        )}
         <main className="flex-1 p-4 md:p-8">
           {children}
         </main>

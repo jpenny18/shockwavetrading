@@ -5,8 +5,10 @@ import { useRouter } from 'next/navigation';
 import Particles from '../components/Particles';
 import Image from 'next/image';
 import { collection, query, where, getDocs } from 'firebase/firestore';
-import { db, auth, registerUser, signInUser, getUser, updateUser, getCurrentUser } from '@/lib/firebase';
-import { Check, Zap, Shield, TrendingUp, ChevronRight, AlertCircle, CreditCard, CalendarOff, Percent, Tag, Gift, ChevronDown, Bitcoin } from 'lucide-react';
+import { db, auth, registerUser, signInUser, getUser, updateUser, getCurrentUser, resetPassword, signOut as signOutUser } from '@/lib/firebase';
+import { updateProfile } from 'firebase/auth';
+import { countries, countryName } from '@/lib/countries';
+import { Check, Zap, ChevronRight, AlertCircle, CreditCard, CalendarOff, Percent, Tag, Gift, ChevronDown, Bitcoin, Mail, Lock, User, Phone, Eye, EyeOff, LogOut } from 'lucide-react';
 import Link from 'next/link';
 
 // Define the type for challenge options
@@ -71,219 +73,78 @@ const addOnMeta: Record<string, { icon: typeof CalendarOff }> = {
   'profit-split-100': { icon: Percent },
 };
 
-const countries = [
-  { code: 'AF', name: 'Afghanistan' },
-  { code: 'AL', name: 'Albania' },
-  { code: 'DZ', name: 'Algeria' },
-  { code: 'AD', name: 'Andorra' },
-  { code: 'AO', name: 'Angola' },
-  { code: 'AG', name: 'Antigua and Barbuda' },
-  { code: 'AR', name: 'Argentina' },
-  { code: 'AM', name: 'Armenia' },
-  { code: 'AU', name: 'Australia' },
-  { code: 'AT', name: 'Austria' },
-  { code: 'AZ', name: 'Azerbaijan' },
-  { code: 'BS', name: 'Bahamas' },
-  { code: 'BH', name: 'Bahrain' },
-  { code: 'BD', name: 'Bangladesh' },
-  { code: 'BB', name: 'Barbados' },
-  { code: 'BY', name: 'Belarus' },
-  { code: 'BE', name: 'Belgium' },
-  { code: 'BZ', name: 'Belize' },
-  { code: 'BJ', name: 'Benin' },
-  { code: 'BT', name: 'Bhutan' },
-  { code: 'BO', name: 'Bolivia' },
-  { code: 'BA', name: 'Bosnia and Herzegovina' },
-  { code: 'BW', name: 'Botswana' },
-  { code: 'BR', name: 'Brazil' },
-  { code: 'BN', name: 'Brunei' },
-  { code: 'BG', name: 'Bulgaria' },
-  { code: 'BF', name: 'Burkina Faso' },
-  { code: 'BI', name: 'Burundi' },
-  { code: 'KH', name: 'Cambodia' },
-  { code: 'CM', name: 'Cameroon' },
-  { code: 'CA', name: 'Canada' },
-  { code: 'CV', name: 'Cape Verde' },
-  { code: 'CF', name: 'Central African Republic' },
-  { code: 'TD', name: 'Chad' },
-  { code: 'CL', name: 'Chile' },
-  { code: 'CN', name: 'China' },
-  { code: 'CO', name: 'Colombia' },
-  { code: 'KM', name: 'Comoros' },
-  { code: 'CG', name: 'Congo' },
-  { code: 'CD', name: 'Congo, Democratic Republic' },
-  { code: 'CR', name: 'Costa Rica' },
-  { code: 'CI', name: 'Côte d\'Ivoire' },
-  { code: 'HR', name: 'Croatia' },
-  { code: 'CU', name: 'Cuba' },
-  { code: 'CY', name: 'Cyprus' },
-  { code: 'CZ', name: 'Czech Republic' },
-  { code: 'DK', name: 'Denmark' },
-  { code: 'DJ', name: 'Djibouti' },
-  { code: 'DM', name: 'Dominica' },
-  { code: 'DO', name: 'Dominican Republic' },
-  { code: 'EC', name: 'Ecuador' },
-  { code: 'EG', name: 'Egypt' },
-  { code: 'SV', name: 'El Salvador' },
-  { code: 'GQ', name: 'Equatorial Guinea' },
-  { code: 'ER', name: 'Eritrea' },
-  { code: 'EE', name: 'Estonia' },
-  { code: 'SZ', name: 'Eswatini' },
-  { code: 'ET', name: 'Ethiopia' },
-  { code: 'FJ', name: 'Fiji' },
-  { code: 'FI', name: 'Finland' },
-  { code: 'FR', name: 'France' },
-  { code: 'GA', name: 'Gabon' },
-  { code: 'GM', name: 'Gambia' },
-  { code: 'GE', name: 'Georgia' },
-  { code: 'DE', name: 'Germany' },
-  { code: 'GH', name: 'Ghana' },
-  { code: 'GR', name: 'Greece' },
-  { code: 'GD', name: 'Grenada' },
-  { code: 'GT', name: 'Guatemala' },
-  { code: 'GN', name: 'Guinea' },
-  { code: 'GW', name: 'Guinea-Bissau' },
-  { code: 'GY', name: 'Guyana' },
-  { code: 'HT', name: 'Haiti' },
-  { code: 'HN', name: 'Honduras' },
-  { code: 'HK', name: 'Hong Kong' },
-  { code: 'HU', name: 'Hungary' },
-  { code: 'IS', name: 'Iceland' },
-  { code: 'IN', name: 'India' },
-  { code: 'ID', name: 'Indonesia' },
-  { code: 'IR', name: 'Iran' },
-  { code: 'IQ', name: 'Iraq' },
-  { code: 'IE', name: 'Ireland' },
-  { code: 'IL', name: 'Israel' },
-  { code: 'IT', name: 'Italy' },
-  { code: 'JM', name: 'Jamaica' },
-  { code: 'JP', name: 'Japan' },
-  { code: 'JO', name: 'Jordan' },
-  { code: 'KZ', name: 'Kazakhstan' },
-  { code: 'KE', name: 'Kenya' },
-  { code: 'KI', name: 'Kiribati' },
-  { code: 'KP', name: 'Korea, North' },
-  { code: 'KR', name: 'Korea, South' },
-  { code: 'KW', name: 'Kuwait' },
-  { code: 'KG', name: 'Kyrgyzstan' },
-  { code: 'LA', name: 'Laos' },
-  { code: 'LV', name: 'Latvia' },
-  { code: 'LB', name: 'Lebanon' },
-  { code: 'LS', name: 'Lesotho' },
-  { code: 'LR', name: 'Liberia' },
-  { code: 'LY', name: 'Libya' },
-  { code: 'LI', name: 'Liechtenstein' },
-  { code: 'LT', name: 'Lithuania' },
-  { code: 'LU', name: 'Luxembourg' },
-  { code: 'MO', name: 'Macao' },
-  { code: 'MG', name: 'Madagascar' },
-  { code: 'MW', name: 'Malawi' },
-  { code: 'MY', name: 'Malaysia' },
-  { code: 'MV', name: 'Maldives' },
-  { code: 'ML', name: 'Mali' },
-  { code: 'MT', name: 'Malta' },
-  { code: 'MH', name: 'Marshall Islands' },
-  { code: 'MR', name: 'Mauritania' },
-  { code: 'MU', name: 'Mauritius' },
-  { code: 'MX', name: 'Mexico' },
-  { code: 'FM', name: 'Micronesia' },
-  { code: 'MD', name: 'Moldova' },
-  { code: 'MC', name: 'Monaco' },
-  { code: 'MN', name: 'Mongolia' },
-  { code: 'ME', name: 'Montenegro' },
-  { code: 'MA', name: 'Morocco' },
-  { code: 'MZ', name: 'Mozambique' },
-  { code: 'MM', name: 'Myanmar' },
-  { code: 'NA', name: 'Namibia' },
-  { code: 'NR', name: 'Nauru' },
-  { code: 'NP', name: 'Nepal' },
-  { code: 'NL', name: 'Netherlands' },
-  { code: 'NZ', name: 'New Zealand' },
-  { code: 'NI', name: 'Nicaragua' },
-  { code: 'NE', name: 'Niger' },
-  { code: 'NG', name: 'Nigeria' },
-  { code: 'NO', name: 'Norway' },
-  { code: 'OM', name: 'Oman' },
-  { code: 'PK', name: 'Pakistan' },
-  { code: 'PW', name: 'Palau' },
-  { code: 'PS', name: 'Palestine' },
-  { code: 'PA', name: 'Panama' },
-  { code: 'PG', name: 'Papua New Guinea' },
-  { code: 'PY', name: 'Paraguay' },
-  { code: 'PE', name: 'Peru' },
-  { code: 'PH', name: 'Philippines' },
-  { code: 'PL', name: 'Poland' },
-  { code: 'PT', name: 'Portugal' },
-  { code: 'QA', name: 'Qatar' },
-  { code: 'RO', name: 'Romania' },
-  { code: 'RU', name: 'Russia' },
-  { code: 'RW', name: 'Rwanda' },
-  { code: 'KN', name: 'Saint Kitts and Nevis' },
-  { code: 'LC', name: 'Saint Lucia' },
-  { code: 'VC', name: 'Saint Vincent and the Grenadines' },
-  { code: 'WS', name: 'Samoa' },
-  { code: 'SM', name: 'San Marino' },
-  { code: 'ST', name: 'Sao Tome and Principe' },
-  { code: 'SA', name: 'Saudi Arabia' },
-  { code: 'SN', name: 'Senegal' },
-  { code: 'RS', name: 'Serbia' },
-  { code: 'SC', name: 'Seychelles' },
-  { code: 'SL', name: 'Sierra Leone' },
-  { code: 'SG', name: 'Singapore' },
-  { code: 'SK', name: 'Slovakia' },
-  { code: 'SI', name: 'Slovenia' },
-  { code: 'SB', name: 'Solomon Islands' },
-  { code: 'SO', name: 'Somalia' },
-  { code: 'ZA', name: 'South Africa' },
-  { code: 'SS', name: 'South Sudan' },
-  { code: 'ES', name: 'Spain' },
-  { code: 'LK', name: 'Sri Lanka' },
-  { code: 'SD', name: 'Sudan' },
-  { code: 'SR', name: 'Suriname' },
-  { code: 'SE', name: 'Sweden' },
-  { code: 'CH', name: 'Switzerland' },
-  { code: 'SY', name: 'Syria' },
-  { code: 'TW', name: 'Taiwan' },
-  { code: 'TJ', name: 'Tajikistan' },
-  { code: 'TZ', name: 'Tanzania' },
-  { code: 'TH', name: 'Thailand' },
-  { code: 'TL', name: 'Timor-Leste' },
-  { code: 'TG', name: 'Togo' },
-  { code: 'TO', name: 'Tonga' },
-  { code: 'TT', name: 'Trinidad and Tobago' },
-  { code: 'TN', name: 'Tunisia' },
-  { code: 'TR', name: 'Turkey' },
-  { code: 'TM', name: 'Turkmenistan' },
-  { code: 'TV', name: 'Tuvalu' },
-  { code: 'UG', name: 'Uganda' },
-  { code: 'UA', name: 'Ukraine' },
-  { code: 'AE', name: 'United Arab Emirates' },
-  { code: 'GB', name: 'United Kingdom' },
-  { code: 'US', name: 'United States' },
-  { code: 'UY', name: 'Uruguay' },
-  { code: 'UZ', name: 'Uzbekistan' },
-  { code: 'VU', name: 'Vanuatu' },
-  { code: 'VA', name: 'Vatican City' },
-  { code: 'VE', name: 'Venezuela' },
-  { code: 'VN', name: 'Vietnam' },
-  { code: 'YE', name: 'Yemen' },
-  { code: 'ZM', name: 'Zambia' },
-  { code: 'ZW', name: 'Zimbabwe' }
-];
-
 interface FormErrors {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  phone?: string;
-  country?: string;
-  password?: string;
-  confirmPassword?: string;
+  account?: string;
   type?: string;
   amount?: string;
   platform?: string;
   terms?: string;
   discountCode?: string;
+}
+
+interface AuthErrors {
+  general?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  country?: string;
+  disclaimer?: string;
+  terms?: string;
+}
+
+interface AccountProfile {
+  email?: string;
+  displayName?: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  country?: string;
+}
+
+interface CustomerDetails {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  country: string;
+  discordUsername: string;
+}
+
+const emptyCustomer = (): CustomerDetails => ({
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  country: '',
+  discordUsername: '',
+});
+
+function isValidPhone(value: string): boolean {
+  const digits = value.replace(/\D/g, '');
+  return digits.length >= 7 && digits.length <= 15;
+}
+
+function customerFromAccount(
+  email: string | null | undefined,
+  profile: AccountProfile | null,
+  displayName?: string | null
+): CustomerDetails {
+  const resolvedEmail = (email || profile?.email || '').trim();
+  const profileFirst = profile?.firstName?.trim() || '';
+  const profileLast = profile?.lastName?.trim() || '';
+  const fallbackParts = (displayName || profile?.displayName || '').split(' ').filter(Boolean);
+
+  return {
+    firstName: profileFirst || fallbackParts[0] || '',
+    lastName: profileLast || fallbackParts.slice(1).join(' '),
+    email: resolvedEmail,
+    phone: profile?.phone?.trim() || '',
+    country: profile?.country?.trim() || '',
+    discordUsername: '',
+  };
 }
 
 interface DiscountCode {
@@ -406,18 +267,35 @@ export default function ChallengePage() {
   const [selectedAmount, setSelectedAmount] = useState<string | null>(null);
   const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CustomerDetails>(emptyCustomer());
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [accountUser, setAccountUser] = useState<{ uid: string; email: string | null } | null>(null);
+  const [authReady, setAuthReady] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [authFirstName, setAuthFirstName] = useState('');
+  const [authLastName, setAuthLastName] = useState('');
+  const [authPhone, setAuthPhone] = useState('');
+  const [authCountry, setAuthCountry] = useState('');
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [authConfirmPassword, setAuthConfirmPassword] = useState('');
+  const [showAuthPassword, setShowAuthPassword] = useState(false);
+  const [showAuthConfirmPassword, setShowAuthConfirmPassword] = useState(false);
+  const [acceptAuthDisclaimer, setAcceptAuthDisclaimer] = useState(false);
+  const [acceptAuthTerms, setAcceptAuthTerms] = useState(false);
+  const [authErrors, setAuthErrors] = useState<AuthErrors>({});
+  const [authMessage, setAuthMessage] = useState('');
+  const [isAuthSubmitting, setIsAuthSubmitting] = useState(false);
+  const [profileDraft, setProfileDraft] = useState({
     firstName: '',
     lastName: '',
-    email: '',
     phone: '',
     country: '',
-    discordUsername: ''
   });
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [accountUser, setAccountUser] = useState<{ uid: string; email: string | null } | null>(null);
+  const [profileErrors, setProfileErrors] = useState<AuthErrors>({});
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const signupProfileRef = useRef<CustomerDetails | null>(null);
+  const profileDraftUidRef = useRef<string | null>(null);
   const [isLinkingAccount, setIsLinkingAccount] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [cardError, setCardError] = useState<string | null>(null);
@@ -434,31 +312,19 @@ export default function ChallengePage() {
   const step5Ref = useRef<HTMLDivElement>(null);
   const stepRefs = [null, step1Ref, step2Ref, step3Ref, step4Ref, step5Ref] as const;
 
-  const hasAccountAccess = Boolean(accountUser || (password.length >= 6 && password === confirmPassword));
-
-  const isInfoComplete = Boolean(
-    formData.firstName &&
-    formData.lastName &&
-    formData.email &&
-    formData.phone &&
-    formData.country &&
-    termsAccepted &&
-    hasAccountAccess
+  const orderProfileReady = Boolean(
+    formData.firstName.trim() &&
+    formData.lastName.trim() &&
+    isValidPhone(formData.phone) &&
+    formData.country.trim()
   );
 
-  const isInfoStarted = Boolean(
-    formData.firstName ||
-    formData.lastName ||
-    formData.email ||
-    formData.phone ||
-    formData.country ||
-    formData.discordUsername ||
-    termsAccepted ||
-    addonsContinued
-  );
+  const isInfoComplete = Boolean(accountUser && termsAccepted && orderProfileReady);
+
+  const isInfoStarted = Boolean(termsAccepted || addonsContinued);
 
   // Steps 1-3 require selections; step 4 (add-ons) is optional;
-  // step 5 completes when required info + terms are filled.
+  // step 5 completes once the shopper is signed in and accepts the purchase terms.
   const completedSteps =
     isInfoComplete && selectedType && selectedAmount && selectedPlatform ? 5 :
     isInfoStarted && selectedPlatform ? 4 :
@@ -493,34 +359,69 @@ export default function ChallengePage() {
   
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      if (!user) {
-        setAccountUser(null);
-        return;
-      }
-
-      setAccountUser({ uid: user.uid, email: user.email });
-
       try {
-        const profile = await getUser(user.uid);
-        const nameParts = (user.displayName || '').split(' ').filter(Boolean);
-        setFormData((prev) => ({
-          ...prev,
-          email: user.email || prev.email,
-          firstName: prev.firstName || profile?.firstName || nameParts[0] || '',
-          lastName: prev.lastName || profile?.lastName || nameParts.slice(1).join(' ') || '',
-          phone: prev.phone || profile?.phone || '',
-          country: prev.country || profile?.country || ''
-        }));
-      } catch (error) {
-        console.error('Could not load account profile:', error);
-        if (user.email) {
-          setFormData((prev) => ({ ...prev, email: user.email || prev.email }));
+        if (!user) {
+          signupProfileRef.current = null;
+          setAccountUser(null);
+          setFormData(emptyCustomer());
+          return;
         }
+
+        setAccountUser({ uid: user.uid, email: user.email });
+
+        let profile: AccountProfile | null = null;
+        try {
+          profile = await getUser(user.uid);
+          if (!profile) {
+            await new Promise((resolve) => setTimeout(resolve, 400));
+            profile = await getUser(user.uid);
+          }
+        } catch (error) {
+          console.error('Could not load account profile:', error);
+        }
+
+        setFormData((prev) => {
+          const next = customerFromAccount(user.email, profile, user.displayName);
+          const typedName = signupProfileRef.current;
+          const sameAccount = prev.email.toLowerCase() === next.email.toLowerCase()
+            || typedName?.email.toLowerCase() === next.email.toLowerCase();
+          if (!sameAccount) return next;
+
+          const kept = typedName && typedName.email.toLowerCase() === next.email.toLowerCase() ? typedName : prev;
+          return {
+            ...next,
+            firstName: profile?.firstName?.trim() || kept.firstName || next.firstName,
+            lastName: profile?.lastName?.trim() || kept.lastName || next.lastName,
+            phone: profile?.phone?.trim() || kept.phone || next.phone,
+            country: profile?.country?.trim() || kept.country || next.country,
+          };
+        });
+      } finally {
+        setAuthReady(true);
       }
     });
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!accountUser || !authReady) {
+      if (!accountUser) profileDraftUidRef.current = null;
+      return;
+    }
+
+    const profileLoaded = formData.email === (accountUser.email || '')
+      || Boolean(formData.firstName || formData.lastName || formData.phone || formData.country);
+    if (!profileLoaded || profileDraftUidRef.current === accountUser.uid) return;
+
+    profileDraftUidRef.current = accountUser.uid;
+    setProfileDraft({
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      phone: formData.phone,
+      country: formData.country,
+    });
+  }, [accountUser, authReady, formData.firstName, formData.lastName, formData.phone, formData.country]);
 
   // Check for preselected values from pricing table
   useEffect(() => {
@@ -590,11 +491,6 @@ export default function ChallengePage() {
     });
     return basePrice * totalMultiplier;
     */
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const validateDiscountCode = async (code: string) => {
@@ -668,106 +564,275 @@ export default function ChallengePage() {
     return calculateDiscountedPrice(priceWithAddOns, appliedDiscount);
   };
 
-  const ensureAccount = async (): Promise<{ uid: string; email: string } | null> => {
-    const signedIn = accountUser
-      ? accountUser
-      : await (async () => {
-          const user = await getCurrentUser();
-          if (!user) return null;
-          const linked = { uid: user.uid, email: user.email };
-          setAccountUser(linked);
-          return linked;
-        })();
-
-    if (signedIn) {
-      try {
-        await updateUser(signedIn.uid, {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          phone: formData.phone,
-          country: formData.country,
-          displayName: `${formData.firstName} ${formData.lastName}`.trim()
-        });
-      } catch (error) {
-        console.error('Could not refresh profile before checkout:', error);
+  const ensureAccount = async (): Promise<{ uid: string; email: string; customer: CustomerDetails } | null> => {
+    let signedIn = accountUser;
+    if (!signedIn) {
+      const user = await getCurrentUser();
+      if (user) {
+        signedIn = { uid: user.uid, email: user.email };
+        setAccountUser(signedIn);
       }
-      return { uid: signedIn.uid, email: signedIn.email || formData.email };
     }
 
-    if (password.length < 6) {
-      setFormErrors((prev) => ({ ...prev, password: 'Password must be at least 6 characters' }));
-      return null;
-    }
-    if (password !== confirmPassword) {
-      setFormErrors((prev) => ({ ...prev, confirmPassword: 'Passwords do not match' }));
+    if (!signedIn) {
+      setFormErrors((prev) => ({ ...prev, account: 'Sign in or create an account to continue' }));
       return null;
     }
 
+    let profile: AccountProfile | null = null;
     try {
-      const credential = await registerUser(formData.email, password, {
-        displayName: `${formData.firstName} ${formData.lastName}`.trim(),
-        firstName: formData.firstName,
-        lastName: formData.lastName
-      });
-      try {
-        await updateUser(credential.user.uid, {
-          phone: formData.phone,
-          country: formData.country
-        });
-      } catch (error) {
-        console.error('Could not save profile details:', error);
-      }
-      const linked = { uid: credential.user.uid, email: credential.user.email || formData.email };
-      setAccountUser(linked);
-      return linked;
-    } catch (error: any) {
-      if (error?.code === 'auth/email-already-in-use') {
-        try {
-          const credential = await signInUser(formData.email, password);
-          const linked = { uid: credential.user.uid, email: credential.user.email || formData.email };
-          setAccountUser(linked);
-          return linked;
-        } catch (signInError: any) {
-          const activeUser = auth.currentUser;
-          const wrongPassword = ['auth/wrong-password', 'auth/invalid-credential', 'auth/user-not-found', 'auth/invalid-email'].includes(signInError?.code);
-          if (!wrongPassword && activeUser && activeUser.email?.toLowerCase() === formData.email.toLowerCase()) {
-            const linked = { uid: activeUser.uid, email: activeUser.email };
-            setAccountUser(linked);
-            return linked;
-          }
-          setFormErrors((prev) => ({
-            ...prev,
-            email: 'This email already has an account.',
-            password: 'Enter the password for that account to continue.'
-          }));
-          return null;
-        }
-      }
+      profile = await getUser(signedIn.uid);
+    } catch (error) {
+      console.error('Could not load account profile:', error);
+    }
 
+    const customer = customerFromAccount(
+      signedIn.email || auth.currentUser?.email,
+      profile,
+      auth.currentUser?.displayName
+    );
+    const typedName = signupProfileRef.current;
+    if (typedName && typedName.email.toLowerCase() === customer.email.toLowerCase()) {
+      customer.firstName = profile?.firstName?.trim() || typedName.firstName || customer.firstName;
+      customer.lastName = profile?.lastName?.trim() || typedName.lastName || customer.lastName;
+      customer.phone = profile?.phone?.trim() || typedName.phone || customer.phone;
+      customer.country = profile?.country?.trim() || typedName.country || customer.country;
+    }
+
+    if (!customer.email) {
+      setFormErrors((prev) => ({ ...prev, account: 'Your account is missing an email address.' }));
+      return null;
+    }
+
+    if (!customer.firstName || !customer.lastName || !customer.phone || !customer.country) {
       setFormErrors((prev) => ({
         ...prev,
-        password: 'Could not create your account. Please try again.'
+        account: 'Add your last name, phone number, and country before payment.',
       }));
       return null;
     }
+
+    setFormData(customer);
+    return { uid: signedIn.uid, email: customer.email, customer };
+  };
+
+  const applyAuthError = (error: any) => {
+    const errorCode = error?.code;
+    switch (errorCode) {
+      case 'auth/email-already-in-use':
+        setAuthErrors({ email: 'This email address is already in use.' });
+        break;
+      case 'auth/invalid-email':
+        setAuthErrors({ email: 'The email address is not valid.' });
+        break;
+      case 'auth/user-disabled':
+        setAuthErrors({ general: 'This user account has been disabled.' });
+        break;
+      case 'auth/user-not-found':
+      case 'auth/wrong-password':
+      case 'auth/invalid-credential':
+        setAuthErrors({ general: 'Invalid email or password.' });
+        break;
+      case 'auth/weak-password':
+        setAuthErrors({ password: 'The password is too weak.' });
+        break;
+      default:
+        setAuthErrors({ general: 'An unexpected error occurred. Please try again.' });
+    }
+  };
+
+  const handleAuthSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthErrors({});
+    setAuthMessage('');
+    setFormErrors((prev) => ({ ...prev, account: undefined }));
+    setIsAuthSubmitting(true);
+
+    try {
+      if (authMode === 'login') {
+        const nextErrors: AuthErrors = {};
+        if (!authEmail.trim()) nextErrors.email = 'Please enter your email address';
+        if (!authPassword) nextErrors.password = 'Please enter your password';
+        if (!acceptAuthDisclaimer) nextErrors.disclaimer = 'You must acknowledge and accept the disclaimer';
+        if (Object.keys(nextErrors).length) {
+          setAuthErrors(nextErrors);
+          return;
+        }
+
+        const credential = await signInUser(authEmail.trim(), authPassword);
+        const profile = await getUser(credential.user.uid).catch(() => null);
+        const customer = customerFromAccount(credential.user.email, profile, credential.user.displayName);
+        signupProfileRef.current = null;
+        setAccountUser({ uid: credential.user.uid, email: credential.user.email });
+        setFormData(customer);
+        setAuthPassword('');
+        setTimeout(() => scrollToStep(5, true), 150);
+        return;
+      }
+
+      const nextErrors: AuthErrors = {};
+      if (!authFirstName.trim()) nextErrors.firstName = 'First name is required';
+      if (!authLastName.trim()) nextErrors.lastName = 'Last name is required';
+      if (!authPhone.trim()) nextErrors.phone = 'Phone number is required';
+      else if (!isValidPhone(authPhone)) nextErrors.phone = 'Enter a valid phone number';
+      if (!authCountry) nextErrors.country = 'Country is required';
+      if (!authEmail.trim()) nextErrors.email = 'Please enter your email address';
+      if (!authPassword) nextErrors.password = 'Please enter your password';
+      else if (authPassword.length < 6) nextErrors.password = 'Password must be at least 6 characters';
+      if (!authConfirmPassword) nextErrors.confirmPassword = 'Retype your password';
+      else if (authPassword !== authConfirmPassword) nextErrors.confirmPassword = 'Passwords do not match';
+      if (!acceptAuthDisclaimer) nextErrors.disclaimer = 'You must acknowledge and accept the disclaimer';
+      if (!acceptAuthTerms) nextErrors.terms = 'You must accept the terms and conditions';
+      if (Object.keys(nextErrors).length) {
+        setAuthErrors(nextErrors);
+        return;
+      }
+
+      const firstName = authFirstName.trim();
+      const lastName = authLastName.trim();
+      const phone = authPhone.trim();
+      const displayName = `${firstName} ${lastName}`.trim();
+      const credential = await registerUser(authEmail.trim(), authPassword, {
+        displayName,
+        firstName,
+        lastName,
+        phone,
+        country: authCountry,
+      });
+      const customer = customerFromAccount(
+        credential.user.email || authEmail.trim(),
+        {
+          email: credential.user.email || authEmail.trim(),
+          displayName,
+          firstName,
+          lastName,
+          phone,
+          country: authCountry,
+        },
+        displayName
+      );
+      signupProfileRef.current = customer;
+      setAccountUser({ uid: credential.user.uid, email: credential.user.email });
+      setFormData(customer);
+      setAuthPassword('');
+      setAuthConfirmPassword('');
+      setTimeout(() => scrollToStep(5, true), 150);
+    } catch (error: any) {
+      console.error('Authentication error:', error);
+      applyAuthError(error);
+    } finally {
+      setIsAuthSubmitting(false);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    setAuthErrors({});
+    setAuthMessage('');
+    if (!authEmail.trim()) {
+      setAuthErrors({ email: 'Enter your email address first' });
+      return;
+    }
+
+    try {
+      await resetPassword(authEmail.trim());
+      setAuthMessage('Password reset email sent.');
+    } catch (error) {
+      console.error('Password reset failed:', error);
+      setAuthErrors({ general: 'Could not send a reset email. Check the address and try again.' });
+    }
+  };
+
+  const handleUseDifferentAccount = async () => {
+    setAuthErrors({});
+    try {
+      await signOutUser();
+    } catch (error) {
+      console.error('Could not sign out:', error);
+      setAuthErrors({ general: 'Could not sign out. Please try again.' });
+      return;
+    }
+
+    signupProfileRef.current = null;
+    profileDraftUidRef.current = null;
+    setAccountUser(null);
+    setFormData(emptyCustomer());
+    setTermsAccepted(false);
+    setAuthPassword('');
+    setAuthConfirmPassword('');
+    setAuthMode('login');
+  };
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!accountUser) return;
+
+    const nextErrors: AuthErrors = {};
+    if (!profileDraft.firstName.trim()) nextErrors.firstName = 'First name is required';
+    if (!profileDraft.lastName.trim()) nextErrors.lastName = 'Last name is required';
+    if (!profileDraft.phone.trim()) nextErrors.phone = 'Phone number is required';
+    else if (!isValidPhone(profileDraft.phone)) nextErrors.phone = 'Enter a valid phone number';
+    if (!profileDraft.country) nextErrors.country = 'Country is required';
+    if (Object.keys(nextErrors).length) {
+      setProfileErrors(nextErrors);
+      return;
+    }
+
+    setIsSavingProfile(true);
+    setProfileErrors({});
+    try {
+      const firstName = profileDraft.firstName.trim();
+      const lastName = profileDraft.lastName.trim();
+      const phone = profileDraft.phone.trim();
+      const country = profileDraft.country;
+      const displayName = `${firstName} ${lastName}`.trim();
+      await updateUser(accountUser.uid, {
+        firstName,
+        lastName,
+        phone,
+        country,
+        displayName,
+      });
+      if (auth.currentUser) {
+        try {
+          await updateProfile(auth.currentUser, { displayName });
+        } catch (error) {
+          console.error('Could not update auth display name:', error);
+        }
+      }
+
+      const customer: CustomerDetails = {
+        firstName,
+        lastName,
+        email: accountUser.email || formData.email,
+        phone,
+        country,
+        discordUsername: '',
+      };
+      signupProfileRef.current = customer;
+      setFormData(customer);
+      setFormErrors((prev) => ({ ...prev, account: undefined }));
+    } catch (error) {
+      console.error('Could not save profile:', error);
+      setProfileErrors({ general: 'Could not save your profile. Please try again.' });
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
+
+  const collectCheckoutErrors = (): FormErrors => {
+    const errors: FormErrors = {};
+    if (!selectedType) errors.type = 'Please select a challenge type';
+    if (!selectedAmount) errors.amount = 'Please select an amount';
+    if (!selectedPlatform) errors.platform = 'Please select a platform';
+    if (!accountUser) errors.account = 'Sign in or create an account to continue';
+    if (accountUser && !orderProfileReady) errors.account = 'Add your last name, phone number, and country before payment';
+    if (!termsAccepted) errors.terms = 'Please accept the terms and conditions';
+    return errors;
   };
 
   const handleProceedToPayment = async () => {
-    if (!isFormValid()) {
-      // Show validation errors
-      const errors: FormErrors = {};
-      if (!formData.firstName) errors.firstName = 'First name is required';
-      if (!formData.lastName) errors.lastName = 'Last name is required';
-      if (!formData.email) errors.email = 'Email is required';
-      if (!formData.phone) errors.phone = 'Phone number is required';
-      if (!formData.country) errors.country = 'Country is required';
-      if (!selectedType) errors.type = 'Please select a challenge type';
-      if (!selectedAmount) errors.amount = 'Please select an amount';
-      if (!selectedPlatform) errors.platform = 'Please select a platform';
-      if (!termsAccepted) errors.terms = 'Please accept the terms and conditions';
-      if (!accountUser && password.length < 6) errors.password = 'Password must be at least 6 characters';
-      if (!accountUser && password !== confirmPassword) errors.confirmPassword = 'Passwords do not match';
-      
+    const errors = collectCheckoutErrors();
+    if (Object.keys(errors).length) {
       setFormErrors(errors);
       return;
     }
@@ -776,32 +841,24 @@ export default function ChallengePage() {
     try {
       const account = await ensureAccount();
       if (!account) return;
-    
-    // Store form data in session storage
-    sessionStorage.setItem('challengeData', JSON.stringify({
-      type: selectedType,
-      amount: selectedAmount,
-      platform: selectedPlatform,
-      addOns: selectedAddOns,
-      userId: account.uid,
-      formData: {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: account.email,
-        phone: formData.phone,
-        country: formData.country,
-        discordUsername: formData.discordUsername || ''
-      },
-      price: getCurrentPrice(),
-      discount: appliedDiscount ? {
-        id: appliedDiscount.id,
-        code: appliedDiscount.code,
-        type: appliedDiscount.type,
-        value: appliedDiscount.value
-      } : null
-    }));
-    
-    router.push('/challenge/payment');
+
+      sessionStorage.setItem('challengeData', JSON.stringify({
+        type: selectedType,
+        amount: selectedAmount,
+        platform: selectedPlatform,
+        addOns: selectedAddOns,
+        userId: account.uid,
+        formData: account.customer,
+        price: getCurrentPrice(),
+        discount: appliedDiscount ? {
+          id: appliedDiscount.id,
+          code: appliedDiscount.code,
+          type: appliedDiscount.type,
+          value: appliedDiscount.value
+        } : null
+      }));
+
+      router.push('/challenge/payment');
     } finally {
       setIsLinkingAccount(false);
     }
@@ -810,19 +867,8 @@ export default function ChallengePage() {
   const handlePayWithCard = async () => {
     if (isRedirecting || isLinkingAccount) return;
 
-    if (!isFormValid()) {
-      const errors: FormErrors = {};
-      if (!formData.firstName) errors.firstName = 'First name is required';
-      if (!formData.lastName) errors.lastName = 'Last name is required';
-      if (!formData.email) errors.email = 'Email is required';
-      if (!formData.phone) errors.phone = 'Phone number is required';
-      if (!formData.country) errors.country = 'Country is required';
-      if (!selectedType) errors.type = 'Please select a challenge type';
-      if (!selectedAmount) errors.amount = 'Please select an amount';
-      if (!selectedPlatform) errors.platform = 'Please select a platform';
-      if (!termsAccepted) errors.terms = 'Please accept the terms and conditions';
-      if (!accountUser && password.length < 6) errors.password = 'Password must be at least 6 characters';
-      if (!accountUser && password !== confirmPassword) errors.confirmPassword = 'Passwords do not match';
+    const errors = collectCheckoutErrors();
+    if (Object.keys(errors).length) {
       setFormErrors(errors);
       return;
     }
@@ -854,12 +900,12 @@ export default function ChallengePage() {
           body: JSON.stringify({
             idempotencyKey,
             userId: account.uid,
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            email: account.email || formData.email,
-            phone: formData.phone,
-            country: formData.country,
-            discordUsername: formData.discordUsername || '',
+            firstName: account.customer.firstName,
+            lastName: account.customer.lastName,
+            email: account.customer.email,
+            phone: account.customer.phone,
+            country: account.customer.country,
+            discordUsername: account.customer.discordUsername,
             challengeType: selectedType,
             challengeAmount: selectedAmount,
             platform: selectedPlatform,
@@ -931,21 +977,8 @@ export default function ChallengePage() {
   };
 
   const handleCreditCardPayment = async () => {
-    if (!isFormValid()) {
-      // Show validation errors
-      const errors: FormErrors = {};
-      if (!formData.firstName) errors.firstName = 'First name is required';
-      if (!formData.lastName) errors.lastName = 'Last name is required';
-      if (!formData.email) errors.email = 'Email is required';
-      if (!formData.phone) errors.phone = 'Phone number is required';
-      if (!formData.country) errors.country = 'Country is required';
-      if (!selectedType) errors.type = 'Please select a challenge type';
-      if (!selectedAmount) errors.amount = 'Please select an amount';
-      if (!selectedPlatform) errors.platform = 'Please select a platform';
-      if (!termsAccepted) errors.terms = 'Please accept the terms and conditions';
-      if (!accountUser && password.length < 6) errors.password = 'Password must be at least 6 characters';
-      if (!accountUser && password !== confirmPassword) errors.confirmPassword = 'Passwords do not match';
-      
+    const errors = collectCheckoutErrors();
+    if (Object.keys(errors).length) {
       setFormErrors(errors);
       return;
     }
@@ -958,12 +991,12 @@ export default function ChallengePage() {
       // Create order data for card-orders collection
       const orderData = {
         userId: account.uid,
-        customerEmail: account.email,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        phone: formData.phone,
-        country: formData.country,
-        discordUsername: formData.discordUsername || '',
+        customerEmail: account.customer.email,
+        firstName: account.customer.firstName,
+        lastName: account.customer.lastName,
+        phone: account.customer.phone,
+        country: account.customer.country,
+        discordUsername: account.customer.discordUsername,
         challengeType: selectedType!,
         challengeAmount: selectedAmount!,
         platform: selectedPlatform!,
@@ -1021,17 +1054,15 @@ export default function ChallengePage() {
 
   const isFormValid = () => {
     return (
+      authReady &&
+      Boolean(accountUser) &&
+      orderProfileReady &&
       selectedType &&
       selectedAmount &&
       selectedPlatform &&
-      formData.firstName &&
-      formData.lastName &&
-      formData.email &&
-      formData.phone &&
-      formData.country &&
       termsAccepted &&
-      hasAccountAccess &&
-      !isLinkingAccount
+      !isLinkingAccount &&
+      !isAuthSubmitting
     );
   };
 
@@ -1243,7 +1274,7 @@ export default function ChallengePage() {
                   <div className="text-left min-w-0">
                     <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-black/60">Next Step</div>
                     <div className="truncate text-sm font-semibold text-black sm:text-base">
-                      Continue to Your Information
+                      {accountUser ? 'Continue to Payment' : 'Continue to Sign In'}
                     </div>
                   </div>
                   <ChevronRight size={20} className="shrink-0 text-black transition-transform group-hover:translate-x-1" />
@@ -1807,244 +1838,548 @@ export default function ChallengePage() {
           ref={step5Ref}
           className="mt-8 rounded-[22px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl lg:mt-12 lg:p-8"
         >
-          <div className="flex items-center justify-center gap-3 mb-6">
-            {renderStepCircle(5)}
-            <h3 className={`text-xl lg:text-2xl font-bold transition-colors duration-300 ${getStepState(5) === 'upcoming' ? 'text-white/35' : 'text-white'}`}>
-              Your Information
-            </h3>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-3 md:gap-4 lg:gap-6 max-w-4xl mx-auto">
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">First Name</label>
-                <input
-                  type="text"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                className={`w-full rounded-2xl border bg-black/40 px-3 py-2.5 text-white placeholder-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none md:px-4 md:py-3 ${formErrors.firstName ? 'border-red-500' : 'border-white/10'}`}
-                placeholder="First Name"
-                />
-              {formErrors.firstName && <p className="mt-1 text-sm text-red-400 flex items-center gap-1"><AlertCircle size={14} />{formErrors.firstName}</p>}
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Last Name</label>
-                <input
-                  type="text"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                className={`w-full rounded-2xl border bg-black/40 px-3 py-2.5 text-white placeholder-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none md:px-4 md:py-3 ${formErrors.lastName ? 'border-red-500' : 'border-white/10'}`}
-                placeholder="Last Name"
-                />
-              {formErrors.lastName && <p className="mt-1 text-sm text-red-400 flex items-center gap-1"><AlertCircle size={14} />{formErrors.lastName}</p>}
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={accountUser?.email || formData.email}
-                  onChange={handleInputChange}
-                  readOnly={Boolean(accountUser)}
-                className={`w-full rounded-2xl border bg-black/40 px-3 py-2.5 text-white placeholder-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none md:px-4 md:py-3 ${formErrors.email ? 'border-red-500' : 'border-white/10'} ${accountUser ? 'opacity-80' : ''}`}
-                placeholder="Email"
-                />
-              {formErrors.email && <p className="mt-1 text-sm text-red-400 flex items-center gap-1"><AlertCircle size={14} />{formErrors.email}</p>}
-              {accountUser && (
-                <p className="mt-1 text-xs text-[#0FF1CE]">This purchase will be added to your account.</p>
-              )}
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Phone</label>
-                <input
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleInputChange}
-                className={`w-full rounded-2xl border bg-black/40 px-3 py-2.5 text-white placeholder-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none md:px-4 md:py-3 ${formErrors.phone ? 'border-red-500' : 'border-white/10'}`}
-                placeholder="Phone"
-                />
-              {formErrors.phone && <p className="mt-1 text-sm text-red-400 flex items-center gap-1"><AlertCircle size={14} />{formErrors.phone}</p>}
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">Country</label>
-                <select
-                  name="country"
-                  value={formData.country}
-                  onChange={handleInputChange}
-                className={`w-full rounded-2xl border bg-black/40 px-3 py-2.5 text-white focus:border-[#0FF1CE]/60 focus:outline-none md:px-4 md:py-3 ${formErrors.country ? 'border-red-500' : 'border-white/10'}`}
-                >
-                  <option value="">Country</option>
-                  {countries.map((country) => (
-                    <option key={country.code} value={country.code}>
-                      {country.name}
-                    </option>
-                  ))}
-                </select>
-              {formErrors.country && <p className="mt-1 text-sm text-red-400 flex items-center gap-1"><AlertCircle size={14} />{formErrors.country}</p>}
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-2">
-                  <span className="md:hidden">Discord (Optional)</span>
-                  <span className="hidden md:inline">Discord Username (Optional)</span>
-                </label>
-                <input
-                  type="text"
-                  name="discordUsername"
-                  value={formData.discordUsername}
-                  onChange={handleInputChange}
-                className="w-full rounded-2xl border border-white/10 bg-black/40 px-3 py-2.5 text-white placeholder-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none md:px-4 md:py-3"
-                placeholder="Discord Username"
-                />
+          <div className="mb-6 text-center">
+            <div className="mb-3 flex items-center justify-center gap-3">
+              {renderStepCircle(5)}
+              <h3 className={`text-xl font-bold transition-colors duration-300 lg:text-2xl ${getStepState(5) === 'upcoming' ? 'text-white/35' : 'text-white'}`}>
+                Your Information
+              </h3>
             </div>
+            <p className="mx-auto max-w-xl text-sm text-gray-400">
+              {accountUser
+                ? orderProfileReady
+                  ? 'Signed in. This order uses the details saved on your account.'
+                  : 'Add your last name, phone number, and country. Payment stays locked until your profile is complete.'
+                : 'Sign in or create an account. Payment stays locked until you do.'}
+            </p>
+          </div>
 
-            {!accountUser && (
-              <>
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Create Password</label>
-                  <input
-                    type="password"
-                    name="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    autoComplete="new-password"
-                    className={`w-full rounded-2xl border bg-black/40 px-3 py-2.5 text-white placeholder-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none md:px-4 md:py-3 ${formErrors.password ? 'border-red-500' : 'border-white/10'}`}
-                    placeholder="Create a password"
-                  />
-                  {formErrors.password && <p className="mt-1 text-sm text-red-400 flex items-center gap-1"><AlertCircle size={14} />{formErrors.password}</p>}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-2">Confirm Password</label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    autoComplete="new-password"
-                    className={`w-full rounded-2xl border bg-black/40 px-3 py-2.5 text-white placeholder-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none md:px-4 md:py-3 ${formErrors.confirmPassword ? 'border-red-500' : 'border-white/10'}`}
-                    placeholder="Confirm password"
-                  />
-                  {formErrors.confirmPassword && <p className="mt-1 text-sm text-red-400 flex items-center gap-1"><AlertCircle size={14} />{formErrors.confirmPassword}</p>}
-                  <p className="mt-1 text-xs text-gray-500">Create an account so this purchase is saved to your client portal.</p>
-                </div>
-              </>
-            )}
-              </div>
-              
-          <div className="mt-8 max-w-4xl mx-auto">
-            
-            
-            <div className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    id="disclaimer"
-                    checked={termsAccepted}
-                    onChange={() => setTermsAccepted(!termsAccepted)}
-                className="mt-1 w-4 h-4 rounded border-gray-600 text-[#0FF1CE] focus:ring-[#0FF1CE] focus:ring-offset-0 bg-[#1A1A1A]/50"
-                  />
-                  <label htmlFor="disclaimer" className="text-sm text-gray-400">
-                    <span className="md:hidden">
-                      I understand Shockwave Capital provides a funded trading account and that payouts follow the program rules. I agree to the{' '}
-                    </span>
-                    <span className="hidden md:inline">
-                      I acknowledge that Shockwave Capital provides a funded trading account and that payouts follow the program rules. I agree to the{' '}
-                    </span>
-                    <Link href="/disclaimer" className="text-[#0FF1CE] hover:underline">
-                      Disclaimer
-                    </Link>, {' '}
-                    <Link href="/terms" className="text-[#0FF1CE] hover:underline">
-                      Terms of Use
-                    </Link>, {' '}
-                    <Link href="/privacy" className="text-[#0FF1CE] hover:underline">
-                      Privacy Policy
-                    </Link>, {' '}
-                    <Link href="/legal-disclosure" className="text-[#0FF1CE] hover:underline">
-                      Legal Disclosure
-                    </Link>, and {' '}
-                    <Link href="/refund" className="text-[#0FF1CE] hover:underline">
-                      Refund Policy
-                    </Link>.
-                  </label>
-                </div>
-            {formErrors.terms && <p className="mt-1 text-sm text-red-400 flex items-center gap-1"><AlertCircle size={14} />{formErrors.terms}</p>}
-              
-              {/* Credit/Debit Card payment - hidden (Whop dropped us) */}
-              <div className="hidden">
-                <button
-                  onClick={handleCreditCardPayment}
-                  disabled={!isFormValid()}
-                  className={`w-full mt-6 relative overflow-hidden rounded-xl font-bold py-4 px-6 transition-all duration-300 ${
-                    isFormValid()
-                      ? 'bg-gradient-to-r from-[#0FF1CE] to-[#0AA89E] text-black hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25'
-                      : 'bg-gray-700 text-gray-400 cursor-not-allowed opacity-50'
-                  }`}
-                >
-                  <div className="relative flex items-center justify-center gap-2">
-                    <CreditCard size={20} />
-                    <span>Pay with Credit/Debit Card</span>
-                    <ChevronRight size={20} className={isFormValid() ? 'group-hover:translate-x-1 transition-transform' : ''} />
+          {!authReady ? (
+            <div className="flex justify-center py-12">
+              <div className="h-10 w-10 animate-spin rounded-full border-2 border-[#0FF1CE] border-t-transparent" />
+            </div>
+          ) : accountUser ? (
+            <>
+            <div className="mx-auto max-w-xl rounded-[18px] border border-[#0FF1CE]/30 bg-[#0FF1CE]/10 p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#0FF1CE] text-black">
+                    <Check size={20} strokeWidth={3} />
                   </div>
+                  <div>
+                    <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#0FF1CE]">Signed in</p>
+                    <p className="font-semibold text-white">
+                      {[formData.firstName, formData.lastName].filter(Boolean).join(' ') || 'Your account'}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleUseDifferentAccount}
+                  className="inline-flex items-center gap-1 text-xs text-gray-300 transition-colors hover:text-white"
+                >
+                  <LogOut size={14} />
+                  Switch account
                 </button>
               </div>
-              
-              <button
-                onClick={handlePayWithCard}
-                disabled={!isFormValid() || isRedirecting || isLinkingAccount}
-                className={`mt-6 w-full rounded-2xl px-6 py-4 font-bold transition-all duration-300 ${
-                  isFormValid() && !isRedirecting
-                    ? 'bg-[#0FF1CE] text-black shadow-[0_8px_30px_rgba(15,241,206,0.22)] hover:scale-[1.02] active:scale-[0.98]'
-                    : 'cursor-not-allowed bg-white/10 text-white/35'
-                }`}
-              >
-                <div className="relative flex items-center justify-center gap-2">
-                  <CreditCard size={20} />
-                  <span>Pay with card</span>
+              <dl className="mt-4 space-y-2 text-sm">
+                <div className="flex items-start justify-between gap-4">
+                  <dt className="text-gray-400">Email</dt>
+                  <dd className="break-all text-right text-white">{accountUser.email || formData.email}</dd>
                 </div>
-              </button>
-              <p className="mt-2 text-center text-xs text-gray-400">
-                You will be redirected to complete your purchase
+                {formData.phone ? (
+                  <div className="flex items-start justify-between gap-4">
+                    <dt className="text-gray-400">Phone</dt>
+                    <dd className="text-right text-white">{formData.phone}</dd>
+                  </div>
+                ) : null}
+                {formData.country ? (
+                  <div className="flex items-start justify-between gap-4">
+                    <dt className="text-gray-400">Country</dt>
+                    <dd className="text-right text-white">{countryName(formData.country)}</dd>
+                  </div>
+                ) : null}
+              </dl>
+              {orderProfileReady && (
+                <p className="mt-4 text-sm text-gray-300">This purchase will be added to your account.</p>
+              )}
+            </div>
+            {!orderProfileReady && (
+              <form onSubmit={handleSaveProfile} className="mx-auto mt-4 max-w-xl space-y-4" noValidate>
+                <p className="text-sm text-gray-300">
+                  Your account is missing details this order needs. Save them to your profile before payment.
+                </p>
+                {profileErrors.general && (
+                  <p className="flex items-center gap-1 text-sm text-red-400"><AlertCircle size={14} />{profileErrors.general}</p>
+                )}
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="profile-first-name" className="mb-2 block text-sm font-medium text-gray-400">First Name</label>
+                    <input
+                      id="profile-first-name"
+                      type="text"
+                      autoComplete="given-name"
+                      value={profileDraft.firstName}
+                      onChange={(e) => setProfileDraft((current) => ({ ...current, firstName: e.target.value }))}
+                      placeholder="First name"
+                      className={`w-full rounded-2xl border bg-black/40 px-4 py-3.5 text-base text-white placeholder:text-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none ${profileErrors.firstName ? 'border-red-500' : 'border-white/10'}`}
+                    />
+                    {profileErrors.firstName && <p className="mt-1 flex items-center gap-1 text-sm text-red-400"><AlertCircle size={14} />{profileErrors.firstName}</p>}
+                  </div>
+                  <div>
+                    <label htmlFor="profile-last-name" className="mb-2 block text-sm font-medium text-gray-400">Last Name</label>
+                    <input
+                      id="profile-last-name"
+                      type="text"
+                      autoComplete="family-name"
+                      value={profileDraft.lastName}
+                      onChange={(e) => setProfileDraft((current) => ({ ...current, lastName: e.target.value }))}
+                      placeholder="Last name"
+                      className={`w-full rounded-2xl border bg-black/40 px-4 py-3.5 text-base text-white placeholder:text-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none ${profileErrors.lastName ? 'border-red-500' : 'border-white/10'}`}
+                    />
+                    {profileErrors.lastName && <p className="mt-1 flex items-center gap-1 text-sm text-red-400"><AlertCircle size={14} />{profileErrors.lastName}</p>}
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="profile-phone" className="mb-2 block text-sm font-medium text-gray-400">Phone Number</label>
+                    <input
+                      id="profile-phone"
+                      type="tel"
+                      autoComplete="tel"
+                      value={profileDraft.phone}
+                      onChange={(e) => setProfileDraft((current) => ({ ...current, phone: e.target.value }))}
+                      placeholder="Phone number"
+                      className={`w-full rounded-2xl border bg-black/40 px-4 py-3.5 text-base text-white placeholder:text-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none ${profileErrors.phone ? 'border-red-500' : 'border-white/10'}`}
+                    />
+                    {profileErrors.phone && <p className="mt-1 flex items-center gap-1 text-sm text-red-400"><AlertCircle size={14} />{profileErrors.phone}</p>}
+                  </div>
+                  <div>
+                    <label htmlFor="profile-country" className="mb-2 block text-sm font-medium text-gray-400">Country</label>
+                    <select
+                      id="profile-country"
+                      value={profileDraft.country}
+                      onChange={(e) => setProfileDraft((current) => ({ ...current, country: e.target.value }))}
+                      className={`w-full rounded-2xl border bg-black/40 px-4 py-3.5 text-base text-white focus:border-[#0FF1CE]/60 focus:outline-none ${profileErrors.country ? 'border-red-500' : 'border-white/10'}`}
+                    >
+                      <option value="">Select country</option>
+                      {countries.map((country) => (
+                        <option key={country.code} value={country.code}>{country.name}</option>
+                      ))}
+                    </select>
+                    {profileErrors.country && <p className="mt-1 flex items-center gap-1 text-sm text-red-400"><AlertCircle size={14} />{profileErrors.country}</p>}
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  disabled={isSavingProfile}
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0FF1CE] px-4 py-4 font-bold text-black transition-transform duration-300 hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {isSavingProfile ? 'Saving profile...' : 'Save profile'}
+                </button>
+              </form>
+            )}
+            </>
+          ) : (
+            <form onSubmit={handleAuthSubmit} className="mx-auto max-w-xl space-y-4" noValidate>
+              <div className="flex rounded-2xl bg-black/30 p-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode('login');
+                    setAuthErrors({});
+                    setAuthMessage('');
+                  }}
+                  className={`flex-1 rounded-xl py-2.5 text-sm font-semibold transition-colors ${
+                    authMode === 'login' ? 'bg-[#0FF1CE] text-black' : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  Sign In
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMode('signup');
+                    setAuthErrors({});
+                    setAuthMessage('');
+                  }}
+                  className={`flex-1 rounded-xl py-2.5 text-sm font-semibold transition-colors ${
+                    authMode === 'signup' ? 'bg-[#0FF1CE] text-black' : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  Sign Up
+                </button>
+              </div>
+
+              <p className="text-center text-sm text-gray-400">
+                {authMode === 'login' ? (
+                  <>
+                    Don&apos;t have a profile yet?{' '}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAuthMode('signup');
+                        setAuthErrors({});
+                      }}
+                      className="font-semibold text-[#0FF1CE] hover:underline"
+                    >
+                      create a profile
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    Already have a profile?{' '}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAuthMode('login');
+                        setAuthErrors({});
+                      }}
+                      className="font-semibold text-[#0FF1CE] hover:underline"
+                    >
+                      sign in
+                    </button>
+                  </>
+                )}
               </p>
-              {cardError && (
-                <p className="mt-2 flex items-center justify-center gap-1 text-sm text-red-400">
+
+              {authMessage && (
+                <div className="flex items-center gap-2 rounded-2xl border border-[#0FF1CE]/30 bg-[#0FF1CE]/10 px-4 py-3 text-sm text-[#0FF1CE]">
+                  <Check size={16} />
+                  <span>{authMessage}</span>
+                </div>
+              )}
+
+              {authErrors.general && (
+                <div className="flex items-center gap-2 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                  <AlertCircle size={16} />
+                  <span>{authErrors.general}</span>
+                </div>
+              )}
+
+              {authMode === 'signup' && (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="auth-first-name" className="mb-2 block text-sm font-medium text-gray-400">First Name</label>
+                    <div className="relative">
+                      <User size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+                      <input
+                        id="auth-first-name"
+                        type="text"
+                        autoComplete="given-name"
+                        value={authFirstName}
+                        onChange={(e) => setAuthFirstName(e.target.value)}
+                        placeholder="First name"
+                        className={`w-full rounded-2xl border bg-black/40 py-3.5 pl-11 pr-4 text-base text-white placeholder:text-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none ${authErrors.firstName ? 'border-red-500' : 'border-white/10'}`}
+                      />
+                    </div>
+                    {authErrors.firstName && <p className="mt-1 flex items-center gap-1 text-sm text-red-400"><AlertCircle size={14} />{authErrors.firstName}</p>}
+                  </div>
+                  <div>
+                    <label htmlFor="auth-last-name" className="mb-2 block text-sm font-medium text-gray-400">Last Name</label>
+                    <input
+                      id="auth-last-name"
+                      type="text"
+                      autoComplete="family-name"
+                      value={authLastName}
+                      onChange={(e) => setAuthLastName(e.target.value)}
+                      placeholder="Last name"
+                      className={`w-full rounded-2xl border bg-black/40 px-4 py-3.5 text-base text-white placeholder:text-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none ${authErrors.lastName ? 'border-red-500' : 'border-white/10'}`}
+                    />
+                    {authErrors.lastName && <p className="mt-1 flex items-center gap-1 text-sm text-red-400"><AlertCircle size={14} />{authErrors.lastName}</p>}
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <label htmlFor="auth-email" className="mb-2 block text-sm font-medium text-gray-400">Email Address</label>
+                <div className="relative">
+                  <Mail size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+                  <input
+                    id="auth-email"
+                    type="email"
+                    autoComplete="email"
+                    value={authEmail}
+                    onChange={(e) => setAuthEmail(e.target.value)}
+                    placeholder="Email address"
+                    className={`w-full rounded-2xl border bg-black/40 py-3.5 pl-11 pr-4 text-base text-white placeholder:text-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none ${authErrors.email ? 'border-red-500' : 'border-white/10'}`}
+                  />
+                </div>
+                {authErrors.email && <p className="mt-1 flex items-center gap-1 text-sm text-red-400"><AlertCircle size={14} />{authErrors.email}</p>}
+              </div>
+
+              {authMode === 'signup' && (
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="auth-phone" className="mb-2 block text-sm font-medium text-gray-400">Phone Number</label>
+                    <div className="relative">
+                      <Phone size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+                      <input
+                        id="auth-phone"
+                        type="tel"
+                        autoComplete="tel"
+                        value={authPhone}
+                        onChange={(e) => setAuthPhone(e.target.value)}
+                        placeholder="Phone number"
+                        className={`w-full rounded-2xl border bg-black/40 py-3.5 pl-11 pr-4 text-base text-white placeholder:text-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none ${authErrors.phone ? 'border-red-500' : 'border-white/10'}`}
+                      />
+                    </div>
+                    {authErrors.phone && <p className="mt-1 flex items-center gap-1 text-sm text-red-400"><AlertCircle size={14} />{authErrors.phone}</p>}
+                  </div>
+                  <div>
+                    <label htmlFor="auth-country" className="mb-2 block text-sm font-medium text-gray-400">Country</label>
+                    <select
+                      id="auth-country"
+                      autoComplete="country"
+                      value={authCountry}
+                      onChange={(e) => setAuthCountry(e.target.value)}
+                      className={`w-full rounded-2xl border bg-black/40 px-4 py-3.5 text-base text-white focus:border-[#0FF1CE]/60 focus:outline-none ${authErrors.country ? 'border-red-500' : 'border-white/10'}`}
+                    >
+                      <option value="">Select country</option>
+                      {countries.map((country) => (
+                        <option key={country.code} value={country.code}>{country.name}</option>
+                      ))}
+                    </select>
+                    {authErrors.country && <p className="mt-1 flex items-center gap-1 text-sm text-red-400"><AlertCircle size={14} />{authErrors.country}</p>}
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <label htmlFor="auth-password" className="mb-2 block text-sm font-medium text-gray-400">Password</label>
+                <div className="relative">
+                  <Lock size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+                  <input
+                    id="auth-password"
+                    type={showAuthPassword ? 'text' : 'password'}
+                    autoComplete={authMode === 'login' ? 'current-password' : 'new-password'}
+                    value={authPassword}
+                    onChange={(e) => setAuthPassword(e.target.value)}
+                    placeholder="Password"
+                    className={`w-full rounded-2xl border bg-black/40 py-3.5 pl-11 pr-12 text-base text-white placeholder:text-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none ${authErrors.password ? 'border-red-500' : 'border-white/10'}`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowAuthPassword((current) => !current)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500 transition-colors hover:text-[#0FF1CE]"
+                    aria-label={showAuthPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showAuthPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+                {authErrors.password && <p className="mt-1 flex items-center gap-1 text-sm text-red-400"><AlertCircle size={14} />{authErrors.password}</p>}
+                {authMode === 'signup' ? (
+                  <p className={`mt-2 text-xs ${authPassword.length >= 6 ? 'text-[#0FF1CE]' : 'text-gray-500'}`}>
+                    At least 6 characters. Use the eye icon to view it, then retype it below.
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    className="mt-2 text-xs font-medium text-[#0FF1CE] hover:underline"
+                  >
+                    Forgot password?
+                  </button>
+                )}
+              </div>
+
+              {authMode === 'signup' && (
+                <div>
+                  <label htmlFor="auth-confirm-password" className="mb-2 block text-sm font-medium text-gray-400">Retype Password</label>
+                  <div className="relative">
+                    <Lock size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" />
+                    <input
+                      id="auth-confirm-password"
+                      type={showAuthConfirmPassword ? 'text' : 'password'}
+                      autoComplete="new-password"
+                      value={authConfirmPassword}
+                      onChange={(e) => setAuthConfirmPassword(e.target.value)}
+                      placeholder="Retype password"
+                      className={`w-full rounded-2xl border bg-black/40 py-3.5 pl-11 pr-12 text-base text-white placeholder:text-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none ${authErrors.confirmPassword ? 'border-red-500' : 'border-white/10'}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowAuthConfirmPassword((current) => !current)}
+                      className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-500 transition-colors hover:text-[#0FF1CE]"
+                      aria-label={showAuthConfirmPassword ? 'Hide password confirmation' : 'Show password confirmation'}
+                    >
+                      {showAuthConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  {authErrors.confirmPassword && <p className="mt-1 flex items-center gap-1 text-sm text-red-400"><AlertCircle size={14} />{authErrors.confirmPassword}</p>}
+                  {authConfirmPassword.length > 0 && authPassword === authConfirmPassword && (
+                    <p className="mt-2 text-xs text-[#0FF1CE]">Passwords match.</p>
+                  )}
+                </div>
+              )}
+
+              <label className="flex cursor-pointer items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={acceptAuthDisclaimer}
+                  onChange={(e) => setAcceptAuthDisclaimer(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-gray-600 bg-[#1A1A1A]/50 text-[#0FF1CE] focus:ring-[#0FF1CE] focus:ring-offset-0"
+                />
+                <span className="text-xs leading-relaxed text-gray-400">
+                  I acknowledge the simulated environment and agree to the{' '}
+                  <Link href="/terms" className="text-[#0FF1CE] hover:underline">Terms</Link>,{' '}
+                  <Link href="/privacy" className="text-[#0FF1CE] hover:underline">Privacy</Link>, and{' '}
+                  <Link href="/disclaimer" className="text-[#0FF1CE] hover:underline">Disclaimer</Link>.
+                </span>
+              </label>
+
+              {authMode === 'signup' && (
+                <label className="flex cursor-pointer items-start gap-3">
+                  <input
+                    type="checkbox"
+                    checked={acceptAuthTerms}
+                    onChange={(e) => setAcceptAuthTerms(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 rounded border-gray-600 bg-[#1A1A1A]/50 text-[#0FF1CE] focus:ring-[#0FF1CE] focus:ring-offset-0"
+                  />
+                  <span className="text-xs leading-relaxed text-gray-400">
+                    I accept the Terms of Service and Privacy Policy.
+                  </span>
+                </label>
+              )}
+
+              {(authErrors.disclaimer || authErrors.terms) && (
+                <p className="flex items-center gap-1 text-sm text-red-400">
                   <AlertCircle size={14} />
-                  {cardError}
+                  {authErrors.disclaimer || authErrors.terms}
                 </p>
               )}
 
               <button
-                onClick={handleProceedToPayment}
-                disabled={!isFormValid() || isRedirecting || isLinkingAccount}
-                className={`mt-3 w-full rounded-2xl px-6 py-4 font-bold transition-all duration-300 ${
-                  isFormValid() && !isLinkingAccount
-                    ? 'border border-[#0FF1CE] text-[#0FF1CE] hover:bg-[#0FF1CE]/10'
-                    : 'cursor-not-allowed bg-white/10 text-white/35'
+                type="submit"
+                disabled={isAuthSubmitting}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0FF1CE] px-4 py-4 font-bold text-black transition-transform duration-300 hover:scale-[1.01] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isAuthSubmitting ? (
+                  <>
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-black border-t-transparent" />
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>{authMode === 'login' ? 'Sign In' : 'Create Account'}</span>
+                    <ChevronRight size={18} />
+                  </>
+                )}
+              </button>
+            </form>
+          )}
+
+          {accountUser && orderProfileReady && (
+          <div className="mx-auto mt-8 max-w-4xl">
+            <div className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                id="disclaimer"
+                checked={termsAccepted}
+                onChange={() => setTermsAccepted(!termsAccepted)}
+                className="mt-1 h-4 w-4 rounded border-gray-600 bg-[#1A1A1A]/50 text-[#0FF1CE] focus:ring-[#0FF1CE] focus:ring-offset-0"
+              />
+              <label htmlFor="disclaimer" className="text-sm text-gray-400">
+                <span className="md:hidden">
+                  I understand Shockwave Capital provides a funded trading account and that payouts follow the program rules. I agree to the{' '}
+                </span>
+                <span className="hidden md:inline">
+                  I acknowledge that Shockwave Capital provides a funded trading account and that payouts follow the program rules. I agree to the{' '}
+                </span>
+                <Link href="/disclaimer" className="text-[#0FF1CE] hover:underline">
+                  Disclaimer
+                </Link>, {' '}
+                <Link href="/terms" className="text-[#0FF1CE] hover:underline">
+                  Terms of Use
+                </Link>, {' '}
+                <Link href="/privacy" className="text-[#0FF1CE] hover:underline">
+                  Privacy Policy
+                </Link>, {' '}
+                <Link href="/legal-disclosure" className="text-[#0FF1CE] hover:underline">
+                  Legal Disclosure
+                </Link>, and {' '}
+                <Link href="/refund" className="text-[#0FF1CE] hover:underline">
+                  Refund Policy
+                </Link>.
+              </label>
+            </div>
+            {formErrors.terms && <p className="mt-1 flex items-center gap-1 text-sm text-red-400"><AlertCircle size={14} />{formErrors.terms}</p>}
+            {formErrors.account && <p className="mt-1 flex items-center gap-1 text-sm text-red-400"><AlertCircle size={14} />{formErrors.account}</p>}
+
+            <div className="hidden">
+              <button
+                type="button"
+                onClick={handleCreditCardPayment}
+                disabled={!isFormValid()}
+                className={`mt-6 w-full rounded-xl px-6 py-4 font-bold transition-all duration-300 ${
+                  isFormValid()
+                    ? 'bg-gradient-to-r from-[#0FF1CE] to-[#0AA89E] text-black hover:scale-[1.02] active:scale-[0.98]'
+                    : 'cursor-not-allowed bg-gray-700 text-gray-400 opacity-50'
                 }`}
               >
                 <div className="relative flex items-center justify-center gap-2">
-                  <Bitcoin size={20} />
-                  <span>{isLinkingAccount ? 'Saving your account...' : 'Pay with crypto'}</span>
+                  <CreditCard size={20} />
+                  <span>Pay with Credit/Debit Card</span>
+                  <ChevronRight size={20} />
                 </div>
               </button>
-              {selectedType === 'Gauntlet' && (
-                <div className="mt-3 rounded-2xl border border-[#FF6B6B]/30 bg-[#FF6B6B]/10 p-4 text-center">
-                  <p className="text-[#FF6B6B] font-bold text-sm mb-1">🔥 Gauntlet Challenge</p>
-                  <p className="text-white text-xs">
-                    Pay only $19.99 now. If you pass, you'll pay the activation fee to get your funded account.
-                  </p>
-                  <p className="text-gray-400 text-xs mt-1">
-                    Activation fees: $10k→$199, $25k→$299, $50k→$499, $100k→$799, $200k→$1,499, $500k→$2,999
-                  </p>
-                </div>
-              )}
             </div>
+
+            <button
+              type="button"
+              onClick={handlePayWithCard}
+              disabled={!isFormValid() || isRedirecting || isLinkingAccount}
+              className={`mt-6 w-full rounded-2xl px-6 py-4 font-bold transition-all duration-300 ${
+                isFormValid() && !isRedirecting
+                  ? 'bg-[#0FF1CE] text-black shadow-[0_8px_30px_rgba(15,241,206,0.22)] hover:scale-[1.02] active:scale-[0.98]'
+                  : 'cursor-not-allowed bg-white/10 text-white/35'
+              }`}
+            >
+              <div className="relative flex items-center justify-center gap-2">
+                <CreditCard size={20} />
+                <span>Pay with card</span>
+              </div>
+            </button>
+            <p className="mt-2 text-center text-xs text-gray-400">
+              You will be redirected to complete your purchase
+            </p>
+            {cardError && (
+              <p className="mt-2 flex items-center justify-center gap-1 text-sm text-red-400">
+                <AlertCircle size={14} />
+                {cardError}
+              </p>
+            )}
+
+            <button
+              type="button"
+              onClick={handleProceedToPayment}
+              disabled={!isFormValid() || isRedirecting || isLinkingAccount}
+              className={`mt-3 w-full rounded-2xl px-6 py-4 font-bold transition-all duration-300 ${
+                isFormValid() && !isLinkingAccount
+                  ? 'border border-[#0FF1CE] text-[#0FF1CE] hover:bg-[#0FF1CE]/10'
+                  : 'cursor-not-allowed bg-white/10 text-white/35'
+              }`}
+            >
+              <div className="relative flex items-center justify-center gap-2">
+                <Bitcoin size={20} />
+                <span>{isLinkingAccount ? 'Preparing payment...' : 'Pay with crypto'}</span>
+              </div>
+            </button>
           </div>
+          )}
+          {selectedType === 'Gauntlet' && (
+            <div className="mx-auto mt-4 max-w-4xl rounded-2xl border border-[#FF6B6B]/30 bg-[#FF6B6B]/10 p-4 text-center">
+              <p className="mb-1 text-sm font-bold text-[#FF6B6B]">🔥 Gauntlet Challenge</p>
+              <p className="text-xs text-white">
+                Pay only $19.99 now. If you pass, you&apos;ll pay the activation fee to get your funded account.
+              </p>
+              <p className="mt-1 text-xs text-gray-400">
+                Activation fees: $10k→$199, $25k→$299, $50k→$499, $100k→$799, $200k→$1,499, $500k→$2,999
+              </p>
+            </div>
+          )}
         </div>
+      </div>
       {isRedirecting && (
         <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm">
           <div className="w-full max-w-sm rounded-[22px] border border-white/10 bg-[#121212] p-8 text-center">

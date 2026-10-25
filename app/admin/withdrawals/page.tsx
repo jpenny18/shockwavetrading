@@ -7,6 +7,8 @@ import {
   updateWithdrawalStatus,
   getAllUsers,
   enableUserWithdrawal,
+  setUserPayoutsAccess,
+  getUser,
   auth,
   UserData
 } from '../../../lib/firebase';
@@ -28,7 +30,7 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { toast } from 'react-hot-toast';
+import { toast, Toaster } from 'react-hot-toast';
 
 export default function AdminWithdrawalsPage() {
   const [user] = useAuthState(auth);
@@ -50,6 +52,7 @@ export default function AdminWithdrawalsPage() {
   const [allUsers, setAllUsers] = useState<UserData[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<UserData[]>([]);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const [accessUpdating, setAccessUpdating] = useState(false);
 
   useEffect(() => {
     fetchWithdrawals();
@@ -98,12 +101,12 @@ export default function AdminWithdrawalsPage() {
     }
   }, [enableEmail, allUsers]);
 
-  const handleSelectUser = async (user: UserData) => {
+  const handleSelectUser = async (selected: UserData) => {
     setSearching(true);
     try {
-      // Removed automatic eligibility checks - admin can manually enable withdrawal for any user
-      setSelectedUser(user);
-      setEnableEmail(user.email || '');
+      const fresh = await getUser(selected.uid);
+      setSelectedUser({ ...(fresh || selected), uid: selected.uid, email: fresh?.email || selected.email });
+      setEnableEmail(selected.email || '');
       setShowUserDropdown(false);
       toast.success('User selected successfully');
     } catch (error) {
@@ -114,9 +117,35 @@ export default function AdminWithdrawalsPage() {
     }
   };
 
+  const handleTogglePayoutAccess = async () => {
+    if (!selectedUser?.uid) {
+      toast.error('Please select a user first');
+      return;
+    }
+    if (!user) {
+      toast.error('Authentication error. Please refresh and try again.');
+      return;
+    }
+
+    const nextUnlocked = selectedUser.payoutsUnlocked !== true;
+    setAccessUpdating(true);
+    try {
+      await setUserPayoutsAccess(selectedUser.uid, nextUnlocked, user.uid);
+      const updated = { ...selectedUser, payoutsUnlocked: nextUnlocked };
+      setSelectedUser(updated);
+      setAllUsers((current) => current.map((entry) => (
+        entry.uid === selectedUser.uid ? { ...entry, payoutsUnlocked: nextUnlocked } : entry
+      )));
+      toast.success(nextUnlocked ? 'Payout page unlocked' : 'Payout page locked');
+    } catch (error) {
+      console.error('Error updating payout access:', error);
+      toast.error('Failed to update payout page access');
+    } finally {
+      setAccessUpdating(false);
+    }
+  };
+
   const handleEnableWithdrawal = async () => {
-    console.log('Enable withdrawal clicked', { selectedUser, amountOwed, profitSplit, user });
-    
     if (!selectedUser) {
       toast.error('Please select a user first');
       return;
@@ -243,6 +272,7 @@ export default function AdminWithdrawalsPage() {
 
   return (
     <div>
+      <Toaster position="top-center" />
       <div className="mb-5 md:mb-8">
         <h1 className="text-xl md:text-3xl font-bold text-white mb-1 md:mb-2">Withdrawal Management</h1>
         <p className="text-gray-400 text-sm">Review and manage user withdrawal requests</p>
@@ -456,6 +486,11 @@ export default function AdminWithdrawalsPage() {
                                 Has Request
                               </span>
                             )}
+                            {user.payoutsUnlocked && (
+                              <span className="text-xs text-[#0FF1CE] bg-[#0FF1CE]/10 px-2 py-1 rounded ml-2">
+                                Page open
+                              </span>
+                            )}
                           </div>
                         </button>
                       );
@@ -483,6 +518,12 @@ export default function AdminWithdrawalsPage() {
                           </p>
                         )}
                         <p className="text-gray-400 text-xs mt-1">{selectedUser.uid}</p>
+                        <p className={`text-xs mt-2 font-medium ${selectedUser.payoutsUnlocked ? 'text-[#0FF1CE]' : 'text-gray-500'}`}>
+                          Payout page: {selectedUser.payoutsUnlocked ? 'Unlocked' : 'Locked'}
+                          {withdrawals.some((entry) => entry.userId === selectedUser.uid)
+                            ? ' · A payout request is already on file'
+                            : ''}
+                        </p>
                       </div>
                       <button
                         type="button"
@@ -536,7 +577,25 @@ export default function AdminWithdrawalsPage() {
               )}
             </div>
 
-            <div className="flex gap-3 mt-6">
+            <div className="flex flex-col gap-3 mt-6">
+              <button
+                type="button"
+                onClick={handleTogglePayoutAccess}
+                disabled={!selectedUser || accessUpdating || updating}
+                className="w-full bg-[#151515] border border-[#2F2F2F] text-white font-semibold py-2 rounded-lg hover:border-[#0FF1CE]/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {accessUpdating
+                  ? 'Saving...'
+                  : selectedUser?.payoutsUnlocked
+                    ? 'Lock payout page'
+                    : 'Unlock payout page'}
+              </button>
+              <p className="text-gray-500 text-xs -mt-1">
+                {selectedUser && withdrawals.some((entry) => entry.userId === selectedUser.uid)
+                  ? 'This user already has a payout request, so the page stays open while that request exists. Unlock keeps it open after the request is gone.'
+                  : 'Opens the payouts page without creating a payout. Use Enable Withdrawal when there is an amount to pay.'}
+              </p>
+              <div className="flex gap-3">
               <button
                 type="button"
                 onClick={() => {
@@ -554,15 +613,14 @@ export default function AdminWithdrawalsPage() {
               <button
                 type="button"
                 onClick={() => {
-                  console.log('Enable withdrawal button clicked');
-                  console.log('Current state:', { selectedUser, amountOwed, profitSplit, updating });
                   handleEnableWithdrawal();
                 }}
-                disabled={!selectedUser || !amountOwed || !profitSplit || updating}
+                disabled={!selectedUser || !amountOwed || !profitSplit || updating || accessUpdating}
                 className="flex-1 bg-[#0FF1CE] text-black font-semibold py-2 rounded-lg hover:bg-[#0FF1CE]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {updating ? 'Enabling...' : 'Enable Withdrawal'}
               </button>
+              </div>
             </div>
           </div>
         </div>
