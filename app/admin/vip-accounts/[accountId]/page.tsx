@@ -103,7 +103,7 @@ const MetricCard = ({ title, value, icon: Icon, format = 'number', prefix = '', 
   };
 
   return (
-    <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 hover:border-[#0FF1CE]/30 transition-all">
+    <div className="bg-black rounded-xl border border-white/10 p-4 hover:border-[#0FF1CE]/30 transition-all">
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <p className="text-gray-400 text-xs mb-1">{title}</p>
@@ -162,12 +162,12 @@ const TradingObjectivesTable = ({ objectives, accountInfo }: { objectives: Tradi
   ];
 
   return (
-    <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 md:p-6">
+    <div className="bg-black rounded-xl border border-white/10 p-4 md:p-6">
       <h3 className="text-base md:text-lg font-semibold text-white mb-3 md:mb-4">Trading Objectives</h3>
       {/* Mobile card view */}
       <div className="md:hidden space-y-2">
         {rows.map((row, index) => (
-          <div key={index} className="bg-[#151515] rounded-lg p-3 flex items-center justify-between gap-3">
+          <div key={index} className="bg-black rounded-lg p-3 flex items-center justify-between gap-3">
             <div className="flex-1 min-w-0">
               <p className="text-xs text-white font-medium truncate">{row.label}</p>
               <p className="text-xs text-gray-400 mt-0.5">
@@ -191,7 +191,7 @@ const TradingObjectivesTable = ({ objectives, accountInfo }: { objectives: Tradi
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-[#2F2F2F]">
+            <tr className="border-b border-white/10">
               <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Objective</th>
               <th className="text-center py-3 px-4 text-sm font-medium text-gray-400">Target</th>
               <th className="text-center py-3 px-4 text-sm font-medium text-gray-400">Current</th>
@@ -200,7 +200,7 @@ const TradingObjectivesTable = ({ objectives, accountInfo }: { objectives: Tradi
           </thead>
           <tbody>
             {rows.map((row, index) => (
-              <tr key={index} className="border-b border-[#2F2F2F]/50">
+              <tr key={index} className="border-b border-white/10">
                 <td className="py-3 px-4 text-sm text-white">{row.label}</td>
                 <td className="py-3 px-4 text-sm text-center text-gray-300">
                   {formatTarget(row)}
@@ -230,7 +230,7 @@ const TradingObjectivesTable = ({ objectives, accountInfo }: { objectives: Tradi
 const RiskEventsTable = ({ riskEvents }: { riskEvents: RiskEvent[] }) => {
   if (!riskEvents || riskEvents.length === 0) {
     return (
-      <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6">
+      <div className="bg-black rounded-xl border border-white/10 p-6">
         <h3 className="text-lg font-semibold text-white mb-4">Risk Events</h3>
         <p className="text-gray-400 text-sm">No risk events recorded</p>
       </div>
@@ -238,12 +238,12 @@ const RiskEventsTable = ({ riskEvents }: { riskEvents: RiskEvent[] }) => {
   }
 
   return (
-    <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 md:p-6">
+    <div className="bg-black rounded-xl border border-white/10 p-4 md:p-6">
       <h3 className="text-base md:text-lg font-semibold text-white mb-3 md:mb-4">Risk Events</h3>
       {/* Mobile card view */}
       <div className="md:hidden space-y-2">
         {riskEvents.map((event, index) => (
-          <div key={event.id || index} className="bg-[#151515] rounded-lg p-3">
+          <div key={event.id || index} className="bg-black rounded-lg p-3">
             <div className="flex items-center justify-between mb-1">
               <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
                 event.exceededThresholdType === 'drawdown'
@@ -267,7 +267,7 @@ const RiskEventsTable = ({ riskEvents }: { riskEvents: RiskEvent[] }) => {
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-[#2F2F2F]">
+            <tr className="border-b border-white/10">
               <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Time</th>
               <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Type</th>
               <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Drawdown %</th>
@@ -276,7 +276,7 @@ const RiskEventsTable = ({ riskEvents }: { riskEvents: RiskEvent[] }) => {
           </thead>
           <tbody>
             {riskEvents.map((event, index) => (
-              <tr key={event.id || index} className="border-b border-[#2F2F2F]/50">
+              <tr key={event.id || index} className="border-b border-white/10">
                 <td className="py-3 px-4 text-sm text-white">
                   {new Date(event.brokerTime).toLocaleString()}
                 </td>
@@ -310,7 +310,7 @@ const RiskEventsTable = ({ riskEvents }: { riskEvents: RiskEvent[] }) => {
 const PeriodStatsChart = ({ periodStats }: { periodStats: PeriodStatistic[] }) => {
   if (!periodStats || periodStats.length === 0) {
     return (
-      <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6">
+      <div className="bg-black rounded-xl border border-white/10 p-6">
         <h3 className="text-lg font-semibold text-white mb-4">Period Statistics</h3>
         <p className="text-gray-400 text-sm">No period statistics available</p>
       </div>
@@ -318,12 +318,12 @@ const PeriodStatsChart = ({ periodStats }: { periodStats: PeriodStatistic[] }) =
   }
 
   return (
-    <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 md:p-6">
+    <div className="bg-black rounded-xl border border-white/10 p-4 md:p-6">
       <h3 className="text-base md:text-lg font-semibold text-white mb-3 md:mb-4">Daily Performance (Last 7 Days)</h3>
       {/* Mobile card view */}
       <div className="md:hidden space-y-2">
         {periodStats.slice(-7).map((stat, index) => (
-          <div key={index} className="bg-[#151515] rounded-lg p-3">
+          <div key={index} className="bg-black rounded-lg p-3">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-white">{new Date(stat.startBrokerTime).toLocaleDateString()}</span>
               <span className={`text-sm font-semibold ${stat.profit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
@@ -351,7 +351,7 @@ const PeriodStatsChart = ({ periodStats }: { periodStats: PeriodStatistic[] }) =
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-[#2F2F2F]">
+            <tr className="border-b border-white/10">
               <th className="text-left py-3 px-4 text-sm font-medium text-gray-400">Date</th>
               <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Balance</th>
               <th className="text-right py-3 px-4 text-sm font-medium text-gray-400">Equity</th>
@@ -363,7 +363,7 @@ const PeriodStatsChart = ({ periodStats }: { periodStats: PeriodStatistic[] }) =
           </thead>
           <tbody>
             {periodStats.slice(-7).map((stat, index) => (
-              <tr key={index} className="border-b border-[#2F2F2F]/50">
+              <tr key={index} className="border-b border-white/10">
                 <td className="py-3 px-4 text-sm text-white">
                   {new Date(stat.startBrokerTime).toLocaleDateString()}
                 </td>
@@ -440,7 +440,7 @@ const TradingJournal = ({ trades }: { trades: TradeData[] }) => {
   };
   
   return (
-    <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 md:p-6">
+    <div className="bg-black rounded-xl border border-white/10 p-4 md:p-6">
       <div className="flex items-center justify-between mb-3 md:mb-4">
         <h3 className="text-base md:text-lg font-semibold text-white">Trading Journal</h3>
         <span className="text-xs md:text-sm text-gray-400">
@@ -454,7 +454,7 @@ const TradingJournal = ({ trades }: { trades: TradeData[] }) => {
           {/* Mobile Card View */}
           <div className="md:hidden space-y-2">
             {currentTrades.map((trade) => (
-              <div key={trade.id} className="bg-[#151515] rounded-lg p-3">
+              <div key={trade.id} className="bg-black rounded-lg p-3">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-bold text-white">{trade.symbol}</span>
@@ -497,7 +497,7 @@ const TradingJournal = ({ trades }: { trades: TradeData[] }) => {
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full min-w-[800px]">
               <thead>
-                <tr className="border-b border-[#2F2F2F]">
+                <tr className="border-b border-white/10">
                   <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase">Symbol</th>
                   <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase">Type</th>
                   <th className="text-left py-3 px-4 text-xs font-medium text-gray-400 uppercase">Volume</th>
@@ -552,7 +552,7 @@ const TradingJournal = ({ trades }: { trades: TradeData[] }) => {
       
       {/* Pagination Controls */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-4 md:mt-6 pt-4 border-t border-[#2F2F2F]/50">
+        <div className="flex items-center justify-between mt-4 md:mt-6 pt-4 border-t border-white/10">
           <div className="text-xs md:text-sm text-gray-400">
             {startIndex + 1}–{Math.min(endIndex, trades.length)} of {trades.length}
           </div>
@@ -562,7 +562,7 @@ const TradingJournal = ({ trades }: { trades: TradeData[] }) => {
             <button
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className="px-3 py-1.5 text-sm font-medium text-gray-400 bg-[#151515] border border-[#2F2F2F] rounded-lg hover:bg-[#1A1A1A] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1.5 text-sm font-medium text-gray-400 bg-black border border-white/10 rounded-lg hover:bg-black hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Previous
             </button>
@@ -579,7 +579,7 @@ const TradingJournal = ({ trades }: { trades: TradeData[] }) => {
                     className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
                       currentPage === page
                         ? 'bg-[#0FF1CE] text-black'
-                        : 'text-gray-400 bg-[#151515] border border-[#2F2F2F] hover:bg-[#1A1A1A] hover:text-white'
+                        : 'text-gray-400 bg-black border border-white/10 hover:bg-black hover:text-white'
                     }`}
                   >
                     {page}
@@ -592,7 +592,7 @@ const TradingJournal = ({ trades }: { trades: TradeData[] }) => {
             <button
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
-              className="px-3 py-1.5 text-sm font-medium text-gray-400 bg-[#151515] border border-[#2F2F2F] rounded-lg hover:bg-[#1A1A1A] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1.5 text-sm font-medium text-gray-400 bg-black border border-white/10 rounded-lg hover:bg-black hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
             </button>
@@ -969,7 +969,7 @@ export default function AdminAccountDetailsPage() {
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-red-500/30 p-8 max-w-md">
+        <div className="bg-black rounded-xl border border-red-500/30 p-8 max-w-md">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-white text-center mb-2">Error Loading Account</h2>
           <p className="text-gray-400 text-center mb-6">{error}</p>
@@ -1022,7 +1022,7 @@ export default function AdminAccountDetailsPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.push('/admin/vip-accounts')}
-            className="p-2 rounded-lg bg-[#0D0D0D]/80 border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/30 transition-all"
+            className="p-2 rounded-lg bg-black border border-white/10 hover:border-[#0FF1CE]/30 transition-all"
           >
             <ArrowLeft size={18} className="text-white" />
           </button>
@@ -1109,7 +1109,7 @@ export default function AdminAccountDetailsPage() {
 
       {/* Account Info Card */}
       {accountInfo && (
-        <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6 mb-8">
+        <div className="bg-black rounded-xl border border-white/10 p-6 mb-8">
           <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
             <Server size={20} />
             Account Information
@@ -1174,7 +1174,7 @@ export default function AdminAccountDetailsPage() {
       {objectives && <TradingObjectivesTable objectives={objectives} accountInfo={accountInfo} />}
 
       {/* Equity Growth Chart */}
-      <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6 mb-8 mt-8">
+      <div className="bg-black rounded-xl border border-white/10 p-6 mb-8 mt-8">
         <h3 className="text-lg font-semibold text-white mb-4">Equity Growth</h3>
         {chartData.length > 0 ? (
           <ApexChart
@@ -1184,7 +1184,7 @@ export default function AdminAccountDetailsPage() {
             height={350}
           />
         ) : (
-          <div className="h-[350px] flex items-center justify-center border border-dashed border-[#2F2F2F] rounded-lg">
+          <div className="h-[350px] flex items-center justify-center border border-dashed border-white/10 rounded-lg">
             <p className="text-gray-500">No chart data available</p>
           </div>
         )}

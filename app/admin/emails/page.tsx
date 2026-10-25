@@ -1250,15 +1250,15 @@ export default function EmailTemplatesPage() {
     });
     
     return (
-      <div className="bg-[#151515] rounded-lg p-6 mb-6">
+      <div className="bg-black rounded-lg p-6 mb-6">
         <div className="mb-4">
           <h3 className="text-white font-medium mb-2">Subject</h3>
-          <div className="bg-[#0D0D0D] p-3 rounded text-white border border-[#2F2F2F]">{previewSubject}</div>
+          <div className="bg-black p-3 rounded text-white border border-white/10">{previewSubject}</div>
         </div>
         <div>
           <h3 className="text-white font-medium mb-2">Body</h3>
           <div 
-            className="bg-[#0D0D0D] p-4 rounded text-white border border-[#2F2F2F] max-h-96 overflow-y-auto"
+            className="bg-black p-4 rounded text-white border border-white/10 max-h-96 overflow-y-auto"
             dangerouslySetInnerHTML={{ __html: previewBody }}
           ></div>
         </div>
@@ -1328,7 +1328,7 @@ export default function EmailTemplatesPage() {
         <select
           value={testValues[variable] || ''}
           onChange={(e) => handleTestValueChange(variable, e.target.value)}
-          className="w-full bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+          className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#0FF1CE]/50"
         >
           <option value="">Select {variable}</option>
           {options.map(option => (
@@ -1343,7 +1343,7 @@ export default function EmailTemplatesPage() {
         type="text"
         value={testValues[variable] || ''}
         onChange={(e) => handleTestValueChange(variable, e.target.value)}
-        className="w-full bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+        className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#0FF1CE]/50"
       />
     );
   };
@@ -1733,26 +1733,26 @@ export default function EmailTemplatesPage() {
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4">
-            <div className="bg-[#0D0D0D]/50 rounded-lg p-4 border border-[#2F2F2F]">
+            <div className="bg-black rounded-lg p-4 border border-white/10">
               <div className="text-gray-400 text-sm mb-1">Total Recipients</div>
               <div className="text-2xl font-bold text-white">{bulkRecipients.length}</div>
             </div>
-            <div className="bg-[#0D0D0D]/50 rounded-lg p-4 border border-[#2F2F2F]">
+            <div className="bg-black rounded-lg p-4 border border-white/10">
               <div className="text-gray-400 text-sm mb-1">Selected</div>
               <div className="text-2xl font-bold text-[#0FF1CE]">{selectedRecipients.size}</div>
             </div>
             {isActiveAccountsBulk ? (
-              <div className="bg-[#0D0D0D]/50 rounded-lg p-4 border border-[#2F2F2F]">
+              <div className="bg-black rounded-lg p-4 border border-white/10">
                 <div className="text-gray-400 text-sm mb-1">In Drawdown</div>
                 <div className="text-2xl font-bold text-red-400">{drawdownCount}</div>
               </div>
             ) : (
-              <div className="bg-[#0D0D0D]/50 rounded-lg p-4 border border-[#2F2F2F]">
+              <div className="bg-black rounded-lg p-4 border border-white/10">
                 <div className="text-gray-400 text-sm mb-1">Unique Emails</div>
                 <div className="text-2xl font-bold text-white">{new Set(bulkRecipients.map(r => r.email)).size}</div>
               </div>
             )}
-            <div className="bg-[#0D0D0D]/50 rounded-lg p-4 border border-[#2F2F2F]">
+            <div className="bg-black rounded-lg p-4 border border-white/10">
               <div className="text-gray-400 text-sm mb-1">Status</div>
               <div className="text-sm font-medium text-green-400">
                 {loadingBulkRecipients ? 'Loading...' : 'Ready to send'}
@@ -1761,7 +1761,7 @@ export default function EmailTemplatesPage() {
           </div>
 
           {sendingBulk && (
-            <div className="bg-[#0D0D0D]/80 rounded-lg p-4 mb-4 border border-[#0FF1CE]/50">
+            <div className="bg-black rounded-lg p-4 mb-4 border border-[#0FF1CE]/50">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-white font-medium">Sending emails...</span>
                 <span className="text-[#0FF1CE] font-bold">
@@ -1794,7 +1794,7 @@ export default function EmailTemplatesPage() {
             <button
               onClick={refreshBulkRecipients}
               disabled={loadingBulkRecipients || sendingBulk}
-              className="px-4 py-3 bg-[#151515] text-white rounded-lg hover:bg-[#2F2F2F] transition-colors disabled:opacity-50"
+              className="px-4 py-3 bg-black text-white rounded-lg hover:bg-white/5 transition-colors disabled:opacity-50"
               title="Refresh recipients list"
             >
               <RefreshCw size={18} />
@@ -1802,7 +1802,7 @@ export default function EmailTemplatesPage() {
           </div>
 
           {/* Recipient Management Section */}
-          <div className="bg-[#0D0D0D]/50 rounded-lg p-4 border border-[#2F2F2F]">
+          <div className="bg-black rounded-lg p-4 border border-white/10">
             <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
               <h4 className="text-white font-medium">Manage Recipients</h4>
               <div className="flex gap-2 flex-wrap">
@@ -1831,7 +1831,7 @@ export default function EmailTemplatesPage() {
                 </button>
                 <button
                   onClick={() => setShowBulkUserSearch(!showBulkUserSearch)}
-                  className="text-xs px-3 py-1.5 bg-[#151515] text-[#0FF1CE] rounded hover:bg-[#2F2F2F] transition-colors flex items-center gap-1"
+                  className="text-xs px-3 py-1.5 bg-black text-[#0FF1CE] rounded hover:bg-white/5 transition-colors flex items-center gap-1"
                 >
                   <Plus size={14} />
                   Add User
@@ -1849,13 +1849,13 @@ export default function EmailTemplatesPage() {
                     placeholder="Search users by name or email..."
                     value={bulkUserSearch}
                     onChange={(e) => setBulkUserSearch(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-[#151515] border border-[#2F2F2F] rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#0FF1CE]/50"
+                    className="w-full pl-10 pr-4 py-2 bg-black border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#0FF1CE]/50"
                   />
                 </div>
                 
                 {/* User Search Results */}
                 {bulkUserSearch && (
-                  <div className="absolute z-20 w-full mt-1 bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <div className="absolute z-20 w-full mt-1 bg-black border border-white/10 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                     {customers
                       .filter(c => 
                         c.email?.toLowerCase().includes(bulkUserSearch.toLowerCase()) ||
@@ -1868,7 +1868,7 @@ export default function EmailTemplatesPage() {
                         <div
                           key={customer.id}
                           onClick={() => addUserToBulk(customer)}
-                          className="p-3 hover:bg-[#2F2F2F] cursor-pointer border-b border-[#2F2F2F] last:border-b-0"
+                          className="p-3 hover:bg-white/5 cursor-pointer border-b border-white/10 last:border-b-0"
                         >
                           <div className="flex items-center justify-between">
                             <div>
@@ -1899,14 +1899,14 @@ export default function EmailTemplatesPage() {
                     placeholder="Filter by name, email, or account type..."
                     value={bulkListSearch}
                     onChange={(e) => setBulkListSearch(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 bg-[#151515] border border-[#2F2F2F] rounded-lg text-white text-sm placeholder-gray-400 focus:outline-none focus:border-[#0FF1CE]/50"
+                    className="w-full pl-9 pr-3 py-2 bg-black border border-white/10 rounded-lg text-white text-sm placeholder-gray-400 focus:outline-none focus:border-[#0FF1CE]/50"
                   />
                 </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setBulkListFilter('all')}
                     className={`text-xs px-3 py-2 rounded transition-colors ${
-                      bulkListFilter === 'all' ? 'bg-[#0FF1CE] text-black' : 'bg-[#151515] text-gray-400 hover:text-white'
+                      bulkListFilter === 'all' ? 'bg-[#0FF1CE] text-black' : 'bg-black text-gray-400 hover:text-white'
                     }`}
                   >
                     All Active
@@ -1914,7 +1914,7 @@ export default function EmailTemplatesPage() {
                   <button
                     onClick={() => setBulkListFilter('drawdown')}
                     className={`text-xs px-3 py-2 rounded transition-colors flex items-center gap-1 ${
-                      bulkListFilter === 'drawdown' ? 'bg-red-500 text-white' : 'bg-[#151515] text-gray-400 hover:text-white'
+                      bulkListFilter === 'drawdown' ? 'bg-red-500 text-white' : 'bg-black text-gray-400 hover:text-white'
                     }`}
                   >
                     <AlertTriangle size={12} />
@@ -1935,14 +1935,14 @@ export default function EmailTemplatesPage() {
                         ? recipient.drawdownBreached
                           ? 'bg-red-500/10 border border-red-500/40'
                           : 'bg-amber-500/10 border border-amber-500/30'
-                        : 'bg-[#151515]'
+                        : 'bg-black'
                     }`}
                   >
                     <input
                       type="checkbox"
                       checked={selectedRecipients.has(getBulkRecipientKey(recipient))}
                       onChange={() => toggleRecipient(getBulkRecipientKey(recipient))}
-                      className="w-4 h-4 rounded border-[#2F2F2F] text-[#0FF1CE] focus:ring-[#0FF1CE] focus:ring-offset-0 cursor-pointer"
+                      className="w-4 h-4 rounded border-white/10 text-[#0FF1CE] focus:ring-[#0FF1CE] focus:ring-offset-0 cursor-pointer"
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
@@ -2004,7 +2004,7 @@ export default function EmailTemplatesPage() {
       {/* Bulk Send Confirmation Modal */}
       {showBulkConfirm && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0D0D0D] border border-[#2F2F2F] rounded-xl p-6 max-w-md w-full">
+          <div className="bg-black border border-white/10 rounded-xl p-6 max-w-md w-full">
             <h3 className="text-xl font-bold text-white mb-4">Confirm Bulk Send</h3>
             <p className="text-gray-400 mb-4">
               You are about to send "<strong className="text-white">{currentTemplate?.subject}</strong>" to <strong className="text-[#0FF1CE]">{selectedRecipients.size} selected recipient{selectedRecipients.size !== 1 ? 's' : ''}</strong>.
@@ -2020,7 +2020,7 @@ export default function EmailTemplatesPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowBulkConfirm(false)}
-                className="flex-1 px-4 py-2 bg-[#151515] text-white rounded-lg hover:bg-[#2F2F2F] transition-colors"
+                className="flex-1 px-4 py-2 bg-black text-white rounded-lg hover:bg-white/5 transition-colors"
               >
                 Cancel
               </button>
@@ -2037,7 +2037,7 @@ export default function EmailTemplatesPage() {
 
       {/* User Selection Section */}
       {isEditing && currentTemplate && !currentTemplate.isBulkTemplate && (
-        <div className="bg-[#151515] rounded-lg p-6 mb-6 border border-[#2F2F2F]/50">
+        <div className="bg-black rounded-lg p-6 mb-6 border border-white/10">
           <div className="flex items-center gap-3 mb-4">
             <Users size={20} className="text-[#0FF1CE]" />
             <h3 className="text-white font-medium">Select User</h3>
@@ -2074,15 +2074,15 @@ export default function EmailTemplatesPage() {
                       setShowRecentOrdersDropdown(false);
                     }
                   }}
-                  className="w-full pl-10 pr-12 py-2.5 bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#0FF1CE]/50"
+                  className="w-full pl-10 pr-12 py-2.5 bg-black border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#0FF1CE]/50"
                 />
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
               </div>
               
               {/* Recent Orders/Active Accounts Dropdown */}
               {(currentTemplate.name === 'Login Credentials' || currentTemplate.name === 'Passed Gauntlet Challenge' || currentTemplate.name === 'Gauntlet Final Reminder') && showRecentOrdersDropdown && userSearchTerm === '' && (
-                <div className="absolute z-10 w-full mt-1 bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg shadow-lg max-h-96 overflow-y-auto">
-                  <div className="p-3 border-b border-[#2F2F2F] flex items-center justify-between sticky top-0 bg-[#0D0D0D]">
+                <div className="absolute z-10 w-full mt-1 bg-black border border-white/10 rounded-lg shadow-lg max-h-96 overflow-y-auto">
+                  <div className="p-3 border-b border-white/10 flex items-center justify-between sticky top-0 bg-black">
                     <span className="text-sm text-gray-400">
                       {(currentTemplate.name === 'Passed Gauntlet Challenge' || currentTemplate.name === 'Gauntlet Final Reminder') ? 'Active Accounts' : 'Recent Orders'}
                     </span>
@@ -2101,7 +2101,7 @@ export default function EmailTemplatesPage() {
                               setRecentOrdersType('crypto');
                             }}
                             className={`text-xs px-2 py-1 rounded transition-colors ${
-                              recentOrdersType === 'crypto' ? 'bg-[#0FF1CE] text-black' : 'bg-[#151515] text-gray-400 hover:text-white'
+                              recentOrdersType === 'crypto' ? 'bg-[#0FF1CE] text-black' : 'bg-black text-gray-400 hover:text-white'
                             }`}
                           >
                             Crypto
@@ -2112,7 +2112,7 @@ export default function EmailTemplatesPage() {
                               setRecentOrdersType('credit');
                             }}
                             className={`text-xs px-2 py-1 rounded transition-colors ${
-                              recentOrdersType === 'credit' ? 'bg-[#0FF1CE] text-black' : 'bg-[#151515] text-gray-400 hover:text-white'
+                              recentOrdersType === 'credit' ? 'bg-[#0FF1CE] text-black' : 'bg-black text-gray-400 hover:text-white'
                             }`}
                           >
                             Credit
@@ -2156,7 +2156,7 @@ export default function EmailTemplatesPage() {
                             }
                           }
                         }}
-                        className="p-3 hover:bg-[#2F2F2F] cursor-pointer border-b border-[#2F2F2F] last:border-b-0 transition-colors"
+                        className="p-3 hover:bg-white/5 cursor-pointer border-b border-white/10 last:border-b-0 transition-colors"
                       >
                         <div className="flex items-center justify-between">
                           <div>
@@ -2181,7 +2181,7 @@ export default function EmailTemplatesPage() {
               
               {/* User Dropdown */}
               {showUserDropdown && userSearchTerm && (
-                <div className="absolute z-10 w-full mt-1 bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                <div className="absolute z-10 w-full mt-1 bg-black border border-white/10 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                   {loadingUsers ? (
                     <div className="p-4 text-center text-gray-400">
                       <Loader size={16} className="animate-spin inline mr-2" />
@@ -2192,7 +2192,7 @@ export default function EmailTemplatesPage() {
                       <div
                         key={customer.id}
                         onClick={() => handleUserSelect(customer)}
-                        className="p-3 hover:bg-[#2F2F2F] cursor-pointer border-b border-[#2F2F2F] last:border-b-0"
+                        className="p-3 hover:bg-white/5 cursor-pointer border-b border-white/10 last:border-b-0"
                       >
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 bg-[#0FF1CE]/20 rounded-full flex items-center justify-center">
@@ -2226,7 +2226,7 @@ export default function EmailTemplatesPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Templates List */}
         <div className={`lg:col-span-1 ${isEditing ? 'hidden lg:block' : ''}`}>
-          <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6">
+          <div className="bg-black rounded-xl border border-white/10 p-6">
             <div className="relative mb-4">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
               <input 
@@ -2234,7 +2234,7 @@ export default function EmailTemplatesPage() {
                 placeholder="Search templates..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-[#151515] border border-[#2F2F2F] rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#0FF1CE]/50"
+                className="w-full pl-10 pr-4 py-2.5 bg-black border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#0FF1CE]/50"
               />
             </div>
             
@@ -2242,7 +2242,7 @@ export default function EmailTemplatesPage() {
               {filteredTemplates.map(template => (
                 <div 
                   key={template.id}
-                  className="bg-[#151515] rounded-lg p-4 hover:border-[#0FF1CE]/30 transition-all border border-transparent cursor-pointer group"
+                  className="bg-black rounded-lg p-4 hover:border-[#0FF1CE]/30 transition-all border border-transparent cursor-pointer group"
                   onClick={() => handleEdit(template)}
                 >
                   <div className="flex items-start justify-between">
@@ -2312,7 +2312,7 @@ export default function EmailTemplatesPage() {
         {/* Template Editor */}
         {isEditing && currentTemplate && (
           <div className="lg:col-span-2">
-            <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6">
+            <div className="bg-black rounded-xl border border-white/10 p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-semibold text-white">
                   {templates.find(t => t.id === currentTemplate.id) ? 'Edit Template' : 'Create New Template'}
@@ -2320,7 +2320,7 @@ export default function EmailTemplatesPage() {
                 <div className="flex items-center gap-2">
                   <button 
                     onClick={handlePreview}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#151515] text-white hover:bg-[#2F2F2F] transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black text-white hover:bg-white/5 transition-colors"
                   >
                     <Eye size={16} />
                     <span>{showPreview ? 'Edit' : 'Preview'}</span>
@@ -2354,7 +2354,7 @@ export default function EmailTemplatesPage() {
                   </button>
                   <button 
                     onClick={handleCancel}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#151515] text-white hover:bg-[#2F2F2F] transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-black text-white hover:bg-white/5 transition-colors"
                   >
                     <X size={16} />
                     <span>Cancel</span>
@@ -2377,7 +2377,7 @@ export default function EmailTemplatesPage() {
                   {renderPreview()}
                   </div>
                   
-                  <div className="bg-[#151515] rounded-lg p-6 border border-[#2F2F2F]">
+                  <div className="bg-black rounded-lg p-6 border border-white/10">
                     <h3 className="text-white font-medium mb-4">Variable Values</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {currentTemplate.variables.map((variable: string) => (
@@ -2405,7 +2405,7 @@ export default function EmailTemplatesPage() {
                       name="name"
                       value={currentTemplate.name}
                       onChange={handleInputChange}
-                      className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                      className="w-full bg-black border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                     />
                   </div>
                   
@@ -2418,7 +2418,7 @@ export default function EmailTemplatesPage() {
                       name="subject"
                       value={currentTemplate.subject}
                       onChange={handleInputChange}
-                      className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                      className="w-full bg-black border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                     />
                   </div>
                   
@@ -2431,7 +2431,7 @@ export default function EmailTemplatesPage() {
                       value={currentTemplate.body}
                       onChange={handleInputChange}
                       rows={12}
-                      className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50 font-mono text-sm"
+                      className="w-full bg-black border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50 font-mono text-sm"
                     ></textarea>
                     <div className="text-xs text-gray-400 mt-1">
                       Use {'{{'} variableName {'}}'}  to insert dynamic content. HTML tags are supported for styling.
@@ -2471,7 +2471,7 @@ export default function EmailTemplatesPage() {
                         type="text"
                         placeholder="Add variable name (e.g., firstName, loginId)"
                         onKeyDown={handleKeyDown}
-                        className="flex-1 bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-[#0FF1CE]/50"
+                        className="flex-1 bg-black border border-white/10 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:border-[#0FF1CE]/50"
                       />
                       <button 
                         onClick={() => {
@@ -2481,7 +2481,7 @@ export default function EmailTemplatesPage() {
                             input.value = '';
                           }
                         }}
-                        className="flex items-center gap-1 px-4 py-2 rounded-lg bg-[#151515] text-white hover:bg-[#2F2F2F] transition-colors border border-[#2F2F2F]"
+                        className="flex items-center gap-1 px-4 py-2 rounded-lg bg-black text-white hover:bg-white/5 transition-colors border border-white/10"
                       >
                         <Plus size={14} />
                         <span>Add</span>

@@ -252,7 +252,7 @@ export default function AdminKYCPage() {
       </div>
 
       {/* User Search Section */}
-      <div className="bg-[#1A1A1A] rounded-xl p-4 md:p-6 border border-[#2F2F2F] mb-5 md:mb-8">
+      <div className="bg-black rounded-xl p-4 md:p-6 border border-white/10 mb-5 md:mb-8">
         <h2 className="text-base md:text-lg font-semibold text-white mb-2 md:mb-4">Unlock KYC for User</h2>
         <p className="text-xs md:text-sm text-gray-400 mb-3 md:mb-4">
           Search for a user by email to manually unlock KYC verification for them.
@@ -264,7 +264,7 @@ export default function AdminKYCPage() {
             value={userSearchEmail}
             onChange={(e) => setUserSearchEmail(e.target.value)}
             placeholder="user@example.com"
-            className="flex-1 bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+            className="flex-1 bg-black border border-white/10 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
           />
           <button
             onClick={searchUserByEmail}
@@ -281,7 +281,7 @@ export default function AdminKYCPage() {
         </div>
         
         {searchedUser && (
-          <div className="mt-4 p-4 bg-[#0D0D0D] rounded-lg border border-[#2F2F2F]">
+          <div className="mt-4 p-4 bg-black rounded-lg border border-white/10">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-white font-medium">
@@ -322,7 +322,7 @@ export default function AdminKYCPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by name or email..."
-              className="w-full bg-[#1A1A1A] border border-[#2F2F2F] rounded-lg pl-9 pr-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+              className="w-full bg-black border border-white/10 rounded-lg pl-9 pr-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
             />
           </div>
         </div>
@@ -331,7 +331,7 @@ export default function AdminKYCPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as any)}
-            className="w-full bg-[#1A1A1A] border border-[#2F2F2F] rounded-lg px-3 py-2.5 text-white text-sm appearance-none focus:outline-none focus:border-[#0FF1CE]/50"
+            className="w-full bg-black border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm appearance-none focus:outline-none focus:border-[#0FF1CE]/50"
           >
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
@@ -344,7 +344,7 @@ export default function AdminKYCPage() {
         
         {/* Stats Cards */}
         <div className="grid grid-cols-2 gap-2 md:contents">
-          <div className="bg-[#1A1A1A] rounded-lg p-3 md:p-4 border border-[#2F2F2F]">
+          <div className="bg-black rounded-lg p-3 md:p-4 border border-white/10">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-xs md:text-sm">Total</p>
@@ -354,7 +354,7 @@ export default function AdminKYCPage() {
             </div>
           </div>
           
-          <div className="bg-[#1A1A1A] rounded-lg p-3 md:p-4 border border-[#2F2F2F]">
+          <div className="bg-black rounded-lg p-3 md:p-4 border border-white/10">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-xs md:text-sm">Pending</p>
@@ -371,11 +371,11 @@ export default function AdminKYCPage() {
       {/* KYC Submissions - Mobile cards */}
       <div className="md:hidden space-y-2">
         {filteredSubmissions.length === 0 ? (
-          <div className="bg-[#1A1A1A] rounded-xl border border-[#2F2F2F] px-4 py-8 text-center text-gray-400">
+          <div className="bg-black rounded-xl border border-white/10 px-4 py-8 text-center text-gray-400">
             No KYC submissions found
           </div>
         ) : filteredSubmissions.map((submission) => (
-          <div key={submission.id} className="bg-[#1A1A1A] rounded-xl border border-[#2F2F2F] p-3">
+          <div key={submission.id} className="bg-black rounded-xl border border-white/10 p-3">
             <div className="flex items-start justify-between mb-2">
               <div>
                 <p className="text-white font-medium text-sm">{submission.personalInfo.firstName} {submission.personalInfo.lastName}</p>
@@ -407,11 +407,11 @@ export default function AdminKYCPage() {
       </div>
 
       {/* KYC Submissions Table - Desktop */}
-      <div className="hidden md:block bg-[#1A1A1A] rounded-xl border border-[#2F2F2F] overflow-hidden">
+      <div className="hidden md:block bg-black rounded-xl border border-white/10 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[#2F2F2F]">
+              <tr className="border-b border-white/10">
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">User</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Contact</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Documents</th>
@@ -429,7 +429,7 @@ export default function AdminKYCPage() {
                 </tr>
               ) : (
                 filteredSubmissions.map((submission) => (
-                  <tr key={submission.id} className="hover:bg-[#0D0D0D]/50 transition-colors">
+                  <tr key={submission.id} className="hover:bg-black transition-colors">
                     <td className="px-6 py-4">
                       <div>
                         <p className="text-white font-medium">
@@ -509,8 +509,8 @@ export default function AdminKYCPage() {
       {/* Review Modal */}
       {selectedSubmission && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#1A1A1A] rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-[#1A1A1A] border-b border-[#2F2F2F] p-6">
+          <div className="bg-black rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-black border-b border-white/10 p-6">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-white">Review KYC Submission</h2>
                 <button
@@ -565,7 +565,7 @@ export default function AdminKYCPage() {
                   Uploaded Documents
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="bg-[#0D0D0D] rounded-lg p-4 border border-[#2F2F2F]">
+                  <div className="bg-black rounded-lg p-4 border border-white/10">
                     <p className="text-sm font-medium text-gray-400 mb-2">Government ID</p>
                     {selectedSubmission.documents.governmentIdUrl ? (
                       <div>
@@ -587,7 +587,7 @@ export default function AdminKYCPage() {
                     )}
                   </div>
                   
-                  <div className="bg-[#0D0D0D] rounded-lg p-4 border border-[#2F2F2F]">
+                  <div className="bg-black rounded-lg p-4 border border-white/10">
                     <p className="text-sm font-medium text-gray-400 mb-2">Proof of Address</p>
                     {selectedSubmission.documents.proofOfAddressUrl ? (
                       <div>
@@ -617,7 +617,7 @@ export default function AdminKYCPage() {
                   <Shield className="w-5 h-5 text-[#0FF1CE]" />
                   Trading Agreement
                 </h3>
-                <div className="bg-[#0D0D0D] rounded-lg p-4 border border-[#2F2F2F]">
+                <div className="bg-black rounded-lg p-4 border border-white/10">
                   {selectedSubmission.documents.tradingAgreementSignedAt ? (
                     <div className="flex items-center gap-2 text-green-500">
                       <CheckCircle className="w-5 h-5" />
@@ -643,7 +643,7 @@ export default function AdminKYCPage() {
                   value={reviewNotes}
                   onChange={(e) => setReviewNotes(e.target.value)}
                   placeholder="Add notes about this submission (optional)..."
-                  className="w-full bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50 min-h-[100px]"
+                  className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50 min-h-[100px]"
                 />
               </div>
 

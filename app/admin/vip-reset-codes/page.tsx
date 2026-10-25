@@ -145,7 +145,7 @@ export default function VipResetCodesPage() {
       </div>
 
       {isCreating && (
-        <form onSubmit={handleSubmit} className="mb-6 space-y-4 rounded-xl border border-[#2F2F2F] bg-[#0D0D0D] p-6">
+        <form onSubmit={handleSubmit} className="mb-6 space-y-4 rounded-xl border border-white/10 bg-black p-6">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <label className="block">
               <span className="mb-1 block text-sm text-gray-400">Code</span>
@@ -154,7 +154,7 @@ export default function VipResetCodesPage() {
                 <input
                   value={code}
                   onChange={(event) => setCode(event.target.value.toUpperCase())}
-                  className="w-full rounded-lg border border-[#2F2F2F] bg-[#151515] py-2 pl-10 pr-4 text-white focus:border-[#0FF1CE]/50 focus:outline-none"
+                  className="w-full rounded-lg border border-white/10 bg-black py-2 pl-10 pr-4 text-white focus:border-[#0FF1CE]/50 focus:outline-none"
                   placeholder="RESET20"
                 />
               </div>
@@ -165,7 +165,7 @@ export default function VipResetCodesPage() {
                 type="date"
                 value={expiresAt}
                 onChange={(event) => setExpiresAt(event.target.value)}
-                className="w-full rounded-lg border border-[#2F2F2F] bg-[#151515] px-4 py-2 text-white focus:border-[#0FF1CE]/50 focus:outline-none"
+                className="w-full rounded-lg border border-white/10 bg-black px-4 py-2 text-white focus:border-[#0FF1CE]/50 focus:outline-none"
               />
             </label>
             <label className="block">
@@ -176,7 +176,7 @@ export default function VipResetCodesPage() {
                 value={usageLimit}
                 onChange={(event) => setUsageLimit(event.target.value)}
                 placeholder="Unlimited"
-                className="w-full rounded-lg border border-[#2F2F2F] bg-[#151515] px-4 py-2 text-white focus:border-[#0FF1CE]/50 focus:outline-none"
+                className="w-full rounded-lg border border-white/10 bg-black px-4 py-2 text-white focus:border-[#0FF1CE]/50 focus:outline-none"
               />
             </label>
             <label className="flex items-center gap-3 pt-6 text-sm text-white">
@@ -184,7 +184,7 @@ export default function VipResetCodesPage() {
                 type="checkbox"
                 checked={active}
                 onChange={(event) => setActive(event.target.checked)}
-                className="h-4 w-4 rounded border-gray-600 bg-[#1A1A1A] text-[#0FF1CE]"
+                className="h-4 w-4 rounded border-gray-600 bg-black text-[#0FF1CE]"
               />
               Active
             </label>
@@ -195,16 +195,16 @@ export default function VipResetCodesPage() {
             <button type="submit" className="rounded-lg bg-[#0FF1CE] px-4 py-2 text-sm font-medium text-black">
               {editingId ? 'Save code' : 'Create code'}
             </button>
-            <button type="button" onClick={resetForm} className="rounded-lg border border-[#2F2F2F] px-4 py-2 text-sm text-gray-300">
+            <button type="button" onClick={resetForm} className="rounded-lg border border-white/10 px-4 py-2 text-sm text-gray-300">
               Cancel
             </button>
           </div>
         </form>
       )}
 
-      <div className="overflow-hidden rounded-xl border border-[#2F2F2F] bg-[#0D0D0D]">
+      <div className="overflow-hidden rounded-xl border border-white/10 bg-black">
         <table className="w-full text-left text-sm">
-          <thead className="border-b border-[#2F2F2F] text-gray-400">
+          <thead className="border-b border-white/10 text-gray-400">
             <tr>
               <th className="px-4 py-3 font-medium">Code</th>
               <th className="px-4 py-3 font-medium">Discount</th>
@@ -222,7 +222,7 @@ export default function VipResetCodesPage() {
               </tr>
             )}
             {codes.map((item) => (
-              <tr key={item.id} className="border-b border-[#2F2F2F]/60 text-white">
+              <tr key={item.id} className="border-b border-white/10/60 text-white">
                 <td className="px-4 py-3 font-medium">{item.code}</td>
                 <td className="px-4 py-3">{item.discountPercent || DISCOUNT_PERCENT}%</td>
                 <td className="px-4 py-3">

@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { formatVipAllocation, formatVipDollars, getVipObjectiveAmounts, isVipMetaApiAccount, normalizeVipProfitSplit } from '../../../../../lib/vip-accounts';
+import { VIP_PAYMENT_PORTAL_URL } from '../../../../../lib/vip-portal';
 import VipProfitTracker from '../../../../components/VipProfitTracker';
 
 // Dynamically import ApexCharts to avoid SSR issues
@@ -85,11 +86,11 @@ const MetricCard = ({ title, value, icon: Icon, format = 'number', prefix = '', 
   };
 
   return (
-    <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl border border-[#0FF1CE]/20 p-3 sm:p-4 hover:border-[#0FF1CE]/50 transition-all duration-300" style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
+    <div className="bg-black rounded-xl border border-[#0FF1CE]/20 p-3 sm:p-4 hover:border-[#0FF1CE]/50 transition-all duration-300" >
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <p className="text-gray-400 text-xs mb-1">{title}</p>
-          <p className="text-white text-base sm:text-lg font-semibold break-words">{formatValue()}</p>
+          <p className="text-white text-sm sm:text-base lg:text-lg font-semibold break-words">{formatValue()}</p>
         </div>
         {Icon && (
           <div className="p-2 rounded-lg bg-[#0FF1CE]/10 text-[#0FF1CE] flex-shrink-0">
@@ -159,7 +160,7 @@ const TradingObjectivesTable = ({ objectives, accountStatus, riskEvents = [], ac
   const showRiskAccordion = hasRecentBreach || recentRiskEvents.length > 0;
 
   return (
-    <div className="h-full bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 sm:p-6">
+    <div className="h-full bg-black rounded-xl border border-white/10 p-4 sm:p-6">
       <h3 className="text-lg font-semibold text-white mb-4">Trading Objectives</h3>
 
       <div className="divide-y divide-[#2F2F2F]/50">
@@ -176,11 +177,11 @@ const TradingObjectivesTable = ({ objectives, accountStatus, riskEvents = [], ac
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <p className="text-[10px] uppercase tracking-wide text-gray-500 mb-0.5">Target</p>
-                <p className="text-sm text-gray-400">{formatTarget(row)}</p>
+                <p className="break-words text-sm text-gray-400">{formatTarget(row)}</p>
               </div>
               <div>
                 <p className="text-[10px] uppercase tracking-wide text-gray-500 mb-0.5">Current</p>
-                <p className={`text-sm ${row.passed ? 'text-green-400' : 'text-yellow-400'}`}>{formatCurrent(row)}</p>
+                <p className={`break-words text-sm ${row.passed ? 'text-green-400' : 'text-yellow-400'}`}>{formatCurrent(row)}</p>
               </div>
             </div>
           </div>
@@ -188,7 +189,7 @@ const TradingObjectivesTable = ({ objectives, accountStatus, riskEvents = [], ac
       </div>
 
       {showRiskAccordion && (
-        <div className="mt-4 pt-3 border-t border-[#2F2F2F]/50">
+        <div className="mt-4 pt-3 border-t border-white/10">
           <button
             type="button"
             onClick={() => setRiskOpen(!riskOpen)}
@@ -312,7 +313,7 @@ const TradingJournal = ({ trades }: { trades: TradeData[] }) => {
   };
   
   return (
-    <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 sm:p-6">
+    <div className="bg-black rounded-xl border border-white/10 p-4 sm:p-6">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
@@ -355,21 +356,21 @@ const TradingJournal = ({ trades }: { trades: TradeData[] }) => {
       )}
       
       {isOpen && totalPages > 1 && (
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#2F2F2F]/50">
+        <div className="mt-4 flex flex-col gap-3 border-t border-white/10 pt-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-gray-500">
             {startIndex + 1}–{Math.min(endIndex, trades.length)} of {trades.length}
           </p>
           
-          <div className="flex items-center gap-1">
+          <div className="flex items-center justify-between gap-2 sm:justify-end">
             <button
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
-              className="px-3 py-1.5 text-sm font-medium text-gray-400 bg-[#151515] border border-[#2F2F2F] rounded-lg hover:bg-[#1A1A1A] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1.5 text-xs font-medium text-gray-400 bg-[#151515] border border-[#2F2F2F] rounded-lg hover:bg-[#1A1A1A] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed sm:text-sm"
             >
               Previous
             </button>
             
-            <div className="flex items-center gap-1 mx-2">
+            <div className="hidden items-center gap-1 sm:flex">
               {getPageNumbers().map((page, index) => (
                 page === '...' ? (
                   <span key={`ellipsis-${index}`} className="px-2 text-gray-500">...</span>
@@ -392,7 +393,7 @@ const TradingJournal = ({ trades }: { trades: TradeData[] }) => {
             <button
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
-              className="px-3 py-1.5 text-sm font-medium text-gray-400 bg-[#151515] border border-[#2F2F2F] rounded-lg hover:bg-[#1A1A1A] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1.5 text-xs font-medium text-gray-400 bg-[#151515] border border-[#2F2F2F] rounded-lg hover:bg-[#1A1A1A] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed sm:text-sm"
             >
               Next
             </button>
@@ -406,7 +407,7 @@ const TradingJournal = ({ trades }: { trades: TradeData[] }) => {
 export default function VipAccountDetailsPage() {
   const params = useParams();
   const router = useRouter();
-  const [user] = useAuthState(auth);
+  const [user, authLoading] = useAuthState(auth);
   const [loading, setLoading] = useState(true);
   const [metrics, setMetrics] = useState<any>(null);
   const [objectives, setObjectives] = useState<TradingObjectives | null>(null);
@@ -598,10 +599,13 @@ export default function VipAccountDetailsPage() {
   };
 
   useEffect(() => {
-    if (user && params.accountId) {
-      fetchMetrics();
+    if (authLoading) return;
+    if (!user) {
+      router.replace('/access');
+      return;
     }
-  }, [user, params.accountId]);
+    if (params.accountId) fetchMetrics();
+  }, [user, authLoading, params.accountId]);
 
   // Separate effect for auto-refresh
   useEffect(() => {
@@ -615,12 +619,7 @@ export default function VipAccountDetailsPage() {
     }
   }, [user, accountStatus]);
 
-  if (!user) {
-    router.push('/signin');
-    return null;
-  }
-
-  if (loading) {
+  if (authLoading || !user || loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="w-8 h-8 text-[#0FF1CE] animate-spin" />
@@ -631,7 +630,7 @@ export default function VipAccountDetailsPage() {
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-red-500/30 p-8 max-w-md">
+        <div className="bg-black rounded-xl border border-red-500/30 p-8 max-w-md">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-white text-center mb-2">Error Loading Metrics</h2>
           <p className="text-gray-400 text-center mb-4">{error}</p>
@@ -651,24 +650,42 @@ export default function VipAccountDetailsPage() {
   const vipAmounts = userAccount?.accountSize ? getVipObjectiveAmounts(userAccount.accountSize) : null;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-w-0">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-3">
+      <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 items-center gap-3">
           <button
             onClick={() => router.push('/dashboard/vip/accounts')}
-            className="p-2 rounded-lg bg-[#1A1A1A]/80 border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/30 transition-all"
+            className="shrink-0 p-2 rounded-lg bg-[#1A1A1A]/80 border border-white/10 hover:border-[#0FF1CE]/30 transition-all"
           >
             <ArrowLeft size={18} className="text-white" />
           </button>
-          <div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent">VIP Account Metrics</h1>
+          <div className="min-w-0">
+            <h1 className="text-xl font-semibold text-white sm:text-2xl">Account metrics</h1>
             {lastUpdate && (
               <p className="text-sm text-gray-400 mt-1">
                 Last updated {formatDistanceToNow(lastUpdate, { addSuffix: true })}
               </p>
             )}
           </div>
+        </div>
+        <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2 sm:flex">
+          <a
+            href={VIP_PAYMENT_PORTAL_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-lg border border-[#2F2F2F] px-3 py-2.5 text-center text-xs font-medium text-white hover:border-[#0FF1CE]/40"
+          >
+            Reset an account
+          </a>
+          <a
+            href={VIP_PAYMENT_PORTAL_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-lg bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] px-3 py-2.5 text-center text-xs font-semibold text-black"
+          >
+            Buy another allocation
+          </a>
         </div>
       </div>
 
@@ -683,6 +700,14 @@ export default function VipAccountDetailsPage() {
                 This VIP account has been marked as failed. The data shown below represents the final state of your account.
                 No new updates will be fetched.
               </p>
+              <a
+                href={VIP_PAYMENT_PORTAL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex w-full items-center justify-center rounded-lg bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] px-3 py-2.5 text-xs font-semibold text-black sm:w-auto"
+              >
+                Reset on the payment portal
+              </a>
             </div>
           </div>
         </div>
@@ -693,7 +718,7 @@ export default function VipAccountDetailsPage() {
         {/* Row 1: VIP Allocation + Account Information */}
         <div className={`grid grid-cols-1 gap-6 items-start ${accountStatus !== 'failed' ? 'lg:grid-cols-2' : ''}`}>
           {accountStatus !== 'failed' && (
-            <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 sm:p-6">
+            <div className="bg-black rounded-xl border border-white/10 p-4 sm:p-6">
               <button
                 type="button"
                 onClick={() => setVipAllocationOpen(!vipAllocationOpen)}
@@ -729,7 +754,7 @@ export default function VipAccountDetailsPage() {
             </div>
           )}
 
-          <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 sm:p-6">
+          <div className="bg-black rounded-xl border border-white/10 p-4 sm:p-6">
             <button
               type="button"
               onClick={() => setAccountInfoOpen(!accountInfoOpen)}
@@ -812,7 +837,7 @@ export default function VipAccountDetailsPage() {
 
         {/* Row 3: Key Metrics Grid - 100% width */}
         <div>
-          <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 sm:p-6">
+          <div className="bg-black rounded-xl border border-white/10 p-4 sm:p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Statistics</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 lg:gap-4">
             <MetricCard title="Balance" value={metrics?.balance || 0} icon={DollarSign} format="currency" />
@@ -831,15 +856,17 @@ export default function VipAccountDetailsPage() {
 
         {/* Row 4: Equity Growth Chart - 100% width */}
         <div>
-          <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6">
+          <div className="min-w-0 bg-black rounded-xl border border-white/10 p-4 sm:p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Equity Growth</h3>
             {chartData.length > 0 ? (
-              <ApexChart
-                options={chartOptions}
-                series={chartSeries}
-                type="area"
-                height={350}
-              />
+              <div className="min-w-0 overflow-x-auto">
+                <ApexChart
+                  options={chartOptions}
+                  series={chartSeries}
+                  type="area"
+                  height={350}
+                />
+              </div>
             ) : (
               <div className="h-[350px] flex items-center justify-center border border-dashed border-[#2F2F2F] rounded-lg">
                 <p className="text-gray-500">No chart data available</p>

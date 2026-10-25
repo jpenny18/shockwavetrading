@@ -97,9 +97,9 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className={`flex min-h-screen bg-gradient-to-br from-[#0D0D0D] via-[#0D0D0D] to-[#151515] ${isShockwaveX ? 'h-[100dvh] overflow-hidden' : ''}`}>
+    <div className={`flex min-h-screen bg-black ${isShockwaveX ? 'h-[100dvh] overflow-hidden' : ''}`}>
       {/* Mobile Header */}
-      <header className="md:hidden fixed top-0 left-0 right-0 h-16 bg-[#121212]/90 backdrop-blur-md border-b border-[#2F2F2F]/50 z-50 px-4 flex items-center justify-between gap-2">
+      <header className="md:hidden fixed top-0 left-0 right-0 h-16 bg-black border-b border-white/10 z-50 px-4 flex items-center justify-between gap-2">
         <Image
           src="/logo.png"
           alt="Shockwave Capital"
@@ -133,7 +133,7 @@ export default function DashboardLayout({
       {/* Sidebar */}
       <aside
         className={`
-          fixed md:sticky top-0 md:top-0 left-0 h-screen w-64 bg-[#0D0D0D]/95 backdrop-blur-sm border-r border-[#2F2F2F]/50 z-50
+          fixed md:sticky top-0 md:top-0 left-0 h-screen w-64 bg-black border-r border-white/10 z-50
           transform transition-transform duration-300 ease-in-out
           ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
           ${isShockwaveX ? 'md:hidden' : 'md:translate-x-0 md:flex md:flex-col'}
@@ -146,7 +146,7 @@ export default function DashboardLayout({
               alt="Shockwave Capital"
               width={120}
               height={120}
-              className="h-8 w-auto"
+              className="h-auto w-40"
             />
           </div>
 
@@ -176,10 +176,10 @@ export default function DashboardLayout({
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-300 group ${
+                  className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors duration-200 group ${
                     isActive
-                      ? 'bg-[#0FF1CE]/10 text-[#0FF1CE] border border-[#0FF1CE]/20'
-                      : 'text-gray-400 border border-transparent hover:text-[#0FF1CE] hover:bg-[#0FF1CE]/10'
+                      ? 'text-[#0FF1CE] border border-[#0FF1CE]/40'
+                      : 'text-gray-400 border border-transparent hover:text-white'
                   }`}
                 >
                   <Icon size={20} className={isActive ? 'text-[#0FF1CE]' : 'group-hover:text-[#0FF1CE]'} />
@@ -190,9 +190,9 @@ export default function DashboardLayout({
           </nav>
 
           {/* User Section */}
-          <div className="border-t border-[#2F2F2F]/50 pt-4 mt-4">
+          <div className="border-t border-white/10 pt-4 mt-4">
             <div className="flex items-center gap-3 px-3 py-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0FF1CE]/30 to-[#00D4FF]/20 border border-[#0FF1CE]/30 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-black border border-[#0FF1CE]/50 flex items-center justify-center">
                 <span className="text-[#0FF1CE] font-medium text-sm">{initials}</span>
               </div>
               <div className="flex-1 min-w-0">
@@ -203,7 +203,7 @@ export default function DashboardLayout({
               </div>
               <button 
                 onClick={handleLogout}
-                className="text-gray-400 hover:text-[#0FF1CE] p-1.5 rounded-lg hover:bg-[#0FF1CE]/10 transition-all"
+                className="text-gray-400 hover:text-[#0FF1CE] p-1.5 rounded-lg transition-colors"
               >
                 <LogOut size={18} />
               </button>
@@ -220,14 +220,16 @@ export default function DashboardLayout({
           </div>
         ) : (
           <div className="max-w-7xl mx-auto p-4 md:p-8">
-            {children}
+            <div className="md:rounded-3xl md:border md:border-white/10 md:p-6">
+              {children}
+            </div>
           </div>
         )}
       </main>
 
       {/* Mobile Bottom Navigation */}
       <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 md:hidden z-50 transition-opacity duration-300 ${isSidebarOpen || isShockwaveX ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-        <div className="flex items-center gap-4 bg-[#121212]/90 backdrop-blur-md border border-[#2F2F2F]/50 rounded-full px-6 py-3 shadow-[0_0_20px_rgba(15,241,206,0.15)]">
+        <div className="flex items-center gap-4 bg-black border border-white/10 rounded-full px-6 py-3">
           <Link
             href="/dashboard/accounts"
             className="flex flex-col items-center text-gray-400 hover:text-[#0FF1CE] transition-all"

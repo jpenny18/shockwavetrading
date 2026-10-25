@@ -4,8 +4,9 @@ import React, { Suspense } from 'react';
 import Particles from '../components/Particles';
 import Header from '../components/Header';
 import { ChevronDown, Crown, Headphones, TrendingUp, Copy } from 'lucide-react';
+import { VIP_PAYMENT_PORTAL_URL } from '@/lib/vip-portal';
 
-const VIP_CHECKOUT_URL = 'https://www.scxdashboards.com/vip';
+const VIP_CHECKOUT_URL = VIP_PAYMENT_PORTAL_URL;
 
 const VIP_RULES = [
   '15% Max Drawdown',

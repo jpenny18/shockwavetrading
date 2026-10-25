@@ -518,7 +518,7 @@ export default function AdminVIPPage() {
       </div>
 
       {/* Unlock VIP Section */}
-      <div className="bg-[#1A1A1A] rounded-xl p-4 md:p-6 border border-[#2F2F2F] mb-5 md:mb-8">
+      <div className="bg-black rounded-xl p-4 md:p-6 border border-white/10 mb-5 md:mb-8">
         <h2 className="text-base md:text-lg font-semibold text-white mb-2 md:mb-4 flex items-center gap-2">
           <Crown className="w-5 h-5 text-[#0FF1CE]" />
           Unlock VIP Portal for User
@@ -533,7 +533,7 @@ export default function AdminVIPPage() {
             value={userSearchEmail}
             onChange={(e) => setUserSearchEmail(e.target.value)}
             placeholder="user@example.com"
-            className="flex-1 bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+            className="flex-1 bg-black border border-white/10 rounded-lg px-4 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
           />
           <button
             onClick={searchUserByEmail}
@@ -550,7 +550,7 @@ export default function AdminVIPPage() {
         </div>
 
         {searchedUser && (
-          <div className="mt-4 p-4 bg-[#0D0D0D] rounded-lg border border-[#2F2F2F]">
+          <div className="mt-4 p-4 bg-black rounded-lg border border-white/10">
             <div className="mb-4">
               <p className="text-white font-medium">
                 {searchedUser.firstName} {searchedUser.lastName}
@@ -574,7 +574,7 @@ export default function AdminVIPPage() {
                   <select
                     value={allocationChoice}
                     onChange={(e) => setAllocationChoice(e.target.value)}
-                    className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-sm appearance-none focus:outline-none focus:border-[#0FF1CE]/50"
+                    className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm appearance-none focus:outline-none focus:border-[#0FF1CE]/50"
                   >
                     {ALLOCATION_PRESETS.map((preset) => (
                       <option key={preset.level} value={preset.level}>
@@ -595,7 +595,7 @@ export default function AdminVIPPage() {
                     value={customAllocation}
                     onChange={(e) => setCustomAllocation(e.target.value)}
                     placeholder="e.g. $5M"
-                    className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+                    className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
                   />
                 </div>
               )}
@@ -608,7 +608,7 @@ export default function AdminVIPPage() {
                   value={customPrice}
                   onChange={(e) => setCustomPrice(e.target.value)}
                   placeholder="e.g. 8999"
-                  className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+                  className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
                 />
                 <p className="text-[11px] text-gray-500 mt-1">The agreed price this user will pay</p>
               </div>
@@ -621,7 +621,7 @@ export default function AdminVIPPage() {
                   value={publicPrice}
                   onChange={(e) => setPublicPrice(e.target.value)}
                   placeholder="e.g. 14999"
-                  className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+                  className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
                 />
                 <p className="text-[11px] text-gray-500 mt-1">Shown crossed out on the user's offer</p>
               </div>
@@ -633,13 +633,13 @@ export default function AdminVIPPage() {
                   value={adminNotes}
                   onChange={(e) => setAdminNotes(e.target.value)}
                   placeholder="e.g. Agreed with Michael over Discord on Aug 15"
-                  className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+                  className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
                 />
               </div>
             </div>
 
             {/* Per-user additional terms */}
-            <div className="mb-4 p-3 bg-[#151515]/60 rounded-lg border border-[#2F2F2F]">
+            <div className="mb-4 p-3 bg-black/60 rounded-lg border border-white/10">
               <label className="flex items-start gap-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -675,7 +675,7 @@ export default function AdminVIPPage() {
                       value={customTermsTitle}
                       onChange={(e) => setCustomTermsTitle(e.target.value)}
                       placeholder="e.g. Corporate Allocation Terms"
-                      className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+                      className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
                     />
                   </div>
                   <div>
@@ -683,7 +683,7 @@ export default function AdminVIPPage() {
                     <textarea
                       value={customTermsContent}
                       onChange={(e) => setCustomTermsContent(e.target.value)}
-                      className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-xs leading-relaxed focus:outline-none focus:border-[#0FF1CE]/50 min-h-[260px]"
+                      className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-xs leading-relaxed focus:outline-none focus:border-[#0FF1CE]/50 min-h-[260px]"
                     />
                     <p className="text-[11px] text-gray-500 mt-1">
                       Prefilled from the $3M Corporate Allocation term sheet with this user's name. Edit names, allocation, fee and payout split per user — this exact text is what the user reads and electronically signs.
@@ -721,7 +721,7 @@ export default function AdminVIPPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by email, allocation or company..."
-              className="w-full bg-[#1A1A1A] border border-[#2F2F2F] rounded-lg pl-9 pr-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+              className="w-full bg-black border border-white/10 rounded-lg pl-9 pr-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
             />
           </div>
         </div>
@@ -730,7 +730,7 @@ export default function AdminVIPPage() {
           <select
             value={kybFilter}
             onChange={(e) => setKybFilter(e.target.value as any)}
-            className="w-full bg-[#1A1A1A] border border-[#2F2F2F] rounded-lg px-3 py-2.5 text-white text-sm appearance-none focus:outline-none focus:border-[#0FF1CE]/50"
+            className="w-full bg-black border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm appearance-none focus:outline-none focus:border-[#0FF1CE]/50"
           >
             <option value="all">All KYB Status</option>
             <option value="not_submitted">Not Submitted</option>
@@ -743,7 +743,7 @@ export default function AdminVIPPage() {
         </div>
 
         <div className="grid grid-cols-2 gap-2 md:contents">
-          <div className="bg-[#1A1A1A] rounded-lg p-3 md:p-4 border border-[#2F2F2F]">
+          <div className="bg-black rounded-lg p-3 md:p-4 border border-white/10">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-xs md:text-sm">Total</p>
@@ -753,7 +753,7 @@ export default function AdminVIPPage() {
             </div>
           </div>
 
-          <div className="bg-[#1A1A1A] rounded-lg p-3 md:p-4 border border-[#2F2F2F]">
+          <div className="bg-black rounded-lg p-3 md:p-4 border border-white/10">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-xs md:text-sm">Pending KYB</p>
@@ -770,11 +770,11 @@ export default function AdminVIPPage() {
       {/* Activations - Mobile cards */}
       <div className="md:hidden space-y-2">
         {filteredActivations.length === 0 ? (
-          <div className="bg-[#1A1A1A] rounded-xl border border-[#2F2F2F] px-4 py-8 text-center text-gray-400">
+          <div className="bg-black rounded-xl border border-white/10 px-4 py-8 text-center text-gray-400">
             No VIP activations found
           </div>
         ) : filteredActivations.map((activation) => (
-          <div key={activation.id} className="bg-[#1A1A1A] rounded-xl border border-[#2F2F2F] p-3">
+          <div key={activation.id} className="bg-black rounded-xl border border-white/10 p-3">
             <div className="flex items-start justify-between mb-2">
               <div className="min-w-0">
                 <p className="text-white font-medium text-sm truncate">{activation.userEmail}</p>
@@ -801,11 +801,11 @@ export default function AdminVIPPage() {
       </div>
 
       {/* Activations Table - Desktop */}
-      <div className="hidden md:block bg-[#1A1A1A] rounded-xl border border-[#2F2F2F] overflow-hidden">
+      <div className="hidden md:block bg-black rounded-xl border border-white/10 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[#2F2F2F]">
+              <tr className="border-b border-white/10">
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">User</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Allocation</th>
                 <th className="px-6 py-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Price</th>
@@ -825,7 +825,7 @@ export default function AdminVIPPage() {
                 </tr>
               ) : (
                 filteredActivations.map((activation) => (
-                  <tr key={activation.id} className="hover:bg-[#0D0D0D]/50 transition-colors">
+                  <tr key={activation.id} className="hover:bg-black transition-colors">
                     <td className="px-6 py-4">
                       <div>
                         <p className="text-white font-medium">{activation.userEmail}</p>
@@ -892,8 +892,8 @@ export default function AdminVIPPage() {
       {/* Manage Modal */}
       {selectedActivation && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#1A1A1A] rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-[#1A1A1A] border-b border-[#2F2F2F] p-6 z-10">
+          <div className="bg-black rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-black border-b border-white/10 p-6 z-10">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold text-white">Manage VIP Activation</h2>
                 <button
@@ -949,7 +949,7 @@ export default function AdminVIPPage() {
                   <DollarSign className="w-5 h-5 text-[#0FF1CE]" />
                   Offer
                 </h3>
-                <div className="bg-[#0D0D0D] rounded-lg p-4 border border-[#2F2F2F]">
+                <div className="bg-black rounded-lg p-4 border border-white/10">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                     <div>
                       <p className="text-sm text-gray-400 mb-1">Allocation</p>
@@ -966,7 +966,7 @@ export default function AdminVIPPage() {
                         value={editPrice}
                         onChange={(e) => setEditPrice(e.target.value)}
                         disabled={selectedActivation.paymentStatus === 'completed'}
-                        className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50 disabled:opacity-50"
+                        className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50 disabled:opacity-50"
                       />
                     </div>
                     <div>
@@ -977,7 +977,7 @@ export default function AdminVIPPage() {
                         value={editPublicPrice}
                         onChange={(e) => setEditPublicPrice(e.target.value)}
                         disabled={selectedActivation.paymentStatus === 'completed'}
-                        className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50 disabled:opacity-50"
+                        className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50 disabled:opacity-50"
                       />
                     </div>
                   </div>
@@ -1003,7 +1003,7 @@ export default function AdminVIPPage() {
                   <Bitcoin className="w-5 h-5 text-[#0FF1CE]" />
                   Payment
                 </h3>
-                <div className="bg-[#0D0D0D] rounded-lg p-4 border border-[#2F2F2F]">
+                <div className="bg-black rounded-lg p-4 border border-white/10">
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                     <div className="space-y-1">
                       <div>{getPaymentBadge(selectedActivation.paymentStatus)}</div>
@@ -1044,12 +1044,12 @@ export default function AdminVIPPage() {
                 </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {(selectedActivation.documents?.corporateDocs || []).length === 0 ? (
-                    <div className="bg-[#0D0D0D] rounded-lg p-4 border border-[#2F2F2F] md:col-span-2">
+                    <div className="bg-black rounded-lg p-4 border border-white/10 md:col-span-2">
                       <p className="text-gray-500 text-sm">No documents uploaded yet</p>
                     </div>
                   ) : (
                     (selectedActivation.documents.corporateDocs || []).map((docItem, index) => (
-                      <div key={index} className="bg-[#0D0D0D] rounded-lg p-4 border border-[#2F2F2F]">
+                      <div key={index} className="bg-black rounded-lg p-4 border border-white/10">
                         <p className="text-xs text-gray-500 mb-2 truncate">{docItem.fileName}</p>
                         <a
                           href={docItem.url}
@@ -1072,7 +1072,7 @@ export default function AdminVIPPage() {
                   <Shield className="w-5 h-5 text-[#0FF1CE]" />
                   Account Terms
                 </h3>
-                <div className="bg-[#0D0D0D] rounded-lg p-4 border border-[#2F2F2F] space-y-3">
+                <div className="bg-black rounded-lg p-4 border border-white/10 space-y-3">
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-sm text-gray-400">Funded Trader Agreement</span>
                     {selectedActivation.documents?.agreementSignedAt ? (
@@ -1090,7 +1090,7 @@ export default function AdminVIPPage() {
                     )}
                   </div>
                   {(selectedActivation.customTerms || selectedActivation.documents?.customTermsSignedAt) && (
-                    <div className="flex items-center justify-between gap-3 border-t border-[#2F2F2F] pt-3">
+                    <div className="flex items-center justify-between gap-3 border-t border-white/10 pt-3">
                       <span className="text-sm text-gray-400">
                         {selectedActivation.customTerms?.title || 'Additional Account Terms'}
                       </span>
@@ -1118,7 +1118,7 @@ export default function AdminVIPPage() {
                   <FileText className="w-5 h-5 text-[#0FF1CE]" />
                   Custom Terms (per-user)
                 </h3>
-                <div className="bg-[#0D0D0D] rounded-lg p-4 border border-[#2F2F2F] space-y-3">
+                <div className="bg-black rounded-lg p-4 border border-white/10 space-y-3">
                   {!selectedActivation.customTerms && (
                     <p className="text-xs text-gray-500">
                       No custom terms attached — this user only sees the standard Funded Trader Agreement. Add terms below to show an extra tab they must also accept.
@@ -1139,7 +1139,7 @@ export default function AdminVIPPage() {
                       value={editCustomTermsTitle}
                       onChange={(e) => setEditCustomTermsTitle(e.target.value)}
                       placeholder="e.g. Corporate Allocation Terms"
-                      className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+                      className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
                     />
                   </div>
                   <div>
@@ -1148,7 +1148,7 @@ export default function AdminVIPPage() {
                       value={editCustomTermsContent}
                       onChange={(e) => setEditCustomTermsContent(e.target.value)}
                       placeholder={'Paste or write the terms this user must accept.\nLeave empty and use "Load Template" to start from the $3M Corporate Allocation term sheet.'}
-                      className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-xs leading-relaxed focus:outline-none focus:border-[#0FF1CE]/50 min-h-[220px]"
+                      className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-xs leading-relaxed focus:outline-none focus:border-[#0FF1CE]/50 min-h-[220px]"
                     />
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -1166,7 +1166,7 @@ export default function AdminVIPPage() {
                           setEditCustomTermsContent(DEFAULT_CUSTOM_TERMS_CONTENT);
                           if (!editCustomTermsTitle.trim()) setEditCustomTermsTitle(DEFAULT_CUSTOM_TERMS_TITLE);
                         }}
-                        className="px-4 py-2 bg-[#151515] border border-[#2F2F2F] text-gray-300 rounded-lg text-sm font-medium hover:text-white transition-colors flex items-center gap-2"
+                        className="px-4 py-2 bg-black border border-white/10 text-gray-300 rounded-lg text-sm font-medium hover:text-white transition-colors flex items-center gap-2"
                       >
                         <FileText className="w-4 h-4" />
                         Load Template
@@ -1193,7 +1193,7 @@ export default function AdminVIPPage() {
                   value={reviewNotes}
                   onChange={(e) => setReviewNotes(e.target.value)}
                   placeholder="Add notes about this submission (visible to the user)..."
-                  className="w-full bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50 min-h-[100px]"
+                  className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50 min-h-[100px]"
                 />
               </div>
 
@@ -1254,7 +1254,7 @@ export default function AdminVIPPage() {
               </div>
 
               {/* Danger Zone */}
-              <div className="border-t border-[#2F2F2F] pt-4">
+              <div className="border-t border-white/10 pt-4">
                 <button
                   onClick={handleRevokeAccess}
                   disabled={isUpdating}

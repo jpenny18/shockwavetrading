@@ -1,13 +1,8 @@
 'use client';
 import React, { useState, useMemo } from 'react';
-import Particles from '../../components/Particles';
 import { 
   ChevronDown, 
-  ChevronUp, 
   Search,
-  HelpCircle,
-  ExternalLink,
-  BookOpen,
   ArrowRight
 } from 'lucide-react';
 
@@ -35,32 +30,21 @@ const FAQCard = ({ question, answer, isExpanded, onClick }: {
   onClick: () => void;
 }) => {
   return (
-    <div className={`bg-gradient-to-b from-[#151515] to-[#0D0D0D] rounded-xl border-2 overflow-hidden transition-all duration-300 ${
-      isExpanded 
-        ? 'border-[#0FF1CE] shadow-[0_0_20px_rgba(15,241,206,0.3)]' 
-        : 'border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50'
-    }`}>
-      <div 
-        className="p-4 cursor-pointer flex items-center justify-between gap-4 hover:bg-[#0FF1CE]/5 transition-colors"
+    <div className={`overflow-hidden rounded-2xl border bg-black ${isExpanded ? 'border-white/20' : 'border-white/10'}`}>
+      <button
+        type="button"
+        className="flex w-full items-center justify-between gap-4 p-4 text-left"
         onClick={onClick}
+        aria-expanded={isExpanded}
       >
-        <h3 className="text-white font-medium">{question}</h3>
-        <button>
-          {isExpanded ? 
-            <ChevronUp size={20} className="text-[#0FF1CE]" /> : 
-            <ChevronDown size={20} className="text-[#0FF1CE]" />
-          }
-        </button>
-      </div>
-      
-      <div className={`
-        overflow-hidden transition-all duration-300 ease-in-out
-        ${isExpanded ? 'max-h-[500px]' : 'max-h-0'}
-      `}>
-        <div className="p-4 pt-0 border-t border-[#2F2F2F]/50 text-gray-300 text-sm leading-relaxed whitespace-pre-line">
+        <h3 className="text-sm font-medium text-white">{question}</h3>
+        <ChevronDown size={16} className={`shrink-0 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+      </button>
+      {isExpanded && (
+        <div className="border-t border-white/10 px-4 py-3 text-sm leading-relaxed text-gray-400 whitespace-pre-line">
           {answer}
         </div>
-      </div>
+      )}
     </div>
   );
 };
@@ -284,140 +268,90 @@ This means your payout is earned from real market profits, not borrowed from the
       );
   }, [faqs, activeCategory, searchQuery]);
 
+  const chipClass = (active: boolean) =>
+    `rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+      active ? 'border-[#0FF1CE]/50 text-[#0FF1CE]' : 'border-white/10 text-gray-400 hover:text-white'
+    }`;
+
   return (
-    <div className="relative">
-      {/* Background Effects */}
-      <div className="absolute top-0 left-0 w-full h-full bg-[#0FF1CE]/[0.02] background-noise"></div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:w-3/4 h-full rounded-full bg-[#0FF1CE]/[0.03] blur-[150px] opacity-60"></div>
-      <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse"></div>
-      <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse delay-1000"></div>
-      <Particles />
-
-      {/* Content */}
-      <div className="relative z-10">
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent mb-6">Frequently Asked Questions</h1>
-
-        {/* Search and Categories */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <div className="lg:col-span-2">
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <Search size={18} className="text-gray-400" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search questions..."
-                className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg pl-10 pr-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="lg:col-span-1">
-            <a href="/dashboard/support" className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black font-bold py-3 rounded-xl hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300">
-              <HelpCircle size={18} />
-              <span>Need more help? Contact Support</span>
-            </a>
-          </div>
+    <div className="space-y-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-white">FAQ</h1>
+          <p className="mt-1 text-sm text-gray-400">{filteredFAQs.length} questions</p>
         </div>
-
-        {/* Category filters */}
-        <div className="flex flex-wrap gap-2 mb-8">
-          <button
-            onClick={() => setActiveCategory(null)}
-            className={`px-4 py-2 rounded-lg transition-colors ${
-              activeCategory === null
-                ? 'bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-black font-bold'
-                : 'bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F]/50 text-gray-400 hover:text-white hover:border-[#0FF1CE]/50'
-            }`}
-          >
-            All Categories
-          </button>
-          {categories.map(category => (
-            <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                activeCategory === category
-                  ? 'bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-black font-bold'
-                  : 'bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F]/50 text-gray-400 hover:text-white hover:border-[#0FF1CE]/50'
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-
-        {/* FAQ Items */}
-        <div className="space-y-4 mb-8">
-          {filteredFAQs.length > 0 ? (
-            filteredFAQs.map((faq, index) => (
-              <FAQCard
-                key={index}
-                question={faq.question}
-                answer={faq.answer}
-                isExpanded={expandedFAQ === index}
-                onClick={() => setExpandedFAQ(expandedFAQ === index ? null : index)}
-              />
-            ))
-          ) : (
-            <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-8 text-center">
-              <HelpCircle size={32} className="text-[#0FF1CE] mx-auto mb-4" />
-              <h3 className="text-white font-medium text-lg mb-2">No matching questions found</h3>
-              <p className="text-gray-400 mb-4">
-                Try adjusting your search or browse all categories.
-              </p>
-              <button 
-                onClick={() => { setSearchQuery(''); setActiveCategory(null); }}
-                className="text-[#0FF1CE] font-medium hover:underline"
-              >
-                Clear filters
-              </button>
-            </div>
-          )}
-        </div>
-
-        {/* Additional Resources */}
-        <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl p-6 border border-[#2F2F2F]/50">
-          <h2 className="text-lg font-bold text-white mb-4">Additional Resources</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <a href="/How-Shockwave-Operates" className="bg-gradient-to-b from-[#151515] to-[#0D0D0D] rounded-xl p-5 border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50 transition-all duration-300 flex flex-col">
-              <BookOpen size={24} className="text-[#0FF1CE] mb-3" />
-              <h3 className="text-white font-medium mb-2">How Shockwave Operates</h3>
-              <p className="text-gray-400 text-sm mb-4">Complete transparency on our business model, rules, and operations.</p>
-              <div className="flex items-center text-[#0FF1CE] mt-auto text-sm">
-                <span>Read more</span>
-                <ArrowRight size={14} className="ml-2" />
-              </div>
-            </a>
-            <a href="/dashboard/support" className="bg-gradient-to-b from-[#151515] to-[#0D0D0D] rounded-xl p-5 border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50 transition-all duration-300 flex flex-col">
-              <ExternalLink size={24} className="text-[#0FF1CE] mb-3" />
-              <h3 className="text-white font-medium mb-2">Contact Support</h3>
-              <p className="text-gray-400 text-sm mb-4">Get personalized help from our support team for specific questions.</p>
-              <div className="flex items-center text-[#0FF1CE] mt-auto text-sm">
-                <span>Get help</span>
-                <ArrowRight size={14} className="ml-2" />
-              </div>
-            </a>
-            <a href="/challenge" className="bg-gradient-to-b from-[#151515] to-[#0D0D0D] rounded-xl p-5 border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50 transition-all duration-300 flex flex-col">
-              <HelpCircle size={24} className="text-[#0FF1CE] mb-3" />
-              <h3 className="text-white font-medium mb-2">Start Your Challenge</h3>
-              <p className="text-gray-400 text-sm mb-4">Ready to begin? Choose your challenge type and start trading.</p>
-              <div className="flex items-center text-[#0FF1CE] mt-auto text-sm">
-                <span>Get started</span>
-                <ArrowRight size={14} className="ml-2" />
-              </div>
-            </a>
-          </div>
-        </div>
+        <a href="/dashboard/support" className="text-sm text-gray-300 hover:text-white">
+          Contact support
+        </a>
       </div>
 
-      <style jsx global>{`
-        .background-noise {
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-          opacity: 0.15;
-        }
-      `}</style>
+      <div className="relative">
+        <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+        <input
+          type="text"
+          placeholder="Search questions"
+          className="w-full rounded-xl border border-white/10 bg-black py-2.5 pl-9 pr-4 text-sm text-white outline-none focus:border-white/30"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        <button type="button" onClick={() => setActiveCategory(null)} className={chipClass(activeCategory === null)}>
+          All
+        </button>
+        {categories.map(category => (
+          <button
+            key={category}
+            type="button"
+            onClick={() => setActiveCategory(category)}
+            className={chipClass(activeCategory === category)}
+          >
+            {category}
+          </button>
+        ))}
+      </div>
+
+      <div className="space-y-2">
+        {filteredFAQs.length > 0 ? (
+          filteredFAQs.map((faq, index) => (
+            <FAQCard
+              key={`${faq.category}-${faq.question}`}
+              question={faq.question}
+              answer={faq.answer}
+              isExpanded={expandedFAQ === index}
+              onClick={() => setExpandedFAQ(expandedFAQ === index ? null : index)}
+            />
+          ))
+        ) : (
+          <div className="rounded-2xl border border-white/10 bg-black px-5 py-8 text-center">
+            <p className="text-sm text-white">No matching questions</p>
+            <button
+              type="button"
+              onClick={() => { setSearchQuery(''); setActiveCategory(null); }}
+              className="mt-3 text-sm text-gray-300 hover:text-white"
+            >
+              Clear filters
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        {[
+          { href: '/How-Shockwave-Operates', title: 'How Shockwave operates', text: 'Business model, rules, and operations.' },
+          { href: '/dashboard/support', title: 'Contact support', text: 'Help with a specific account or issue.' },
+          { href: '/challenge', title: 'Start a challenge', text: 'Choose a program and begin.' }
+        ].map((item) => (
+          <a key={item.href} href={item.href} className="rounded-2xl border border-white/10 bg-black p-4 transition-colors hover:border-white/20">
+            <h2 className="text-sm font-medium text-white">{item.title}</h2>
+            <p className="mt-1 text-xs text-gray-500">{item.text}</p>
+            <span className="mt-3 inline-flex items-center gap-1 text-xs text-gray-300">
+              Open <ArrowRight size={12} />
+            </span>
+          </a>
+        ))}
+      </div>
     </div>
   );
 } 

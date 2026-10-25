@@ -1,7 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import Particles from '../../components/Particles';
-import { Calculator, TrendingUp, Target, DollarSign, BarChart3, Globe, Zap } from 'lucide-react';
+import { Calculator, TrendingUp, Target, DollarSign, Globe } from 'lucide-react';
 
 // Type definitions
 type ForexPair = {
@@ -71,14 +70,14 @@ interface CalculatorCardProps {
 }
 
 const CalculatorCard = ({ icon, title, description, children, className = "" }: CalculatorCardProps) => (
-  <div className={`bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-4 sm:p-6 lg:p-8 hover:border-[#0FF1CE]/50 transition-all duration-300 ${className}`}>
-    <div className="flex items-center gap-3 mb-4 sm:mb-6">
-      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-[#0FF1CE]/20 to-[#0FF1CE]/10 flex items-center justify-center border border-[#0FF1CE]/20">
+  <div className={`rounded-2xl border border-white/10 bg-black p-4 sm:p-6 ${className}`}>
+    <div className="mb-5 flex items-start gap-3">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/10 text-gray-300">
         {icon}
       </div>
-      <div className="flex-1 min-w-0">
-        <h3 className="text-lg sm:text-xl font-bold text-white truncate">{title}</h3>
-        <p className="text-gray-400 text-sm sm:text-base">{description}</p>
+      <div className="min-w-0">
+        <h3 className="text-base font-semibold text-white">{title}</h3>
+        <p className="text-sm text-gray-500">{description}</p>
       </div>
     </div>
     {children}
@@ -111,7 +110,7 @@ const InputField = ({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all text-sm sm:text-base"
+        className="w-full rounded-lg border border-white/10 bg-[#0A0A0A] px-4 py-2.5 text-sm text-white outline-none focus:border-white/30"
       />
       {suffix && (
         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">
@@ -140,7 +139,7 @@ const SelectField = ({
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all text-sm sm:text-base"
+      className="w-full rounded-lg border border-white/10 bg-[#0A0A0A] px-4 py-2.5 text-sm text-white outline-none focus:border-white/30"
     >
       {options.map(option => (
         <option key={option.value} value={option.value} className="bg-[#1A1A1A] text-white">
@@ -162,9 +161,9 @@ const ResultField = ({
   className?: string;
   highlight?: boolean;
 }) => (
-  <div className={`bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl p-4 border border-[#0FF1CE]/20 ${highlight ? 'border-[#0FF1CE]/40 shadow-[0_0_20px_rgba(15,241,206,0.15)]' : ''} ${className}`} style={{ boxShadow: highlight ? undefined : '0 0 20px rgba(15, 241, 206, 0.1)' }}>
-    <div className="text-gray-400 text-xs sm:text-sm mb-1 uppercase tracking-wide">{label}</div>
-    <div className={`font-bold text-lg sm:text-xl ${highlight ? 'text-[#0FF1CE]' : 'text-white'}`}>{value}</div>
+  <div className={`rounded-xl border bg-[#0A0A0A] p-4 ${highlight ? 'border-white/25' : 'border-white/10'} ${className}`}>
+    <div className="mb-1 text-[11px] uppercase tracking-wide text-gray-500">{label}</div>
+    <div className="text-lg font-semibold text-white">{value}</div>
   </div>
 );
 
@@ -181,13 +180,9 @@ const TabButton = ({
   return (
     <button
       onClick={onClick}
-      className={`
-        flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-xl transition-all duration-300 text-sm sm:text-base font-medium
-        ${isActive 
-          ? 'bg-[#0FF1CE]/15 border border-[#0FF1CE] text-[#0FF1CE] shadow-[0_0_12px_rgba(15,241,206,0.35)]' 
-          : 'text-gray-400 hover:text-white hover:bg-[#1A1A1A]/50 border border-transparent'
-        }
-      `}
+      className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium ${
+        isActive ? 'bg-white text-black' : 'text-gray-400 hover:text-white'
+      }`}
     >
       <IconComponent className="w-4 h-4 sm:w-5 sm:h-5" />
       <span className="hidden sm:inline">{tab.label}</span>
@@ -518,13 +513,13 @@ export default function CalculatorsPage() {
                 suffix="lots"
                 step="0.01"
               />
-              <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl p-4 border border-[#2F2F2F]/50">
+              <div className="bg-black rounded-xl p-4 border border-white/10">
                 <div className="text-gray-400 text-xs mb-2">ASSET INFORMATION</div>
                 <div className="text-white text-sm space-y-1">
-                  <div>Asset: <span className="text-[#0FF1CE]">{selectedAsset}</span></div>
-                  <div>Pip Size: <span className="text-[#0FF1CE]">{getCurrentAssetData()?.pipSize}</span></div>
-                  {assetType === 'forex' && <div>Contract Size: <span className="text-[#0FF1CE]">100,000</span></div>}
-                  {assetType === 'commodities' && <div>Contract Size: <span className="text-[#0FF1CE]">{
+                  <div>Asset: <span className="text-white">{selectedAsset}</span></div>
+                  <div>Pip Size: <span className="text-white">{getCurrentAssetData()?.pipSize}</span></div>
+                  {assetType === 'forex' && <div>Contract Size: <span className="text-white">100,000</span></div>}
+                  {assetType === 'commodities' && <div>Contract Size: <span className="text-white">{
                     (() => {
                       const assetData = getCurrentAssetData();
                       return assetData && 'contractSize' in assetData ? assetData.contractSize : 1;
@@ -601,28 +596,16 @@ export default function CalculatorsPage() {
   };
 
   return (
-    <div className="relative min-h-screen">
-      {/* Background Effects */}
-      <div className="fixed inset-0 bg-[#0FF1CE]/[0.02] background-noise"></div>
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:w-3/4 h-full rounded-full bg-[#0FF1CE]/[0.03] blur-[150px] opacity-60"></div>
-      <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse"></div>
-      <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse delay-1000"></div>
-      <Particles />
-
-      {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Header */}
-        <div className="mb-8 sm:mb-12">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent mb-3">Trading Calculators</h1>
-          <p className="text-gray-400 text-sm sm:text-base lg:text-lg max-w-2xl">
-            Professional-grade calculators with asset-specific calculations for precise risk management and position sizing.
-          </p>
+    <div className="space-y-5">
+        <div>
+          <h1 className="text-2xl font-semibold text-white">Calculators</h1>
+          <p className="mt-1 text-sm text-gray-400">Position size, profit and loss, pip value, and compound growth.</p>
         </div>
 
         {/* Asset Selection */}
         <div className="mb-8">
           <CalculatorCard
-            icon={<Globe className="w-5 h-5 sm:w-6 sm:h-6 text-[#0FF1CE]" />}
+            icon={<Globe className="h-4 w-4" />}
             title="Asset Selection"
             description="Choose your asset type and specific instrument for accurate calculations"
           >
@@ -644,11 +627,11 @@ export default function CalculatorsPage() {
                 options={getAssetOptions()}
                 className="sm:col-span-1 lg:col-span-1"
               />
-              <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl p-4 border border-[#0FF1CE]/20" style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
-                <div className="text-[#0FF1CE] text-xs font-medium mb-1">SELECTED ASSET</div>
-                <div className="text-white font-bold text-lg">{selectedAsset}</div>
-                <div className="text-gray-400 text-xs mt-1">
-                  Pip Size: {getCurrentAssetData()?.pipSize || 'N/A'}
+              <div className="rounded-xl border border-white/10 bg-[#0A0A0A] p-4">
+                <div className="text-[11px] uppercase tracking-wide text-gray-500">Selected</div>
+                <div className="mt-1 text-lg font-semibold text-white">{selectedAsset}</div>
+                <div className="mt-1 text-xs text-gray-500">
+                  Pip size {getCurrentAssetData()?.pipSize || 'N/A'}
                 </div>
               </div>
             </div>
@@ -657,7 +640,7 @@ export default function CalculatorsPage() {
 
         {/* Tab Navigation */}
         <div className="mb-8">
-          <div className="flex flex-wrap gap-2 sm:gap-3 p-2 bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50">
+          <div className="flex flex-wrap gap-2">
             {CALCULATOR_TABS.map((tab) => (
               <TabButton
                 key={tab.id}
@@ -673,7 +656,7 @@ export default function CalculatorsPage() {
         <div className="mb-8">
           <CalculatorCard
             icon={React.createElement(CALCULATOR_TABS.find(tab => tab.id === activeTab)?.icon || Target, {
-              className: "w-5 h-5 sm:w-6 sm:h-6 text-[#0FF1CE]"
+              className: "h-4 w-4"
             })}
             title={CALCULATOR_TABS.find(tab => tab.id === activeTab)?.label || 'Calculator'}
             description={CALCULATOR_TABS.find(tab => tab.id === activeTab)?.description || 'Professional trading calculator'}
@@ -683,46 +666,9 @@ export default function CalculatorsPage() {
         </div>
 
         {/* Risk Disclaimer */}
-        <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-2xl p-4 sm:p-6">
-          <div className="flex items-start gap-3">
-            <Zap className="w-5 h-5 text-yellow-500 mt-0.5 flex-shrink-0" />
-            <div>
-              <h4 className="text-yellow-500 font-semibold mb-2">Important Disclaimer</h4>
-              <p className="text-yellow-200/80 text-sm sm:text-base leading-relaxed">
-                These calculators are educational tools designed to help with risk management and position sizing. 
-                Always verify calculations independently and consider real market conditions including spreads, slippage, 
-                commissions, and swap fees. Past performance does not guarantee future results. 
-                Trading involves substantial risk of loss.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <style jsx global>{`
-        .background-noise {
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-          opacity: 0.15;
-        }
-        
-        /* Scrollbar styling */
-        ::-webkit-scrollbar {
-          width: 6px;
-        }
-        
-        ::-webkit-scrollbar-track {
-          background: #0D0D0D;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-          background: #2F2F2F;
-          border-radius: 3px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-          background: #0FF1CE;
-        }
-      `}</style>
+        <p className="text-xs leading-relaxed text-gray-500">
+          These calculators are educational. Check the numbers yourself and account for spread, slippage, commission, and swap. Trading can lose money.
+        </p>
     </div>
   );
 } 

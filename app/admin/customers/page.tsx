@@ -566,7 +566,7 @@ export default function CustomersPage() {
             placeholder="Search customers..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+            className="pl-10 w-full bg-black border border-white/10 rounded-lg px-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
           />
         </div>
         <div className="grid grid-cols-2 md:contents gap-2">
@@ -574,7 +574,7 @@ export default function CustomersPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="appearance-none w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-3 md:px-4 py-2.5 pr-8 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+              className="appearance-none w-full bg-black border border-white/10 rounded-lg px-3 md:px-4 py-2.5 pr-8 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
             >
               <option value="all">All Statuses</option>
               <option value="active">Active</option>
@@ -588,7 +588,7 @@ export default function CustomersPage() {
             <select
               value={joinDatePreset}
               onChange={(e) => setJoinDatePreset(e.target.value as JoinDatePreset)}
-              className="appearance-none w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-3 md:px-4 py-2.5 pr-8 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+              className="appearance-none w-full bg-black border border-white/10 rounded-lg px-3 md:px-4 py-2.5 pr-8 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
             >
               <option value="all">Joined: All Time</option>
               <option value="24h">Joined: Last 24 Hours</option>
@@ -605,7 +605,7 @@ export default function CustomersPage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="appearance-none w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-3 md:px-4 py-2.5 pr-8 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+              className="appearance-none w-full bg-black border border-white/10 rounded-lg px-3 md:px-4 py-2.5 pr-8 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
             >
               <option value="newest">Newest</option>
               <option value="oldest">Oldest</option>
@@ -622,7 +622,7 @@ export default function CustomersPage() {
             <select
               value={itemsPerPage}
               onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
-              className="appearance-none w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-3 md:px-4 py-2.5 pr-8 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+              className="appearance-none w-full bg-black border border-white/10 rounded-lg px-3 md:px-4 py-2.5 pr-8 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
             >
               <option value={25}>25/page</option>
               <option value={50}>50/page</option>
@@ -644,7 +644,7 @@ export default function CustomersPage() {
                 value={customStartDate}
                 max={customEndDate || undefined}
                 onChange={(e) => setCustomStartDate(e.target.value)}
-                className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+                className="w-full bg-black border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
                 style={{ colorScheme: 'dark' }}
               />
             </div>
@@ -656,7 +656,7 @@ export default function CustomersPage() {
                 value={customEndDate}
                 min={customStartDate || undefined}
                 onChange={(e) => setCustomEndDate(e.target.value)}
-                className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+                className="w-full bg-black border border-white/10 rounded-lg px-3 py-2.5 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
                 style={{ colorScheme: 'dark' }}
               />
             </div>
@@ -665,7 +665,7 @@ export default function CustomersPage() {
       </div>
 
       {/* Customers List */}
-      <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 overflow-hidden">
+      <div className="bg-black rounded-xl border border-white/10 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <Loader className="h-8 w-8 text-[#0FF1CE] animate-spin" />
@@ -681,7 +681,7 @@ export default function CustomersPage() {
                 <p>No customers found</p>
               </div>
             ) : paginatedCustomers.map((customer) => (
-              <div key={customer.id} className="px-4 py-3 hover:bg-[#151515]/50 transition-colors">
+              <div key={customer.id} className="px-4 py-3 hover:bg-black/50 transition-colors">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-3 min-w-0">
                     <div className="w-9 h-9 rounded-full bg-[#0FF1CE]/20 flex items-center justify-center text-[#0FF1CE] flex-shrink-0">
@@ -699,7 +699,7 @@ export default function CustomersPage() {
                       <span className={`w-1.5 h-1.5 rounded-full mr-1 ${customer.status === 'active' ? 'bg-green-500' : 'bg-gray-400'}`}></span>
                       {customer.status === 'active' ? 'Active' : 'Inactive'}
                     </span>
-                    <button onClick={() => handleViewDetails(customer)} className="p-1.5 rounded hover:bg-[#2F2F2F] transition-colors">
+                    <button onClick={() => handleViewDetails(customer)} className="p-1.5 rounded hover:bg-white/5 transition-colors">
                       <Eye size={15} className="text-gray-400" />
                     </button>
                   </div>
@@ -718,7 +718,7 @@ export default function CustomersPage() {
           <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="text-left text-gray-400 text-sm border-b border-[#2F2F2F]">
+              <tr className="text-left text-gray-400 text-sm border-b border-white/10">
                 <th className="px-6 py-4 font-medium">Customer</th>
                 <th className="px-6 py-4 font-medium">Joined</th>
                 <th className="px-6 py-4 font-medium">
@@ -738,7 +738,7 @@ export default function CustomersPage() {
               {paginatedCustomers.map((customer) => (
                 <tr 
                   key={customer.id} 
-                  className="border-b border-[#2F2F2F] last:border-b-0 text-white hover:bg-[#151515] transition-colors"
+                  className="border-b border-white/10 last:border-b-0 text-white hover:bg-black transition-colors"
                 >
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -789,20 +789,20 @@ export default function CustomersPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleViewDetails(customer)}
-                        className="p-1.5 rounded hover:bg-[#2F2F2F] transition-colors"
+                        className="p-1.5 rounded hover:bg-white/5 transition-colors"
                         title="View Details"
                       >
                         <Eye size={16} className="text-gray-400 hover:text-white" />
                       </button>
                       <button
-                        className="p-1.5 rounded hover:bg-[#2F2F2F] transition-colors"
+                        className="p-1.5 rounded hover:bg-white/5 transition-colors"
                         title="Send Email"
                       >
                         <Mail size={16} className="text-gray-400 hover:text-white" />
                       </button>
                       <div className="relative">
                         <button
-                          className="p-1.5 rounded hover:bg-[#2F2F2F] transition-colors"
+                          className="p-1.5 rounded hover:bg-white/5 transition-colors"
                           title="More Actions"
                         >
                           <MoreHorizontal size={16} className="text-gray-400 hover:text-white" />
@@ -829,7 +829,7 @@ export default function CustomersPage() {
         
         {/* Pagination Controls */}
         {!loading && paginatedCustomers.length > 0 && (
-          <div className="px-4 md:px-6 py-4 border-t border-[#2F2F2F] flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="px-4 md:px-6 py-4 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="text-xs md:text-sm text-gray-400">
               Showing {startIndex + 1}–{Math.min(endIndex, totalItems)} of {totalItems}
             </div>
@@ -839,7 +839,7 @@ export default function CustomersPage() {
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className="p-2 rounded-lg bg-[#151515] border border-[#2F2F2F] text-gray-400 hover:text-white hover:border-[#0FF1CE]/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="p-2 rounded-lg bg-black border border-white/10 text-gray-400 hover:text-white hover:border-[#0FF1CE]/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronLeft size={16} />
                 </button>
@@ -854,7 +854,7 @@ export default function CustomersPage() {
                         className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                           currentPage === page
                             ? 'bg-[#0FF1CE] text-black'
-                            : 'bg-[#151515] border border-[#2F2F2F] text-gray-400 hover:text-white hover:border-[#0FF1CE]/50'
+                            : 'bg-black border border-white/10 text-gray-400 hover:text-white hover:border-[#0FF1CE]/50'
                         }`}
                       >
                         {page}
@@ -866,7 +866,7 @@ export default function CustomersPage() {
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className="p-2 rounded-lg bg-[#151515] border border-[#2F2F2F] text-gray-400 hover:text-white hover:border-[#0FF1CE]/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="p-2 rounded-lg bg-black border border-white/10 text-gray-400 hover:text-white hover:border-[#0FF1CE]/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   <ChevronRight size={16} />
                 </button>
@@ -880,13 +880,13 @@ export default function CustomersPage() {
       {selectedCustomer && (
         <div className={`fixed inset-0 bg-black/50 z-40 backdrop-blur-sm transition-opacity ${isDetailsOpen ? 'opacity-100' : 'opacity-0'}`}>
           <div 
-            className={`absolute right-0 top-0 h-full bg-[#0D0D0D] border-l border-[#2F2F2F] w-full max-w-2xl transform transition-transform duration-300 ${isDetailsOpen ? 'translate-x-0' : 'translate-x-full'}`}
+            className={`absolute right-0 top-0 h-full bg-black border-l border-white/10 w-full max-w-2xl transform transition-transform duration-300 ${isDetailsOpen ? 'translate-x-0' : 'translate-x-full'}`}
           >
-            <div className="flex items-center justify-between border-b border-[#2F2F2F] p-6">
+            <div className="flex items-center justify-between border-b border-white/10 p-6">
               <h2 className="text-xl font-bold text-white">Customer Details</h2>
               <button 
                 onClick={handleCloseDetails}
-                className="p-1.5 rounded-lg hover:bg-[#151515] text-gray-400 hover:text-white transition-colors"
+                className="p-1.5 rounded-lg hover:bg-black text-gray-400 hover:text-white transition-colors"
               >
                 <X size={20} />
               </button>
@@ -894,7 +894,7 @@ export default function CustomersPage() {
             
             <div className="p-6 h-[calc(100vh-73px)] overflow-y-auto">
               {/* Customer Info Card */}
-              <div className="bg-[#151515] rounded-xl p-6 mb-6">
+              <div className="bg-black rounded-xl p-6 mb-6">
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-16 h-16 rounded-full bg-[#0FF1CE]/20 flex items-center justify-center text-[#0FF1CE]">
                     <User size={32} />
@@ -906,13 +906,13 @@ export default function CustomersPage() {
                           value={editForm.firstName}
                           onChange={(e) => setEditForm((current) => ({ ...current, firstName: e.target.value }))}
                           placeholder="First name"
-                          className="bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+                          className="bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
                         />
                         <input
                           value={editForm.lastName}
                           onChange={(e) => setEditForm((current) => ({ ...current, lastName: e.target.value }))}
                           placeholder="Last name"
-                          className="bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+                          className="bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
                         />
                       </div>
                     ) : (
@@ -946,7 +946,7 @@ export default function CustomersPage() {
                       <input
                         value={editForm.phone}
                         onChange={(e) => setEditForm((current) => ({ ...current, phone: e.target.value }))}
-                        className="w-full bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+                        className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
                       />
                     ) : (
                       <div className="text-white">{selectedCustomer.phone || 'Not provided'}</div>
@@ -958,7 +958,7 @@ export default function CustomersPage() {
                       <input
                         value={editForm.country}
                         onChange={(e) => setEditForm((current) => ({ ...current, country: e.target.value }))}
-                        className="w-full bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+                        className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
                       />
                     ) : (
                       <div className="text-white">{selectedCustomer.country || 'Not provided'}</div>
@@ -994,14 +994,14 @@ export default function CustomersPage() {
                         type="button"
                         onClick={saveCustomerEdits}
                         disabled={savingCustomer}
-                        className="flex items-center gap-2 bg-[#151515] border border-[#0FF1CE]/40 text-white px-4 py-2 rounded-lg font-medium hover:bg-[#2F2F2F] transition-colors disabled:opacity-50"
+                        className="flex items-center gap-2 bg-black border border-[#0FF1CE]/40 text-white px-4 py-2 rounded-lg font-medium hover:bg-white/5 transition-colors disabled:opacity-50"
                       >
                         <span>{savingCustomer ? 'Saving...' : 'Save'}</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => setIsEditingCustomer(false)}
-                        className="flex items-center gap-2 bg-[#151515] border border-[#2F2F2F] text-white px-4 py-2 rounded-lg font-medium hover:bg-[#2F2F2F] transition-colors"
+                        className="flex items-center gap-2 bg-black border border-white/10 text-white px-4 py-2 rounded-lg font-medium hover:bg-white/5 transition-colors"
                       >
                         <span>Cancel</span>
                       </button>
@@ -1010,7 +1010,7 @@ export default function CustomersPage() {
                     <button
                       type="button"
                       onClick={startEditingCustomer}
-                      className="flex items-center gap-2 bg-[#151515] border border-[#2F2F2F] text-white px-4 py-2 rounded-lg font-medium hover:bg-[#2F2F2F] transition-colors"
+                      className="flex items-center gap-2 bg-black border border-white/10 text-white px-4 py-2 rounded-lg font-medium hover:bg-white/5 transition-colors"
                     >
                       <Edit size={16} />
                       <span>Edit Customer</span>
@@ -1021,15 +1021,15 @@ export default function CustomersPage() {
               
               {/* Customer Stats */}
               <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="bg-[#151515] rounded-xl p-5">
+                <div className="bg-black rounded-xl p-5">
                   <div className="text-sm text-gray-400 mb-1">Total Spent</div>
                   <div className="text-2xl font-semibold text-white">${(selectedCustomer.actualTotalSpent ?? 0).toLocaleString()}</div>
                 </div>
-                <div className="bg-[#151515] rounded-xl p-5">
+                <div className="bg-black rounded-xl p-5">
                   <div className="text-sm text-gray-400 mb-1">Orders</div>
                   <div className="text-2xl font-semibold text-white">{selectedCustomer.actualOrderCount ?? 0}</div>
                 </div>
-                <div className="bg-[#151515] rounded-xl p-5">
+                <div className="bg-black rounded-xl p-5">
                   <div className="text-sm text-gray-400 mb-1">Avg. Order Value</div>
                   <div className="text-2xl font-semibold text-white">
                     ${selectedCustomer.actualOrderCount && selectedCustomer.actualOrderCount > 0 ? Math.round((selectedCustomer.actualTotalSpent || 0) / selectedCustomer.actualOrderCount).toLocaleString() : 0}
@@ -1038,7 +1038,7 @@ export default function CustomersPage() {
               </div>
               
               {/* Notes Section */}
-              <div className="bg-[#151515] rounded-xl p-6 mb-6">
+              <div className="bg-black rounded-xl p-6 mb-6">
                 <h3 className="text-lg font-semibold text-white mb-4">Notes</h3>
                 <textarea
                   value={selectedCustomer.notes || ''}
@@ -1055,7 +1055,7 @@ export default function CustomersPage() {
                       handleUpdateNotes(selectedCustomer.id, selectedCustomer.notes || '');
                     }
                   }}
-                  className="w-full bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg p-3 text-white min-h-24 resize-none focus:outline-none focus:border-[#0FF1CE]/50"
+                  className="w-full bg-black border border-white/10 rounded-lg p-3 text-white min-h-24 resize-none focus:outline-none focus:border-[#0FF1CE]/50"
                   placeholder="Add notes about this customer..."
                 />
                 <p className={`text-xs mt-2 ${notesStatus === 'error' ? 'text-red-400' : 'text-gray-500'}`}>

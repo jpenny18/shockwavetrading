@@ -83,7 +83,7 @@ const MetricCard = ({ title, value, icon: Icon, format = 'number', prefix = '', 
   };
 
   return (
-    <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl border border-[#0FF1CE]/20 p-3 sm:p-4 hover:border-[#0FF1CE]/50 transition-all duration-300" style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
+    <div className="bg-black rounded-xl border border-[#0FF1CE]/20 p-3 sm:p-4 hover:border-[#0FF1CE]/50 transition-all duration-300">
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <p className="text-gray-400 text-xs mb-1">{title}</p>
@@ -153,7 +153,7 @@ const TradingObjectivesTable = ({ objectives, accountStatus, riskEvents = [] }: 
   const showRiskAccordion = hasRecentBreach || recentRiskEvents.length > 0;
 
   return (
-    <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 sm:p-6">
+    <div className="bg-black rounded-xl border border-white/10 p-4 sm:p-6">
       <h3 className="text-lg font-semibold text-white mb-4">Trading Objectives</h3>
 
       <div className="divide-y divide-[#2F2F2F]/50">
@@ -182,7 +182,7 @@ const TradingObjectivesTable = ({ objectives, accountStatus, riskEvents = [] }: 
       </div>
 
       {showRiskAccordion && (
-        <div className="mt-4 pt-3 border-t border-[#2F2F2F]/50">
+        <div className="mt-4 pt-3 border-t border-white/10">
           <button
             type="button"
             onClick={() => setRiskOpen(!riskOpen)}
@@ -306,7 +306,7 @@ const TradingJournal = ({ trades }: { trades: TradeData[] }) => {
   };
   
   return (
-    <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 sm:p-6">
+    <div className="bg-black rounded-xl border border-white/10 p-4 sm:p-6">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
@@ -349,7 +349,7 @@ const TradingJournal = ({ trades }: { trades: TradeData[] }) => {
       )}
       
       {isOpen && totalPages > 1 && (
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#2F2F2F]/50">
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-white/10">
           <p className="text-xs text-gray-500">
             {startIndex + 1}–{Math.min(endIndex, trades.length)} of {trades.length}
           </p>
@@ -623,7 +623,7 @@ export default function AccountDetailsPage() {
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-red-500/30 p-8 max-w-md">
+        <div className="bg-black rounded-xl border border-red-500/30 p-8 max-w-md">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-white text-center mb-2">Error Loading Metrics</h2>
           <p className="text-gray-400 text-center mb-4">{error}</p>
@@ -646,7 +646,7 @@ export default function AccountDetailsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent">Account Metrics</h1>
+          <h1 className="text-2xl font-semibold text-white">Account Metrics</h1>
           {lastUpdate && (
             <p className="text-sm text-gray-400 mt-1">
               Last updated {formatDistanceToNow(lastUpdate, { addSuffix: true })}
@@ -703,7 +703,7 @@ export default function AccountDetailsPage() {
 
           {/* Account Information - 40% width */}
           <div className="lg:col-span-2">
-            <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 sm:p-6">
+            <div className="bg-black rounded-xl border border-white/10 p-4 sm:p-6">
               <button
                 type="button"
                 onClick={() => setAccountInfoOpen(!accountInfoOpen)}
@@ -775,7 +775,7 @@ export default function AccountDetailsPage() {
 
         {/* Row 2: Key Metrics Grid - 100% width */}
         <div>
-          <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 sm:p-6">
+          <div className="bg-black rounded-xl border border-white/10 p-4 sm:p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Statistics</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 lg:gap-4">
             <MetricCard title="Balance" value={metrics?.balance || 0} icon={DollarSign} format="currency" />
@@ -794,7 +794,7 @@ export default function AccountDetailsPage() {
 
         {/* Row 3: Equity Growth Chart - 100% width */}
         <div>
-          <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6">
+          <div className="bg-black rounded-xl border border-white/10 p-6">
             <h3 className="text-lg font-semibold text-white mb-4">Equity Growth</h3>
             {chartData.length > 0 ? (
               <ApexChart

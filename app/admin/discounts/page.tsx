@@ -239,7 +239,7 @@ export default function DiscountsPage() {
       </div>
 
       {isCreating && (
-        <div className="bg-[#0D0D0D] rounded-xl p-6 border border-[#2F2F2F] mb-6">
+        <div className="bg-black rounded-xl p-6 border border-white/10 mb-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -250,7 +250,7 @@ export default function DiscountsPage() {
                     type="text"
                     value={formData.code}
                     onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                    className="pl-10 w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                    className="pl-10 w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                     placeholder="SUMMER2024"
                   />
                 </div>
@@ -264,7 +264,7 @@ export default function DiscountsPage() {
                 <select
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value as 'percentage' | 'fixed' })}
-                  className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                  className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                 >
                   <option value="percentage">Percentage</option>
                   <option value="fixed">Fixed Amount</option>
@@ -283,7 +283,7 @@ export default function DiscountsPage() {
                     type="number"
                     value={formData.value}
                     onChange={(e) => setFormData({ ...formData, value: Number(e.target.value) })}
-                    className="pl-10 w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                    className="pl-10 w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                     placeholder={formData.type === 'percentage' ? '10' : '25'}
                     min={0}
                     step={formData.type === 'percentage' ? 1 : 0.01}
@@ -302,7 +302,7 @@ export default function DiscountsPage() {
                     type="number"
                     value={formData.usageLimit || ''}
                     onChange={(e) => setFormData({ ...formData, usageLimit: e.target.value ? Number(e.target.value) : null })}
-                    className="pl-10 w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                    className="pl-10 w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                     placeholder="No limit"
                     min={1}
                   />
@@ -320,7 +320,7 @@ export default function DiscountsPage() {
                     type="date"
                     value={formData.expiresAt}
                     onChange={(e) => setFormData({ ...formData, expiresAt: e.target.value })}
-                    className="pl-10 w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                    className="pl-10 w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                   />
                 </div>
               </div>
@@ -333,7 +333,7 @@ export default function DiscountsPage() {
                     onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-[#151515] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0FF1CE]"></div>
+                  <div className="w-11 h-6 bg-black peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0FF1CE]"></div>
                   <span className="ml-3 text-sm font-medium text-gray-400">Active</span>
                 </label>
               </div>
@@ -361,12 +361,12 @@ export default function DiscountsPage() {
       {/* Mobile card view */}
       <div className="md:hidden space-y-2">
         {discounts.length === 0 ? (
-          <div className="bg-[#0D0D0D]/80 rounded-xl border border-[#2F2F2F]/50 px-4 py-10 text-center text-gray-500">
+          <div className="bg-black rounded-xl border border-white/10 px-4 py-10 text-center text-gray-500">
             <Tag className="mx-auto mb-2" size={24} />
             <p>No discount codes found</p>
           </div>
         ) : discounts.map((discount) => (
-          <div key={discount.id} className="bg-[#0D0D0D]/80 rounded-xl border border-[#2F2F2F]/50 p-3">
+          <div key={discount.id} className="bg-black rounded-xl border border-white/10 p-3">
             <div className="flex items-start justify-between mb-2">
               <div>
                 <span className="text-white font-bold text-sm font-mono">{discount.code}</span>
@@ -386,8 +386,8 @@ export default function DiscountsPage() {
                 Used {discount.usageCount}/{discount.usageLimit || '∞'} · Expires {discount.expiresAt ? discount.expiresAt.toDate().toLocaleDateString() : 'Never'}
               </div>
               <div className="flex items-center gap-1">
-                <button onClick={() => handleEdit(discount)} className="p-1.5 rounded hover:bg-[#2F2F2F] transition-colors"><Edit size={14} className="text-gray-400" /></button>
-                <button onClick={() => handleDelete(discount.id)} className="p-1.5 rounded hover:bg-[#2F2F2F] transition-colors"><Trash2 size={14} className="text-gray-400" /></button>
+                <button onClick={() => handleEdit(discount)} className="p-1.5 rounded hover:bg-white/5 transition-colors"><Edit size={14} className="text-gray-400" /></button>
+                <button onClick={() => handleDelete(discount.id)} className="p-1.5 rounded hover:bg-white/5 transition-colors"><Trash2 size={14} className="text-gray-400" /></button>
               </div>
             </div>
           </div>
@@ -395,11 +395,11 @@ export default function DiscountsPage() {
       </div>
 
       {/* Desktop table */}
-      <div className="hidden md:block bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 overflow-hidden">
+      <div className="hidden md:block bg-black rounded-xl border border-white/10 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="text-left text-gray-400 text-sm border-b border-[#2F2F2F]">
+              <tr className="text-left text-gray-400 text-sm border-b border-white/10">
                 <th className="px-6 py-4 font-medium">Code</th>
                 <th className="px-6 py-4 font-medium">Type</th>
                 <th className="px-6 py-4 font-medium">Value</th>
@@ -413,7 +413,7 @@ export default function DiscountsPage() {
               {discounts.map((discount) => (
                 <tr 
                   key={discount.id}
-                  className="border-b border-[#2F2F2F] last:border-b-0 text-white hover:bg-[#151515] transition-colors"
+                  className="border-b border-white/10 last:border-b-0 text-white hover:bg-black transition-colors"
                 >
                   <td className="px-6 py-4 font-medium">{discount.code}</td>
                   <td className="px-6 py-4 capitalize">{discount.type}</td>
@@ -452,14 +452,14 @@ export default function DiscountsPage() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleEdit(discount)}
-                        className="p-1.5 rounded hover:bg-[#2F2F2F] transition-colors"
+                        className="p-1.5 rounded hover:bg-white/5 transition-colors"
                         title="Edit"
                       >
                         <Edit size={16} className="text-gray-400 hover:text-white" />
                       </button>
                       <button
                         onClick={() => handleDelete(discount.id)}
-                        className="p-1.5 rounded hover:bg-[#2F2F2F] transition-colors"
+                        className="p-1.5 rounded hover:bg-white/5 transition-colors"
                         title="Delete"
                       >
                         <Trash2 size={16} className="text-gray-400 hover:text-white" />

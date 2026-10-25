@@ -153,7 +153,7 @@ export default function PulseManagementPage() {
             <button
               key={f}
               onClick={() => setFilter(f as any)}
-              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm whitespace-nowrap capitalize ${filter === f ? 'bg-[#0FF1CE] text-black font-medium' : 'bg-[#1A1A1A] text-white'}`}
+              className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-sm whitespace-nowrap capitalize ${filter === f ? 'bg-[#0FF1CE] text-black font-medium' : 'bg-black text-white'}`}
             >
               {f === 'all' ? 'All Polls' : f}
             </button>
@@ -171,7 +171,7 @@ export default function PulseManagementPage() {
         {visiblePolls.length === 0 ? (
           <div className="text-gray-400 text-sm">No polls in this view.</div>
         ) : visiblePolls.map((poll) => (
-          <div key={poll.id} className="bg-[#0D0D0D] rounded-xl p-4 md:p-6 border border-[#2F2F2F]">
+          <div key={poll.id} className="bg-black rounded-xl p-4 md:p-6 border border-white/10">
             <div className="flex justify-between items-start mb-3 md:mb-4 gap-3">
               <div className="min-w-0">
                 <h3 className="text-base md:text-xl font-bold text-white mb-1 md:mb-2">{poll.title}</h3>
@@ -183,28 +183,28 @@ export default function PulseManagementPage() {
               <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
                 <button
                   onClick={() => handleUpdatePollStatus(poll.id, 'active')}
-                  className={`p-2 rounded-lg ${poll.status === 'active' ? 'text-[#0FF1CE]' : 'text-gray-400'} hover:bg-[#1A1A1A]`}
+                  className={`p-2 rounded-lg ${poll.status === 'active' ? 'text-[#0FF1CE]' : 'text-gray-400'} hover:bg-black`}
                   title="Mark as Active"
                 >
                   <CheckCircle size={20} />
                 </button>
                 <button
                   onClick={() => handleUpdatePollStatus(poll.id, 'archived')}
-                  className={`p-2 rounded-lg ${poll.status === 'archived' ? 'text-yellow-500' : 'text-gray-400'} hover:bg-[#1A1A1A]`}
+                  className={`p-2 rounded-lg ${poll.status === 'archived' ? 'text-yellow-500' : 'text-gray-400'} hover:bg-black`}
                   title="Archive Poll"
                 >
                   <AlertCircle size={20} />
                 </button>
                 <button
                   onClick={() => handleUpdatePollStatus(poll.id, 'flagged')}
-                  className={`p-2 rounded-lg ${poll.status === 'flagged' ? 'text-red-500' : 'text-gray-400'} hover:bg-[#1A1A1A]`}
+                  className={`p-2 rounded-lg ${poll.status === 'flagged' ? 'text-red-500' : 'text-gray-400'} hover:bg-black`}
                   title="Flag Poll"
                 >
                   <XCircle size={20} />
                 </button>
                 <button
                   onClick={() => handleDeletePoll(poll.id)}
-                  className="p-2 rounded-lg text-red-500 hover:bg-[#1A1A1A]"
+                  className="p-2 rounded-lg text-red-500 hover:bg-black"
                   title="Delete Poll"
                 >
                   <Trash2 size={20} />
@@ -228,7 +228,7 @@ export default function PulseManagementPage() {
                 {comments
                   .filter(comment => comment.pollId === poll.id)
                   .map(comment => (
-                    <div key={comment.id} className="bg-[#1A1A1A] rounded-lg p-3 flex justify-between items-start gap-3">
+                    <div key={comment.id} className="bg-black rounded-lg p-3 flex justify-between items-start gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
                           <span className="text-[#0FF1CE] text-sm font-medium">{comment.username}</span>
@@ -244,14 +244,14 @@ export default function PulseManagementPage() {
                       <div className="flex items-center gap-1 shrink-0">
                         <button
                           onClick={() => handleToggleCommentVisibility(comment.id, comment.status || 'active')}
-                          className={`p-1.5 rounded-lg ${comment.status === 'hidden' ? 'text-yellow-500' : 'text-[#0FF1CE]'} hover:bg-[#0D0D0D]`}
+                          className={`p-1.5 rounded-lg ${comment.status === 'hidden' ? 'text-yellow-500' : 'text-[#0FF1CE]'} hover:bg-black`}
                           title={comment.status === 'hidden' ? 'Show Comment' : 'Hide Comment'}
                         >
                           {comment.status === 'hidden' ? <AlertCircle size={15} /> : <CheckCircle size={15} />}
                         </button>
                         <button
                           onClick={() => handleDeleteComment(comment.id)}
-                          className="p-1.5 rounded-lg text-red-500 hover:bg-[#0D0D0D]"
+                          className="p-1.5 rounded-lg text-red-500 hover:bg-black"
                           title="Delete Comment"
                         >
                           <Trash2 size={15} />

@@ -63,7 +63,7 @@ export default function FeatureTogglesPage() {
         <button
           onClick={loadSettings}
           disabled={loading || saving}
-          className="flex items-center gap-2 bg-[#151515] border border-[#2F2F2F] text-white px-3 md:px-4 py-2 rounded-lg font-medium hover:border-[#0FF1CE]/50 transition-colors text-sm w-full sm:w-auto justify-center sm:justify-start disabled:opacity-50"
+          className="flex items-center gap-2 bg-black border border-white/10 text-white px-3 md:px-4 py-2 rounded-lg font-medium hover:border-[#0FF1CE]/50 transition-colors text-sm w-full sm:w-auto justify-center sm:justify-start disabled:opacity-50"
         >
           <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
           <span>Refresh</span>
@@ -84,7 +84,7 @@ export default function FeatureTogglesPage() {
         </div>
       )}
 
-      <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6">
+      <div className="bg-black rounded-xl border border-white/10 p-6">
         <div className="flex items-center gap-3 mb-6">
           <div className="w-10 h-10 rounded-full bg-[#0FF1CE]/20 flex items-center justify-center text-[#0FF1CE]">
             <ToggleLeft size={20} />
@@ -117,7 +117,7 @@ export default function FeatureTogglesPage() {
                 onChange={handleToggle}
                 disabled={saving}
               />
-              <div className="w-11 h-6 bg-[#151515] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-gray-400 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0FF1CE]"></div>
+              <div className="w-11 h-6 bg-black rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-gray-400 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0FF1CE]"></div>
             </label>
           </div>
         )}

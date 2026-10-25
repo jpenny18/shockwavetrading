@@ -287,7 +287,7 @@ export default function AdminWithdrawalsPage() {
           { label: 'Completed', value: stats.completed, color: 'text-green-400', Icon: CheckCircle, iconColor: 'text-green-400' },
           { label: 'Rejected', value: stats.rejected, color: 'text-red-400', Icon: X, iconColor: 'text-red-400' },
         ].map(({ label, value, color, Icon, iconColor }) => (
-          <div key={label} className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-2.5 md:p-4">
+          <div key={label} className="bg-black rounded-xl border border-white/10 p-2.5 md:p-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-[10px] md:text-sm truncate">{label}</p>
@@ -308,14 +308,14 @@ export default function AdminWithdrawalsPage() {
             placeholder="Search by email or user ID..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full bg-[#0D0D0D]/80 backdrop-blur-sm text-white pl-9 pr-4 py-2 text-sm rounded-lg border border-[#2F2F2F]/50 focus:border-[#0FF1CE]/50 focus:outline-none"
+            className="w-full bg-black text-white pl-9 pr-4 py-2 text-sm rounded-lg border border-white/10 focus:border-[#0FF1CE]/50 focus:outline-none"
           />
         </div>
         <div className="flex gap-2">
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as any)}
-            className="flex-1 sm:flex-none bg-[#0D0D0D]/80 backdrop-blur-sm text-white px-3 py-2 text-sm rounded-lg border border-[#2F2F2F]/50 focus:border-[#0FF1CE]/50 focus:outline-none"
+            className="flex-1 sm:flex-none bg-black text-white px-3 py-2 text-sm rounded-lg border border-white/10 focus:border-[#0FF1CE]/50 focus:outline-none"
           >
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
@@ -337,11 +337,11 @@ export default function AdminWithdrawalsPage() {
       {/* Withdrawals - Mobile cards */}
       <div className="md:hidden space-y-2">
         {filteredWithdrawals.length === 0 ? (
-          <div className="bg-[#0D0D0D]/80 rounded-xl border border-[#2F2F2F]/50 py-8 text-center text-gray-400">
+          <div className="bg-black rounded-xl border border-white/10 py-8 text-center text-gray-400">
             No withdrawal requests found
           </div>
         ) : filteredWithdrawals.map((withdrawal) => (
-          <div key={withdrawal.id} className="bg-[#0D0D0D]/80 rounded-xl border border-[#2F2F2F]/50 p-3">
+          <div key={withdrawal.id} className="bg-black rounded-xl border border-white/10 p-3">
             <div className="flex items-start justify-between mb-2">
               <div>
                 <p className="text-white font-medium text-sm">{withdrawal.userEmail}</p>
@@ -365,11 +365,11 @@ export default function AdminWithdrawalsPage() {
       </div>
 
       {/* Withdrawals Table - Desktop */}
-      <div className="hidden md:block bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 overflow-hidden">
+      <div className="hidden md:block bg-black rounded-xl border border-white/10 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[#2F2F2F]">
+              <tr className="border-b border-white/10">
                 <th className="text-left py-4 px-6 text-sm font-medium text-gray-400">User</th>
                 <th className="text-left py-4 px-6 text-sm font-medium text-gray-400">Amount</th>
                 <th className="text-left py-4 px-6 text-sm font-medium text-gray-400">Method</th>
@@ -387,7 +387,7 @@ export default function AdminWithdrawalsPage() {
                 </tr>
               ) : (
                 filteredWithdrawals.map((withdrawal) => (
-                  <tr key={withdrawal.id} className="border-b border-[#2F2F2F]/50 hover:bg-white/5">
+                  <tr key={withdrawal.id} className="border-b border-white/10 hover:bg-white/5">
                     <td className="py-4 px-6">
                       <div>
                         <p className="text-white font-medium">{withdrawal.userEmail}</p>
@@ -435,7 +435,7 @@ export default function AdminWithdrawalsPage() {
       {/* Enable Withdrawal Modal */}
       {showEnableModal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0D0D0D] rounded-xl border border-[#2F2F2F] p-6 max-w-md w-full">
+          <div className="bg-black rounded-xl border border-white/10 p-6 max-w-md w-full">
             <h3 className="text-xl font-bold text-white mb-4">Enable Withdrawal</h3>
             
             <div className="space-y-4">
@@ -454,14 +454,14 @@ export default function AdminWithdrawalsPage() {
                       }
                     }}
                     placeholder="Search by email or name..."
-                    className="w-full bg-[#151515] text-white pl-10 pr-3 py-2 rounded-lg border border-[#2F2F2F] focus:border-[#0FF1CE]/50 focus:outline-none"
+                    className="w-full bg-black text-white pl-10 pr-3 py-2 rounded-lg border border-white/10 focus:border-[#0FF1CE]/50 focus:outline-none"
                     disabled={searching}
                   />
                 </div>
                 
                 {/* User dropdown */}
                 {showUserDropdown && filteredUsers.length > 0 && (
-                  <div className="absolute z-10 w-full mt-1 bg-[#151515] border border-[#2F2F2F] rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <div className="absolute z-10 w-full mt-1 bg-black border border-white/10 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                     {filteredUsers.map((user) => {
                       const hasExistingWithdrawal = withdrawals.some(w => w.userId === user.uid);
                       return (
@@ -469,7 +469,7 @@ export default function AdminWithdrawalsPage() {
                           key={user.uid}
                           type="button"
                           onClick={() => handleSelectUser(user)}
-                          className="w-full text-left px-4 py-3 hover:bg-[#2F2F2F]/50 transition-colors border-b border-[#2F2F2F]/30 last:border-0"
+                          className="w-full text-left px-4 py-3 hover:bg-white/5/50 transition-colors border-b border-white/10/30 last:border-0"
                           disabled={searching}
                         >
                           <div className="flex items-center justify-between">
@@ -499,7 +499,7 @@ export default function AdminWithdrawalsPage() {
                 )}
                 
                 {showUserDropdown && filteredUsers.length === 0 && enableEmail.trim() && (
-                  <div className="absolute z-10 w-full mt-1 bg-[#151515] border border-[#2F2F2F] rounded-lg shadow-lg p-4">
+                  <div className="absolute z-10 w-full mt-1 bg-black border border-white/10 rounded-lg shadow-lg p-4">
                     <p className="text-gray-400 text-sm text-center">No users found</p>
                   </div>
                 )}
@@ -507,7 +507,7 @@ export default function AdminWithdrawalsPage() {
 
               {selectedUser && (
                 <>
-                  <div className="bg-[#151515] rounded-lg p-3 border border-[#0FF1CE]/30">
+                  <div className="bg-black rounded-lg p-3 border border-[#0FF1CE]/30">
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
                         <p className="text-green-400 text-sm mb-1">Selected User:</p>
@@ -547,7 +547,7 @@ export default function AdminWithdrawalsPage() {
                       placeholder="0.00"
                       step="0.01"
                       min="0"
-                      className="w-full bg-[#151515] text-white px-3 py-2 rounded-lg border border-[#2F2F2F] focus:border-[#0FF1CE]/50 focus:outline-none"
+                      className="w-full bg-black text-white px-3 py-2 rounded-lg border border-white/10 focus:border-[#0FF1CE]/50 focus:outline-none"
                     />
                   </div>
 
@@ -561,12 +561,12 @@ export default function AdminWithdrawalsPage() {
                       min="0"
                       max="100"
                       step="1"
-                      className="w-full bg-[#151515] text-white px-3 py-2 rounded-lg border border-[#2F2F2F] focus:border-[#0FF1CE]/50 focus:outline-none"
+                      className="w-full bg-black text-white px-3 py-2 rounded-lg border border-white/10 focus:border-[#0FF1CE]/50 focus:outline-none"
                     />
                   </div>
 
                   {amountOwed && profitSplit && (
-                    <div className="bg-[#151515] rounded-lg p-3 border border-[#0FF1CE]/30">
+                    <div className="bg-black rounded-lg p-3 border border-[#0FF1CE]/30">
                       <p className="text-gray-400 text-sm">Payout Amount:</p>
                       <p className="text-[#0FF1CE] text-xl font-bold">
                         ${((parseFloat(amountOwed) * parseFloat(profitSplit)) / 100).toFixed(2)}
@@ -582,7 +582,7 @@ export default function AdminWithdrawalsPage() {
                 type="button"
                 onClick={handleTogglePayoutAccess}
                 disabled={!selectedUser || accessUpdating || updating}
-                className="w-full bg-[#151515] border border-[#2F2F2F] text-white font-semibold py-2 rounded-lg hover:border-[#0FF1CE]/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-black border border-white/10 text-white font-semibold py-2 rounded-lg hover:border-[#0FF1CE]/50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {accessUpdating
                   ? 'Saving...'
@@ -629,7 +629,7 @@ export default function AdminWithdrawalsPage() {
       {/* Withdrawal Details Modal */}
       {selectedWithdrawal && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0D0D0D] rounded-xl border border-[#2F2F2F] p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-black rounded-xl border border-white/10 p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-white">Withdrawal Details</h3>
               <button
@@ -648,7 +648,7 @@ export default function AdminWithdrawalsPage() {
               {/* User Information */}
               <div>
                 <h4 className="text-sm font-medium text-gray-400 mb-3">User Information</h4>
-                <div className="bg-[#151515] rounded-lg p-4 space-y-2">
+                <div className="bg-black rounded-lg p-4 space-y-2">
                   <div className="flex justify-between">
                     <span className="text-gray-400">Email:</span>
                     <span className="text-white">{selectedWithdrawal.userEmail}</span>
@@ -663,7 +663,7 @@ export default function AdminWithdrawalsPage() {
               {/* Withdrawal Details */}
               <div>
                 <h4 className="text-sm font-medium text-gray-400 mb-3">Withdrawal Details</h4>
-                <div className="bg-[#151515] rounded-lg p-4 space-y-2">
+                <div className="bg-black rounded-lg p-4 space-y-2">
                   <div className="flex justify-between">
                     <span className="text-gray-400">Total Profit Made:</span>
                     <span className="text-white">${selectedWithdrawal.amountOwed.toFixed(2)}</span>
@@ -702,7 +702,7 @@ export default function AdminWithdrawalsPage() {
               {/* Status Information */}
               <div>
                 <h4 className="text-sm font-medium text-gray-400 mb-3">Status Information</h4>
-                <div className="bg-[#151515] rounded-lg p-4 space-y-2">
+                <div className="bg-black rounded-lg p-4 space-y-2">
                   <div className="flex justify-between">
                     <span className="text-gray-400">Current Status:</span>
                     <span className={`px-3 py-1 text-xs font-medium rounded-full ${getStatusColor(selectedWithdrawal.status)}`}>
@@ -738,7 +738,7 @@ export default function AdminWithdrawalsPage() {
               {selectedWithdrawal.transactionHash && (
                 <div>
                   <h4 className="text-sm font-medium text-gray-400 mb-3">Transaction Information</h4>
-                  <div className="bg-[#151515] rounded-lg p-4">
+                  <div className="bg-black rounded-lg p-4">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-400">Transaction Hash:</span>
                       <div className="flex items-center gap-2">
@@ -761,7 +761,7 @@ export default function AdminWithdrawalsPage() {
               {selectedWithdrawal.reviewNotes && (
                 <div>
                   <h4 className="text-sm font-medium text-gray-400 mb-3">Review Notes</h4>
-                  <div className="bg-[#151515] rounded-lg p-4">
+                  <div className="bg-black rounded-lg p-4">
                     <p className="text-white text-sm">{selectedWithdrawal.reviewNotes}</p>
                   </div>
                 </div>
@@ -769,7 +769,7 @@ export default function AdminWithdrawalsPage() {
 
               {/* Action Section */}
               {selectedWithdrawal.status === 'pending' && selectedWithdrawal.walletAddress && (
-                <div className="space-y-4 pt-4 border-t border-[#2F2F2F]">
+                <div className="space-y-4 pt-4 border-t border-white/10">
                   <div>
                     <label className="block text-sm font-medium text-gray-400 mb-2">Review Notes (Optional)</label>
                     <textarea
@@ -777,7 +777,7 @@ export default function AdminWithdrawalsPage() {
                       onChange={(e) => setReviewNotes(e.target.value)}
                       placeholder="Add any notes about this withdrawal..."
                       rows={3}
-                      className="w-full bg-[#151515] text-white px-3 py-2 rounded-lg border border-[#2F2F2F] focus:border-[#0FF1CE]/50 focus:outline-none resize-none"
+                      className="w-full bg-black text-white px-3 py-2 rounded-lg border border-white/10 focus:border-[#0FF1CE]/50 focus:outline-none resize-none"
                     />
                   </div>
 
@@ -809,7 +809,7 @@ export default function AdminWithdrawalsPage() {
 
               {/* Mark as Complete (for approved withdrawals) */}
               {selectedWithdrawal.status === 'approved' && (
-                <div className="space-y-4 pt-4 border-t border-[#2F2F2F]">
+                <div className="space-y-4 pt-4 border-t border-white/10">
                   <div>
                     <label className="block text-sm font-medium text-gray-400 mb-2">Transaction Hash</label>
                     <input
@@ -817,7 +817,7 @@ export default function AdminWithdrawalsPage() {
                       value={transactionHash}
                       onChange={(e) => setTransactionHash(e.target.value)}
                       placeholder="Enter blockchain transaction hash..."
-                      className="w-full bg-[#151515] text-white px-3 py-2 rounded-lg border border-[#2F2F2F] focus:border-[#0FF1CE]/50 focus:outline-none"
+                      className="w-full bg-black text-white px-3 py-2 rounded-lg border border-white/10 focus:border-[#0FF1CE]/50 focus:outline-none"
                     />
                   </div>
 

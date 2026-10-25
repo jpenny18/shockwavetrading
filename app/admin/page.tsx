@@ -37,7 +37,7 @@ const StatCard = ({ title, value, icon: Icon, change, changeType, isLoading }: {
   changeType?: 'up' | 'down' | 'neutral';
   isLoading?: boolean;
 }) => (
-  <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 md:p-6 hover:border-[#0FF1CE]/30 transition-all">
+  <div className="bg-black rounded-xl border border-white/10 p-4 md:p-6 hover:border-[#0FF1CE]/30 transition-all">
     <div className="flex items-start justify-between">
       <div className="min-w-0 flex-1">
         <p className="text-gray-400 text-xs md:text-sm truncate">{title}</p>
@@ -380,7 +380,7 @@ export default function AdminDashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-5 gap-3">
         <h1 className="text-xl md:text-2xl font-bold text-white">Dashboard</h1>
         <select 
-          className="bg-[#151515] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50 w-full sm:w-auto"
+          className="bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50 w-full sm:w-auto"
           value={timeRange}
           onChange={(e) => setTimeRange(e.target.value)}
         >
@@ -448,7 +448,7 @@ export default function AdminDashboard() {
           { label: 'Failed', value: stats.challengeStatuses.failed, tone: 'bg-red-500/10 text-red-400', Icon: AlertCircle, textColor: 'text-red-400' },
           { label: 'In Progress', value: stats.challengeStatuses.inProgress, tone: 'bg-yellow-500/10 text-yellow-400', Icon: Clock, textColor: 'text-yellow-400' },
         ].map(({ label, value, tone, Icon, textColor }) => (
-          <div key={label} className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-2.5 md:p-4">
+          <div key={label} className="bg-black rounded-xl border border-white/10 p-2.5 md:p-4">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-1 md:gap-0">
               <div className="min-w-0">
                 <p className="text-gray-400 text-[10px] md:text-xs truncate">{label}</p>
@@ -469,7 +469,7 @@ export default function AdminDashboard() {
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
         {/* Revenue Overview */}
-        <div className="lg:col-span-2 bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 md:p-6">
+        <div className="lg:col-span-2 bg-black rounded-xl border border-white/10 p-4 md:p-6">
           <div className="flex items-center justify-between mb-4 md:mb-6">
             <h2 className="text-base md:text-lg font-semibold text-white">Revenue & Orders Overview</h2>
           </div>
@@ -482,7 +482,7 @@ export default function AdminDashboard() {
             <div className="space-y-6">
               {/* Summary Grid */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-[#151515]/50 rounded-lg p-4">
+                <div className="bg-black/50 rounded-lg p-4">
                   <div className="text-gray-400 text-xs mb-1">Card Revenue</div>
                   <div className="text-xl font-bold text-blue-400">
                     ${stats.cardRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -491,7 +491,7 @@ export default function AdminDashboard() {
                     {stats.cardOrders} orders
                   </div>
                 </div>
-                <div className="bg-[#151515]/50 rounded-lg p-4">
+                <div className="bg-black/50 rounded-lg p-4">
                   <div className="text-gray-400 text-xs mb-1">Crypto Revenue</div>
                   <div className="text-xl font-bold text-orange-400">
                     ${stats.cryptoRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
@@ -564,7 +564,7 @@ export default function AdminDashboard() {
         </div>
         
         {/* Challenge Types Breakdown */}
-        <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 md:p-6">
+        <div className="bg-black rounded-xl border border-white/10 p-4 md:p-6">
           <div className="flex items-center justify-between mb-4 md:mb-6">
             <h2 className="text-base md:text-lg font-semibold text-white">Challenge Types</h2>
           </div>
@@ -603,7 +603,7 @@ export default function AdminDashboard() {
               </div>
               
               {/* Legend */}
-              <div className="pt-4 border-t border-[#2F2F2F]/50">
+              <div className="pt-4 border-t border-white/10">
                 <div className="space-y-2">
                   {Object.entries(stats.challengeTypes)
                     .sort((a, b) => b[1] - a[1])
@@ -629,7 +629,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Recent Orders */}
-      <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 md:p-6">
+      <div className="bg-black rounded-xl border border-white/10 p-4 md:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 md:mb-6 gap-3">
           <h2 className="text-base md:text-lg font-semibold text-white">Recent Orders</h2>
           <div className="flex gap-3">
@@ -666,7 +666,7 @@ export default function AdminDashboard() {
                 const Status = statusStyles[statusKey]?.icon || statusStyles.unknown.icon;
                 const isCrypto = order.orderType === 'crypto';
                 return (
-                  <div key={`${order.orderType}-${order.id}`} className="bg-[#151515]/60 rounded-lg p-3 border border-[#2F2F2F]/40">
+                  <div key={`${order.orderType}-${order.id}`} className="bg-black/60 rounded-lg p-3 border border-white/10/40">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <div className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
@@ -701,7 +701,7 @@ export default function AdminDashboard() {
             <div className="hidden md:block overflow-x-auto">
               <table className="w-full min-w-[900px]">
                 <thead>
-                  <tr className="border-b border-[#2F2F2F]">
+                  <tr className="border-b border-white/10">
                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Order Type</th>
                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Order ID</th>
                     <th className="py-3 px-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Customer</th>

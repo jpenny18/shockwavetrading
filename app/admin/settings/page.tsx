@@ -168,7 +168,7 @@ export default function SettingsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6">
-          <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6">
+          <div className="bg-black rounded-xl border border-white/10 p-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-full bg-[#0FF1CE]/20 flex items-center justify-center text-[#0FF1CE]">
                 <Globe size={20} />
@@ -184,7 +184,7 @@ export default function SettingsPage() {
                   name="siteName"
                   value={generalSettings.siteName}
                   onChange={handleGeneralSettingChange}
-                  className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                  className="w-full bg-black border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                 />
               </div>
 
@@ -195,7 +195,7 @@ export default function SettingsPage() {
                   name="supportEmail"
                   value={generalSettings.supportEmail}
                   onChange={handleGeneralSettingChange}
-                  className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                  className="w-full bg-black border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                 />
               </div>
 
@@ -207,7 +207,7 @@ export default function SettingsPage() {
                   value={generalSettings.phoneNumber}
                   onChange={handleGeneralSettingChange}
                   placeholder="Add a support phone number"
-                  className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE]/50"
+                  className="w-full bg-black border border-white/10 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE]/50"
                 />
               </div>
 
@@ -217,7 +217,7 @@ export default function SettingsPage() {
                   name="timezone"
                   value={generalSettings.timezone}
                   onChange={handleGeneralSettingChange}
-                  className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                  className="w-full bg-black border border-white/10 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                 >
                   <option value="America/New_York">Eastern Time (ET)</option>
                   <option value="America/Chicago">Central Time (CT)</option>
@@ -230,7 +230,7 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6">
+          <div className="bg-black rounded-xl border border-white/10 p-6">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-10 h-10 rounded-full bg-[#0FF1CE]/20 flex items-center justify-center text-[#0FF1CE]">
                 <Lock size={20} />
@@ -248,7 +248,7 @@ export default function SettingsPage() {
                 { label: 'MetaAPI', ok: integrations?.metaApi, detail: 'Used to connect and refresh trading accounts' },
                 { label: 'Firebase Admin', ok: integrations?.firebaseAdmin, detail: 'Used for admin sessions and server data access' },
               ].map((item) => (
-                <div key={item.label} className="flex items-center justify-between gap-4 py-3 border-b border-[#2F2F2F] last:border-0">
+                <div key={item.label} className="flex items-center justify-between gap-4 py-3 border-b border-white/10 last:border-0">
                   <div>
                     <h3 className="text-white font-medium">{item.label}</h3>
                     <p className="text-gray-400 text-sm">{item.detail}</p>
@@ -261,7 +261,7 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6">
+          <div className="bg-black rounded-xl border border-white/10 p-6">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-10 h-10 rounded-full bg-[#0FF1CE]/20 flex items-center justify-center text-[#0FF1CE]">
                 <Bell size={20} />
@@ -276,7 +276,7 @@ export default function SettingsPage() {
               {notificationFields.map((field, index) => (
                 <div
                   key={field.key}
-                  className={`flex items-center justify-between py-2 ${index < notificationFields.length - 1 ? 'border-b border-[#2F2F2F]' : ''}`}
+                  className={`flex items-center justify-between py-2 ${index < notificationFields.length - 1 ? 'border-b border-white/10' : ''}`}
                 >
                   <div className="pr-4">
                     <h3 className="text-white font-medium">{field.title}</h3>
@@ -289,7 +289,7 @@ export default function SettingsPage() {
                       checked={notificationSettings[field.key]}
                       onChange={() => handleNotificationToggle(field.key)}
                     />
-                    <div className="w-11 h-6 bg-[#151515] rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-gray-400 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0FF1CE]"></div>
+                    <div className="w-11 h-6 bg-black rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-gray-400 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0FF1CE]"></div>
                   </label>
                 </div>
               ))}

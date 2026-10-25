@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"cursor.general.gitGraphIndexing": "default",
+		"git.decorations.enabled": true
+	}
+}

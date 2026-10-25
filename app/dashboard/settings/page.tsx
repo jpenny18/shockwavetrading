@@ -1,6 +1,5 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import Particles from '../../components/Particles';
 import { 
   User, 
   Lock, 
@@ -59,15 +58,15 @@ const SettingsTabButton = ({ tab, isActive, onClick }: {
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-3 p-3 rounded-lg w-full transition-colors ${
+      className={`flex items-center gap-3 p-3 rounded-xl w-full transition-colors ${
         isActive 
-          ? 'bg-[#0FF1CE]/10 text-[#0FF1CE]' 
-          : 'text-gray-400 hover:text-white hover:bg-[#0FF1CE]/5'
+          ? 'border border-[#0FF1CE]/40 text-[#0FF1CE]' 
+          : 'border border-transparent text-gray-400 hover:text-white'
       }`}
     >
       <Icon size={20} />
       <span>{tab.label}</span>
-      {isActive && <ArrowRight size={16} className="ml-auto" />}
+      {isActive && <ArrowRight size={16} className="ml-auto text-[#0FF1CE]" />}
     </button>
   );
 };
@@ -76,12 +75,12 @@ const ToggleSwitch = ({ enabled, onChange }: { enabled: boolean; onChange: () =>
   <button
     onClick={onChange}
     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-      enabled ? 'bg-[#0FF1CE]' : 'bg-[#2F2F2F]'
+      enabled ? 'bg-white' : 'bg-white/15'
     }`}
   >
     <span
-      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-        enabled ? 'translate-x-6' : 'translate-x-1'
+      className={`inline-block h-4 w-4 transform rounded-full transition-transform ${
+        enabled ? 'translate-x-6 bg-black' : 'translate-x-1 bg-white'
       }`}
     />
   </button>
@@ -316,22 +315,13 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="relative">
-      {/* Background Effects */}
-      <div className="absolute top-0 left-0 w-full h-full bg-[#0FF1CE]/[0.02] background-noise"></div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:w-3/4 h-full rounded-full bg-[#0FF1CE]/[0.03] blur-[150px] opacity-60"></div>
-      <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse"></div>
-      <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse delay-1000"></div>
-      <Particles />
-
-      {/* Content */}
-      <div className="relative z-10">
-        <h1 className="text-2xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent mb-6">Settings</h1>
+    <div>
+        <h1 className="text-2xl font-semibold text-white mb-6">Settings</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-4 space-y-2">
+            <div className="bg-black rounded-2xl border border-white/10 p-4 space-y-2">
               {settingsTabs.map(tab => (
                 <SettingsTabButton
                   key={tab.id}
@@ -341,8 +331,8 @@ export default function SettingsPage() {
                 />
               ))}
               
-              <div className="pt-4 mt-4 border-t border-[#2F2F2F]/50">
-                <button className="flex items-center gap-3 p-3 bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 rounded-xl transition-all w-full">
+              <div className="pt-4 mt-4 border-t border-white/10">
+                <button className="flex items-center gap-3 p-3 text-gray-400 hover:text-white rounded-xl w-full">
                   <LogOut size={20} />
                   <span>Logout</span>
                 </button>
@@ -351,10 +341,10 @@ export default function SettingsPage() {
           </div>
 
           {/* Main content */}
-          <div className="lg:col-span-3 bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-6">
+          <div className="lg:col-span-3 bg-black rounded-2xl border border-white/10 p-6">
             {/* Success Message */}
             {successMessage && (
-              <div className="mb-6 p-4 bg-green-500/20 border border-green-500/50 rounded-lg flex items-center gap-2 text-green-500">
+              <div className="mb-6 p-4 border border-white/10 bg-white/[0.04] rounded-xl flex items-center gap-2 text-white">
                 <CheckCircle size={20} />
                 <span>{successMessage}</span>
               </div>
@@ -373,7 +363,7 @@ export default function SettingsPage() {
                         {profileImage ? (
                           <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
                         ) : (
-                          <span className="text-[#0FF1CE] text-4xl font-medium">
+                          <span className="text-white text-4xl font-medium">
                             {profile.firstName && profile.lastName 
                               ? `${profile.firstName[0]}${profile.lastName[0]}`
                               : 'U'}
@@ -382,7 +372,7 @@ export default function SettingsPage() {
                       </div>
                       <label 
                         htmlFor="profile-upload" 
-                        className="absolute bottom-0 right-0 p-2 bg-[#0FF1CE] rounded-full cursor-pointer hover:bg-[#0FF1CE]/90 transition-colors"
+                        className="absolute bottom-0 right-0 p-2 bg-white rounded-full cursor-pointer"
                       >
                         <Camera size={16} className="text-black" />
                       </label>
@@ -416,7 +406,7 @@ export default function SettingsPage() {
                           type="text"
                           value={profile.firstName}
                           onChange={(e) => setProfile({ ...profile, firstName: e.target.value })}
-                          className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
+                          className="w-full rounded-lg border border-white/10 bg-[#0A0A0A] px-4 py-2.5 text-white outline-none focus:border-white/30"
                         />
                         {formErrors.firstName && (
                           <p className="mt-1 text-sm text-red-500">{formErrors.firstName}</p>
@@ -428,7 +418,7 @@ export default function SettingsPage() {
                           type="text"
                           value={profile.lastName}
                           onChange={(e) => setProfile({ ...profile, lastName: e.target.value })}
-                          className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
+                          className="w-full rounded-lg border border-white/10 bg-[#0A0A0A] px-4 py-2.5 text-white outline-none focus:border-white/30"
                         />
                         {formErrors.lastName && (
                           <p className="mt-1 text-sm text-red-500">{formErrors.lastName}</p>
@@ -446,7 +436,7 @@ export default function SettingsPage() {
                           type="text"
                           value={profile.username}
                           onChange={(e) => setProfile({ ...profile, username: e.target.value })}
-                          className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg pl-10 px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
+                          className="w-full rounded-lg border border-white/10 bg-[#0A0A0A] pl-10 px-4 py-2.5 text-white outline-none focus:border-white/30"
                           placeholder="Your display name for leaderboard"
                         />
                       </div>
@@ -465,7 +455,7 @@ export default function SettingsPage() {
                           type="email"
                           value={profile.email}
                           disabled
-                          className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg pl-10 px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all opacity-50"
+                          className="w-full rounded-lg border border-white/10 bg-[#0A0A0A] pl-10 px-4 py-2.5 text-white outline-none focus:border-white/30 opacity-50"
                         />
                       </div>
                     </div>
@@ -480,7 +470,7 @@ export default function SettingsPage() {
                           type="tel"
                           value={profile.phone}
                           onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                          className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg pl-10 px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
+                          className="w-full rounded-lg border border-white/10 bg-[#0A0A0A] pl-10 px-4 py-2.5 text-white outline-none focus:border-white/30"
                         />
                       </div>
                       {formErrors.phone && (
@@ -497,7 +487,7 @@ export default function SettingsPage() {
                         <select 
                           value={profile.country}
                           onChange={(e) => setProfile({ ...profile, country: e.target.value })}
-                          className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg pl-10 px-4 py-2.5 text-white appearance-none focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
+                          className="w-full rounded-lg border border-white/10 bg-[#0A0A0A] pl-10 px-4 py-2.5 text-white appearance-none outline-none focus:border-white/30"
                         >
                           <option value="">Select a country</option>
                           <option value="US">United States</option>
@@ -519,7 +509,7 @@ export default function SettingsPage() {
                   <button 
                     onClick={handleProfileUpdate}
                     disabled={saving}
-                    className="px-6 py-2.5 bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black font-bold rounded-xl hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] px-4 py-2.5 text-sm font-semibold text-black disabled:cursor-not-allowed disabled:opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {saving ? (
                       <>
@@ -543,7 +533,7 @@ export default function SettingsPage() {
                 <h2 className="text-lg font-bold text-white mb-6">Security Settings</h2>
                 
                 {/* Password Change Section */}
-                <div className="mb-8 p-6 bg-gradient-to-b from-[#151515] to-[#0D0D0D] rounded-xl border border-[#2F2F2F]/50">
+                <div className="mb-8 p-5 rounded-2xl border border-white/10">
                   <h3 className="text-white font-medium mb-4 flex items-center gap-2">
                     <Lock size={18} />
                     <span>Change Password</span>
@@ -559,7 +549,7 @@ export default function SettingsPage() {
                           type={showCurrentPassword ? 'text' : 'password'}
                           value={passwordForm.currentPassword}
                           onChange={(e) => setPasswordForm({ ...passwordForm, currentPassword: e.target.value })}
-                          className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
+                          className="w-full rounded-lg border border-white/10 bg-[#0A0A0A] px-4 py-2.5 text-white outline-none focus:border-white/30"
                         />
                         <button
                           type="button"
@@ -583,7 +573,7 @@ export default function SettingsPage() {
                           type={showNewPassword ? 'text' : 'password'}
                           value={passwordForm.newPassword}
                           onChange={(e) => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
-                          className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
+                          className="w-full rounded-lg border border-white/10 bg-[#0A0A0A] px-4 py-2.5 text-white outline-none focus:border-white/30"
                         />
                         <button
                           type="button"
@@ -606,7 +596,7 @@ export default function SettingsPage() {
                         type="password"
                         value={passwordForm.confirmPassword}
                         onChange={(e) => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
-                        className="w-full bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all"
+                        className="w-full rounded-lg border border-white/10 bg-[#0A0A0A] px-4 py-2.5 text-white outline-none focus:border-white/30"
                       />
                       {formErrors.confirmPassword && (
                         <p className="mt-1 text-sm text-red-500">{formErrors.confirmPassword}</p>
@@ -616,7 +606,7 @@ export default function SettingsPage() {
                     <button
                       onClick={handlePasswordChange}
                       disabled={saving}
-                      className="px-6 py-2.5 bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black font-bold rounded-xl hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] px-4 py-2.5 text-sm font-semibold text-black disabled:cursor-not-allowed disabled:opacity-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {saving ? (
                         <>
@@ -634,7 +624,7 @@ export default function SettingsPage() {
                   </div>
                   
                 {/* Two-Factor Authentication Section */}
-                <div className="p-6 bg-gradient-to-b from-[#151515] to-[#0D0D0D] rounded-xl border border-[#2F2F2F]/50">
+                <div className="p-5 rounded-2xl border border-white/10">
                   <div className="flex items-start justify-between">
                         <div>
                       <h3 className="text-white font-medium mb-2 flex items-center gap-2">
@@ -645,7 +635,7 @@ export default function SettingsPage() {
                         Add an extra layer of security to your account by enabling two-factor authentication.
                       </p>
                     </div>
-                    <button className="px-4 py-2 bg-transparent border border-[#0FF1CE]/50 text-[#0FF1CE] font-bold rounded-xl hover:bg-[#0FF1CE]/10 transition-all duration-300">
+                    <button className="px-4 py-2 border border-white/15 text-white text-sm rounded-xl">
                       Enable
                     </button>
                   </div>
@@ -717,7 +707,7 @@ export default function SettingsPage() {
                   </div>
                   
                   <div className="pt-4">
-                    <button className="px-6 py-2.5 bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black font-bold rounded-xl hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300 flex items-center gap-2">
+                    <button className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] px-4 py-2.5 text-sm font-semibold text-black disabled:cursor-not-allowed disabled:opacity-50">
                       <Save size={18} />
                       <span>Save Preferences</span>
                     </button>
@@ -739,7 +729,7 @@ export default function SettingsPage() {
                       <label className={`
                         relative cursor-pointer
                         border border-[#2F2F2F] rounded-lg p-4 transition-colors
-                        ${themePreference === 'dark' ? 'border-[#0FF1CE] shadow-[0_0_20px_rgba(15,241,206,0.3)]' : 'hover:border-[#0FF1CE]/50'}
+                        ${themePreference === 'dark' ? 'border-white' : 'hover:border-white/30'}
                       `}>
                         <input
                           type="radio"
@@ -749,14 +739,14 @@ export default function SettingsPage() {
                           onChange={() => setThemePreference('dark')}
                           className="sr-only"
                         />
-                        <div className="bg-[#121212] w-full h-24 rounded-lg mb-3 flex items-center justify-center">
-                          <div className="w-8 h-8 rounded-full bg-[#0FF1CE]"></div>
+                        <div className="bg-black w-full h-24 rounded-lg mb-3 flex items-center justify-center">
+                          <div className="w-8 h-8 rounded-full bg-white"></div>
                         </div>
                         <div className="text-center">
                           <span className="text-white font-medium">Dark</span>
                         </div>
                         {themePreference === 'dark' && (
-                          <div className="absolute top-2 right-2 text-[#0FF1CE]">
+                          <div className="absolute top-2 right-2 text-white">
                             <CheckCircle size={16} />
                           </div>
                         )}
@@ -765,7 +755,7 @@ export default function SettingsPage() {
                       <label className={`
                         relative cursor-pointer
                         border border-[#2F2F2F] rounded-lg p-4 transition-colors
-                        ${themePreference === 'light' ? 'border-[#0FF1CE] shadow-[0_0_20px_rgba(15,241,206,0.3)]' : 'hover:border-[#0FF1CE]/50'}
+                        ${themePreference === 'light' ? 'border-white' : 'hover:border-white/30'}
                       `}>
                         <input
                           type="radio"
@@ -776,13 +766,13 @@ export default function SettingsPage() {
                           className="sr-only"
                         />
                         <div className="bg-[#F5F5F5] w-full h-24 rounded-lg mb-3 flex items-center justify-center">
-                          <div className="w-8 h-8 rounded-full bg-[#0FF1CE]"></div>
+                          <div className="w-8 h-8 rounded-full bg-white"></div>
                         </div>
                         <div className="text-center">
                           <span className="text-white font-medium">Light</span>
                         </div>
                         {themePreference === 'light' && (
-                          <div className="absolute top-2 right-2 text-[#0FF1CE]">
+                          <div className="absolute top-2 right-2 text-white">
                             <CheckCircle size={16} />
                           </div>
                         )}
@@ -791,7 +781,7 @@ export default function SettingsPage() {
                       <label className={`
                         relative cursor-pointer
                         border border-[#2F2F2F] rounded-lg p-4 transition-colors
-                        ${themePreference === 'system' ? 'border-[#0FF1CE] shadow-[0_0_20px_rgba(15,241,206,0.3)]' : 'hover:border-[#0FF1CE]/50'}
+                        ${themePreference === 'system' ? 'border-white' : 'hover:border-white/30'}
                       `}>
                         <input
                           type="radio"
@@ -802,13 +792,13 @@ export default function SettingsPage() {
                           className="sr-only"
                         />
                         <div className="bg-gradient-to-r from-[#121212] to-[#F5F5F5] w-full h-24 rounded-lg mb-3 flex items-center justify-center">
-                          <div className="w-8 h-8 rounded-full bg-[#0FF1CE]"></div>
+                          <div className="w-8 h-8 rounded-full bg-white"></div>
                         </div>
                         <div className="text-center">
                           <span className="text-white font-medium">System</span>
                         </div>
                         {themePreference === 'system' && (
-                          <div className="absolute top-2 right-2 text-[#0FF1CE]">
+                          <div className="absolute top-2 right-2 text-white">
                             <CheckCircle size={16} />
                           </div>
                         )}
@@ -819,7 +809,7 @@ export default function SettingsPage() {
                   {/* Language Selection */}
                   <div>
                     <h3 className="text-white font-medium mb-4">Language</h3>
-                    <select className="w-full md:w-1/3 bg-[#151515]/50 backdrop-blur-sm border border-[#2F2F2F] rounded-lg px-4 py-2.5 text-white appearance-none focus:outline-none focus:ring-2 focus:ring-[#0FF1CE]/50 focus:border-transparent transition-all">
+                    <select className="w-full md:w-1/3 rounded-lg border border-white/10 bg-[#0A0A0A] px-4 py-2.5 text-white appearance-none outline-none focus:border-white/30">
                       <option>English (US)</option>
                       <option>English (UK)</option>
                       <option>Spanish</option>
@@ -830,7 +820,7 @@ export default function SettingsPage() {
                   </div>
                   
                   <div className="pt-4">
-                    <button className="px-6 py-2.5 bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black font-bold rounded-xl hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-[#0FF1CE]/25 transition-all duration-300 flex items-center gap-2">
+                    <button className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] px-4 py-2.5 text-sm font-semibold text-black disabled:cursor-not-allowed disabled:opacity-50">
                       <Save size={18} />
                       <span>Save Preferences</span>
                     </button>
@@ -840,14 +830,6 @@ export default function SettingsPage() {
             )}
           </div>
         </div>
-      </div>
-
-      <style jsx global>{`
-        .background-noise {
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-          opacity: 0.15;
-        }
-      `}</style>
     </div>
   );
 } 

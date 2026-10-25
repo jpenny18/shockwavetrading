@@ -471,7 +471,7 @@ export default function OrdersPage() {
       </div>
 
       {/* Filters Row */}
-      <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-3 md:p-4 mb-4 md:mb-6">
+      <div className="bg-black rounded-xl border border-white/10 p-3 md:p-4 mb-4 md:mb-6">
         <div className="flex flex-col gap-2 md:flex-row md:gap-4">
           <div className="flex-1">
             <div className="relative">
@@ -480,7 +480,7 @@ export default function OrdersPage() {
                 placeholder="Search orders..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg pl-9 pr-4 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+                className="w-full bg-black border border-white/10 rounded-lg pl-9 pr-4 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
               />
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={14} />
             </div>
@@ -489,7 +489,7 @@ export default function OrdersPage() {
             <select 
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="w-full md:w-36 bg-[#151515] border border-[#2F2F2F] rounded-lg px-2 md:px-4 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+              className="w-full md:w-36 bg-black border border-white/10 rounded-lg px-2 md:px-4 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
             >
               {statusFilterOptions.map((status) => (
                 <option key={status} value={status}>{status}</option>
@@ -498,7 +498,7 @@ export default function OrdersPage() {
             <select 
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
-              className="w-full md:w-44 bg-[#151515] border border-[#2F2F2F] rounded-lg px-2 md:px-4 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+              className="w-full md:w-44 bg-black border border-white/10 rounded-lg px-2 md:px-4 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
             >
               {challengeTypeOptions.map((type) => (
                 <option key={type} value={type}>{type}</option>
@@ -507,7 +507,7 @@ export default function OrdersPage() {
             <select 
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full md:w-36 bg-[#151515] border border-[#2F2F2F] rounded-lg px-2 md:px-4 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+              className="w-full md:w-36 bg-black border border-white/10 rounded-lg px-2 md:px-4 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
             >
               {sortOptions.map((option) => (
                 <option key={option.value} value={option.value}>{option.label}</option>
@@ -518,7 +518,7 @@ export default function OrdersPage() {
       </div>
 
       {/* Orders Table / Cards */}
-      <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50">
+      <div className="bg-black rounded-xl border border-white/10">
         
         {/* Mobile card view */}
         <div className="md:hidden p-3 space-y-2">
@@ -531,7 +531,7 @@ export default function OrdersPage() {
             const ChallengeIcon = challengeStatusStyles[challengeStatus]?.icon || AlertCircle;
             const isExpanded = expandedOrderId === order.id;
             return (
-              <div key={order.id} className={`rounded-xl border transition-all ${isExpanded ? 'border-[#0FF1CE]/30 bg-[#0FF1CE]/5' : 'border-[#2F2F2F]/50 bg-[#151515]/40'}`}>
+              <div key={order.id} className={`rounded-xl border transition-all ${isExpanded ? 'border-[#0FF1CE]/30 bg-[#0FF1CE]/5' : 'border-white/10 bg-black/40'}`}>
                 <div className="p-3">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
@@ -540,7 +540,7 @@ export default function OrdersPage() {
                         checked={selectedOrders.has(order.id)}
                         onChange={() => handleSelectOrder(order.id)}
                         onClick={(e) => e.stopPropagation()}
-                        className="rounded border-gray-600 text-[#0FF1CE] focus:ring-[#0FF1CE] focus:ring-offset-0 bg-[#1A1A1A]"
+                        className="rounded border-gray-600 text-[#0FF1CE] focus:ring-[#0FF1CE] focus:ring-offset-0 bg-black"
                       />
                       <span className="text-white text-xs font-mono font-medium">#{order.id.slice(0, 10)}</span>
                     </div>
@@ -578,7 +578,7 @@ export default function OrdersPage() {
                   </div>
                 </div>
                 {isExpanded && (
-                  <div className="border-t border-[#2F2F2F]/50 p-3 space-y-3 text-sm">
+                  <div className="border-t border-white/10 p-3 space-y-3 text-sm">
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <div className="text-gray-400 text-xs mb-1">Email</div>
@@ -621,13 +621,13 @@ export default function OrdersPage() {
         <div className="overflow-x-auto">
           <table className="w-full min-w-[900px]">
             <thead>
-              <tr className="border-b border-[#2F2F2F]">
+              <tr className="border-b border-white/10">
                 <th className="py-3 px-4 text-left">
                   <input
                     type="checkbox"
                     checked={selectedOrders.size === sortedOrders.length && sortedOrders.length > 0}
                     onChange={handleSelectAll}
-                    className="rounded border-gray-600 text-[#0FF1CE] focus:ring-[#0FF1CE] focus:ring-offset-0 bg-[#1A1A1A]"
+                    className="rounded border-gray-600 text-[#0FF1CE] focus:ring-[#0FF1CE] focus:ring-offset-0 bg-black"
                   />
                 </th>
                 <th className="py-3 px-4 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Order ID</th>
@@ -659,7 +659,7 @@ export default function OrdersPage() {
                           checked={selectedOrders.has(order.id)}
                           onChange={() => handleSelectOrder(order.id)}
                           onClick={(e) => e.stopPropagation()}
-                          className="rounded border-gray-600 text-[#0FF1CE] focus:ring-[#0FF1CE] focus:ring-offset-0 bg-[#1A1A1A]"
+                          className="rounded border-gray-600 text-[#0FF1CE] focus:ring-[#0FF1CE] focus:ring-offset-0 bg-black"
                         />
                       </td>
                       <td className="py-4 px-4 whitespace-nowrap text-sm font-medium text-white">{order.id}</td>
@@ -684,7 +684,7 @@ export default function OrdersPage() {
                           
                           {/* Payment Status Dropdown */}
                           {showPaymentDropdown === order.id && (
-                            <div className="absolute top-full left-0 mt-1 bg-[#1A1A1A] border border-[#2F2F2F]/50 rounded-lg shadow-lg z-50 min-w-[120px]">
+                            <div className="absolute top-full left-0 mt-1 bg-black border border-white/10 rounded-lg shadow-lg z-50 min-w-[120px]">
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -735,7 +735,7 @@ export default function OrdersPage() {
                                 
                                 {/* Challenge Status Dropdown */}
                                 {showChallengeDropdown === order.id && (
-                                  <div className="absolute top-full left-0 mt-1 bg-[#1A1A1A] border border-[#2F2F2F]/50 rounded-lg shadow-lg z-50 min-w-[120px]">
+                                  <div className="absolute top-full left-0 mt-1 bg-black border border-white/10 rounded-lg shadow-lg z-50 min-w-[120px]">
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
@@ -940,7 +940,7 @@ export default function OrdersPage() {
                                 </button>
                               </div>
                               
-                              <div className="mt-4 pt-4 border-t border-[#2F2F2F]/50 space-y-4">
+                              <div className="mt-4 pt-4 border-t border-white/10 space-y-4">
                                 {/* Payment Status Update Buttons */}
                                 <div>
                                   <h4 className="text-white font-medium mb-2">Update Payment Status</h4>
@@ -1050,7 +1050,7 @@ export default function OrdersPage() {
       {/* Delete Confirmation Modal */}
       {credentialChoices && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1A1A1A] rounded-xl p-6 max-w-lg w-full border border-[#2F2F2F]">
+          <div className="bg-black rounded-xl p-6 max-w-lg w-full border border-white/10">
             <h3 className="text-xl font-bold text-white mb-2">Choose an account</h3>
             <p className="text-gray-400 mb-4 text-sm">
               {credentialChoices.order.customerEmail} has more than one set of trading credentials. Choose which login to resend.
@@ -1062,7 +1062,7 @@ export default function OrdersPage() {
                   type="button"
                   onClick={() => handleResendCredentials(credentialChoices.order, account.accountId)}
                   disabled={resendingOrderId === credentialChoices.order.id}
-                  className="w-full text-left px-4 py-3 rounded-lg bg-[#151515] border border-[#2F2F2F] hover:border-[#0FF1CE]/40 text-sm disabled:opacity-50"
+                  className="w-full text-left px-4 py-3 rounded-lg bg-black border border-white/10 hover:border-[#0FF1CE]/40 text-sm disabled:opacity-50"
                 >
                   <div className="text-white font-medium">
                     {account.accountType} · ${Number(account.accountSize || 0).toLocaleString()} · {account.platform || 'Platform'}
@@ -1088,7 +1088,7 @@ export default function OrdersPage() {
 
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-[#1A1A1A] rounded-xl border border-[#2F2F2F]/50 p-6 max-w-md w-full mx-4">
+          <div className="bg-black rounded-xl border border-white/10 p-6 max-w-md w-full mx-4">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-semibold text-white">Confirm Delete</h3>
               <button

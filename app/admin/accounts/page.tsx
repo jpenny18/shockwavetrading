@@ -2084,8 +2084,8 @@ export default function AdminAccountsPage() {
             
             {/* Alerts Dropdown */}
             {showAlerts && (
-              <div className="absolute right-0 mt-2 w-96 bg-[#0D0D0D] border border-[#2F2F2F] rounded-xl shadow-2xl z-50 max-h-[500px] overflow-hidden flex flex-col">
-                <div className="p-4 border-b border-[#2F2F2F]">
+              <div className="absolute right-0 mt-2 w-96 bg-black border border-white/10 rounded-xl shadow-2xl z-50 max-h-[500px] overflow-hidden flex flex-col">
+                <div className="p-4 border-b border-white/10">
                   <div className="flex items-center justify-between mb-3">
                   <h3 className="text-white font-semibold">Notifications</h3>
                     {alerts.length > 0 && (
@@ -2112,7 +2112,7 @@ export default function AdminAccountsPage() {
                   </div>
                   
                   {/* Filter Tabs */}
-                  <div className="flex gap-1 bg-[#151515] p-1 rounded-lg">
+                  <div className="flex gap-1 bg-black p-1 rounded-lg">
                     <button
                       onClick={() => setAlertFilter('all')}
                       className={`flex-1 px-3 py-1.5 text-xs font-medium rounded transition-colors ${
@@ -2168,7 +2168,7 @@ export default function AdminAccountsPage() {
                     <div
                       key={alert.id}
                           onClick={() => markAlertAsRead(alert.id)}
-                          className={`p-4 border-b border-[#2F2F2F]/50 hover:bg-white/5 transition-colors cursor-pointer ${
+                          className={`p-4 border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer ${
                         !alert.read ? 'bg-white/5' : ''
                       }`}
                     >
@@ -2219,17 +2219,17 @@ export default function AdminAccountsPage() {
       <div className="mb-6">
         {/* Primary Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-3 md:mb-4">
-          <div className="bg-gradient-to-br from-[#0D0D0D] to-[#0D0D0D]/60 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6 hover:border-[#0FF1CE]/30 transition-all duration-300">
+          <div className="bg-black rounded-xl border border-white/10 p-6 hover:border-[#0FF1CE]/30 transition-all duration-300">
             <div className="flex items-start justify-between mb-4">
               <div className="p-3 bg-[#0FF1CE]/10 rounded-lg">
                 <Users className="text-[#0FF1CE]" size={24} />
             </div>
-              <span className="text-xs text-gray-500 bg-[#151515] px-2 py-1 rounded">Overview</span>
+              <span className="text-xs text-gray-500 bg-black px-2 py-1 rounded">Overview</span>
             </div>
             <div className="space-y-1">
               <p className="text-3xl font-bold text-white">{stats.total}</p>
               <p className="text-sm text-gray-400">Total Accounts</p>
-              <div className="pt-3 mt-3 border-t border-[#2F2F2F]/50">
+              <div className="pt-3 mt-3 border-t border-white/10">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-gray-500">Active Rate</span>
                   <span className="text-[#0FF1CE]">{stats.total > 0 ? ((stats.active / stats.total) * 100).toFixed(1) : 0}%</span>
@@ -2238,17 +2238,17 @@ export default function AdminAccountsPage() {
           </div>
         </div>
         
-          <div className="bg-gradient-to-br from-[#0D0D0D] to-[#0D0D0D]/60 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6 hover:border-[#0FF1CE]/30 transition-all duration-300">
+          <div className="bg-black rounded-xl border border-white/10 p-6 hover:border-[#0FF1CE]/30 transition-all duration-300">
             <div className="flex items-start justify-between mb-4">
               <div className="p-3 bg-yellow-500/10 rounded-lg">
                 <DollarSign className="text-yellow-400" size={24} />
             </div>
-              <span className="text-xs text-gray-500 bg-[#151515] px-2 py-1 rounded">Financial</span>
+              <span className="text-xs text-gray-500 bg-black px-2 py-1 rounded">Financial</span>
             </div>
             <div className="space-y-1">
               <p className="text-3xl font-bold text-white">${(stats.totalBalance / 1000).toFixed(1)}k</p>
               <p className="text-sm text-gray-400">Total Balance</p>
-              <div className="pt-3 mt-3 border-t border-[#2F2F2F]/50">
+              <div className="pt-3 mt-3 border-t border-white/10">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-gray-500">Total Equity</span>
                   <span className="text-yellow-400">${(stats.totalEquity / 1000).toFixed(1)}k</span>
@@ -2257,17 +2257,17 @@ export default function AdminAccountsPage() {
           </div>
         </div>
         
-          <div className="bg-gradient-to-br from-[#0D0D0D] to-[#0D0D0D]/60 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-6 hover:border-[#0FF1CE]/30 transition-all duration-300">
+          <div className="bg-black rounded-xl border border-white/10 p-6 hover:border-[#0FF1CE]/30 transition-all duration-300">
             <div className="flex items-start justify-between mb-4">
               <div className="p-3 bg-purple-500/10 rounded-lg">
                 <Target className="text-purple-400" size={24} />
             </div>
-              <span className="text-xs text-gray-500 bg-[#151515] px-2 py-1 rounded">Performance</span>
+              <span className="text-xs text-gray-500 bg-black px-2 py-1 rounded">Performance</span>
             </div>
             <div className="space-y-1">
               <p className="text-3xl font-bold text-white">{stats.total > 0 ? ((stats.passed + stats.funded) / stats.total * 100).toFixed(0) : 0}%</p>
               <p className="text-sm text-gray-400">Success Rate</p>
-              <div className="pt-3 mt-3 border-t border-[#2F2F2F]/50">
+              <div className="pt-3 mt-3 border-t border-white/10">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-gray-500">Failed Rate</span>
                   <span className="text-red-400">{stats.total > 0 ? (stats.failed / stats.total * 100).toFixed(1) : 0}%</span>
@@ -2279,7 +2279,7 @@ export default function AdminAccountsPage() {
         
         {/* Secondary Stats */}
         <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-5 gap-2 md:gap-3">
-          <div className="bg-[#0D0D0D]/60 backdrop-blur-sm rounded-lg border border-[#2F2F2F]/30 p-4 hover:bg-[#0D0D0D]/80 transition-colors">
+          <div className="bg-black/60 backdrop-blur-sm rounded-lg border border-white/10/30 p-4 hover:bg-black transition-colors">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
@@ -2290,7 +2290,7 @@ export default function AdminAccountsPage() {
             <p className="text-xl font-bold text-white mt-2">{stats.active}</p>
         </div>
         
-          <div className="bg-[#0D0D0D]/60 backdrop-blur-sm rounded-lg border border-[#2F2F2F]/30 p-4 hover:bg-[#0D0D0D]/80 transition-colors">
+          <div className="bg-black/60 backdrop-blur-sm rounded-lg border border-white/10/30 p-4 hover:bg-black transition-colors">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
@@ -2301,7 +2301,7 @@ export default function AdminAccountsPage() {
             <p className="text-xl font-bold text-white mt-2">{stats.passed}</p>
         </div>
         
-          <div className="bg-[#0D0D0D]/60 backdrop-blur-sm rounded-lg border border-[#2F2F2F]/30 p-4 hover:bg-[#0D0D0D]/80 transition-colors">
+          <div className="bg-black/60 backdrop-blur-sm rounded-lg border border-white/10/30 p-4 hover:bg-black transition-colors">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-red-400 rounded-full"></div>
@@ -2312,7 +2312,7 @@ export default function AdminAccountsPage() {
             <p className="text-xl font-bold text-white mt-2">{stats.failed}</p>
         </div>
         
-          <div className="bg-[#0D0D0D]/60 backdrop-blur-sm rounded-lg border border-[#2F2F2F]/30 p-4 hover:bg-[#0D0D0D]/80 transition-colors">
+          <div className="bg-black/60 backdrop-blur-sm rounded-lg border border-white/10/30 p-4 hover:bg-black transition-colors">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
@@ -2323,7 +2323,7 @@ export default function AdminAccountsPage() {
             <p className="text-xl font-bold text-white mt-2">{stats.funded}</p>
           </div>
           
-          <div className="bg-[#0D0D0D]/60 backdrop-blur-sm rounded-lg border border-[#2F2F2F]/30 p-4 hover:bg-[#0D0D0D]/80 transition-colors">
+          <div className="bg-black/60 backdrop-blur-sm rounded-lg border border-white/10/30 p-4 hover:bg-black transition-colors">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
@@ -2337,7 +2337,7 @@ export default function AdminAccountsPage() {
       </div>
 
       {/* Filters and Search */}
-      <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-3 md:p-4 mb-4 md:mb-6">
+      <div className="bg-black rounded-xl border border-white/10 p-3 md:p-4 mb-4 md:mb-6">
         <div className="flex flex-col gap-2 md:flex-row md:gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
@@ -2346,7 +2346,7 @@ export default function AdminAccountsPage() {
               placeholder="Search by email, name, or account ID..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg pl-9 pr-9 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE]/50"
+              className="w-full bg-black border border-white/10 rounded-lg pl-9 pr-9 py-2 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE]/50"
             />
             {searchQuery && (
               <button
@@ -2362,7 +2362,7 @@ export default function AdminAccountsPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="flex-1 md:flex-none bg-[#151515] border border-[#2F2F2F] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#0FF1CE]/50"
+              className="flex-1 md:flex-none bg-black border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#0FF1CE]/50"
             >
               <option value="all">All Status</option>
               <option value="active">Active</option>
@@ -2375,7 +2375,7 @@ export default function AdminAccountsPage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="flex-1 md:flex-none bg-[#151515] border border-[#2F2F2F] rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#0FF1CE]/50 md:min-w-[160px]"
+              className="flex-1 md:flex-none bg-black border border-white/10 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-[#0FF1CE]/50 md:min-w-[160px]"
               title="Sort accounts by"
             >
               <optgroup label="Date & Time">
@@ -2463,7 +2463,7 @@ export default function AdminAccountsPage() {
       </div>
 
       {/* Accounts Table */}
-      <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 overflow-hidden">
+      <div className="bg-black rounded-xl border border-white/10 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center p-12">
             <Loader2 className="w-8 h-8 text-[#0FF1CE] animate-spin" />
@@ -2553,12 +2553,12 @@ export default function AdminAccountsPage() {
                   {/* Row 2: Stats grid */}
                   <div className="grid grid-cols-2 gap-2 mb-3 text-xs">
                     {/* Balance */}
-                    <div className="bg-[#151515] rounded-lg p-2.5">
+                    <div className="bg-black rounded-lg p-2.5">
                       <p className="text-gray-500 mb-1">Balance</p>
                       <p className="text-white font-medium">${metrics?.balance?.toLocaleString() || '-'}</p>
                       {config && metrics && config.status === 'active' && (
                         <div className="mt-1.5">
-                          <div className="h-1 bg-[#0D0D0D] rounded-full overflow-hidden mb-0.5">
+                          <div className="h-1 bg-black rounded-full overflow-hidden mb-0.5">
                             <div
                               className={`h-full transition-all duration-500 ${
                                 profitPercent >= targetProfit ? 'bg-green-400' :
@@ -2579,7 +2579,7 @@ export default function AdminAccountsPage() {
                     </div>
 
                     {/* Equity */}
-                    <div className="bg-[#151515] rounded-lg p-2.5">
+                    <div className="bg-black rounded-lg p-2.5">
                       <p className="text-gray-500 mb-1">Equity</p>
                       <p className="text-white font-medium">${metrics?.equity?.toLocaleString() || '-'}</p>
                       {metrics?.balance && metrics?.equity && (
@@ -2590,10 +2590,10 @@ export default function AdminAccountsPage() {
                     </div>
 
                     {/* Max Drawdown */}
-                    <div className="bg-[#151515] rounded-lg p-2.5">
+                    <div className="bg-black rounded-lg p-2.5">
                       <p className="text-gray-500 mb-1">Max DD</p>
                       <div className="flex items-center gap-1.5">
-                        <div className="flex-1 h-1 bg-[#0D0D0D] rounded-full overflow-hidden">
+                        <div className="flex-1 h-1 bg-black rounded-full overflow-hidden">
                           <div
                             className={`h-full transition-all duration-500 ${
                               (metrics?.maxDrawdown || 0) > maxDDLimit ? 'bg-red-400' :
@@ -2613,14 +2613,14 @@ export default function AdminAccountsPage() {
                     </div>
 
                     {/* Daily DD */}
-                    <div className="bg-[#151515] rounded-lg p-2.5">
+                    <div className="bg-black rounded-lg p-2.5">
                       <p className="text-gray-500 mb-1">Daily DD (Peak)</p>
                       {config?.accountType === 'instant' ? (
                         <p className="text-gray-400 font-medium">N/A</p>
                       ) : (
                         <>
                           <div className="flex items-center gap-1.5">
-                            <div className="flex-1 h-1 bg-[#0D0D0D] rounded-full overflow-hidden">
+                            <div className="flex-1 h-1 bg-black rounded-full overflow-hidden">
                               <div
                                 className={`h-full transition-all duration-500 ${
                                   dailyDDValue > dailyDDLimit ? 'bg-red-400' :
@@ -2642,10 +2642,10 @@ export default function AdminAccountsPage() {
                     </div>
 
                     {/* Trading Days */}
-                    <div className="bg-[#151515] rounded-lg p-2.5">
+                    <div className="bg-black rounded-lg p-2.5">
                       <p className="text-gray-500 mb-1">Trading Days</p>
                       <div className="flex items-center gap-1.5">
-                        <div className="flex-1 h-1 bg-[#0D0D0D] rounded-full overflow-hidden">
+                        <div className="flex-1 h-1 bg-black rounded-full overflow-hidden">
                           <div
                             className={`h-full transition-all duration-500 ${
                               currentTradingDays >= minTradingDays ? 'bg-green-400' :
@@ -2661,7 +2661,7 @@ export default function AdminAccountsPage() {
                     </div>
 
                     {/* Last Updated */}
-                    <div className="bg-[#151515] rounded-lg p-2.5">
+                    <div className="bg-black rounded-lg p-2.5">
                       <p className="text-gray-500 mb-1">Last Updated</p>
                       <p className="text-gray-400 text-[11px] leading-tight">
                         {metrics?.lastUpdated
@@ -2677,7 +2677,7 @@ export default function AdminAccountsPage() {
                   {/* Row 3: Action buttons */}
                   <div className="flex flex-wrap gap-1.5">
                     {/* Primary Actions */}
-                    <div className="flex items-center gap-1 bg-[#151515] rounded-lg p-1">
+                    <div className="flex items-center gap-1 bg-black rounded-lg p-1">
                       <button
                         onClick={() => window.location.href = `/admin/accounts/${config?.accountId}`}
                         className="p-1.5 text-gray-400 hover:text-[#0FF1CE] hover:bg-[#0FF1CE]/10 rounded transition-all"
@@ -2723,7 +2723,7 @@ export default function AdminAccountsPage() {
 
                     {/* Email Actions */}
                     {(config?.status === 'active' || config?.status === 'failed' || config?.status === 'passed' || config?.status === 'funded') && (
-                      <div className="flex items-center gap-1 bg-[#151515] rounded-lg p-1">
+                      <div className="flex items-center gap-1 bg-black rounded-lg p-1">
                         {config?.status === 'passed' && (
                           <button
                             onClick={() => sendEmailWithModal(() => sendPassEmail(account), 'pass email')}
@@ -2800,7 +2800,7 @@ export default function AdminAccountsPage() {
                     )}
 
                     {/* Account Management Actions */}
-                    <div className="flex items-center gap-1 bg-[#151515] rounded-lg p-1">
+                    <div className="flex items-center gap-1 bg-black rounded-lg p-1">
                       <button
                         onClick={() => enableAccountFeatures(account)}
                         className="p-1.5 text-gray-400 hover:text-blue-400 hover:bg-blue-400/10 rounded transition-all"
@@ -2844,7 +2844,7 @@ export default function AdminAccountsPage() {
           <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[#2F2F2F] bg-[#151515]">
+                <tr className="border-b border-white/10 bg-black">
                   <th className="text-left p-4">
                     <input
                       type="checkbox"
@@ -2961,7 +2961,7 @@ export default function AdminAccountsPage() {
                             <div className="mt-1">
                               <div className="flex items-center justify-end gap-2">
                                 <div className="w-20">
-                                  <div className="h-1 bg-[#151515] rounded-full overflow-hidden">
+                                  <div className="h-1 bg-black rounded-full overflow-hidden">
                                     <div 
                                       className={`h-full transition-all duration-500 ${
                                         profitPercent >= targetProfit ? 'bg-green-400' : 
@@ -3000,7 +3000,7 @@ export default function AdminAccountsPage() {
                         <div className="text-right">
                           <div className="flex items-center justify-end gap-2">
                             <div className="w-16">
-                              <div className="h-1.5 bg-[#151515] rounded-full overflow-hidden">
+                              <div className="h-1.5 bg-black rounded-full overflow-hidden">
                                 <div 
                                   className={`h-full transition-all duration-500 ${
                                     metrics && metrics.maxDrawdown > (config?.accountType === 'standard' || config?.accountType === 'gauntlet' ? 15 : config?.accountType === '1-step' ? 8 : 4)
@@ -3029,7 +3029,7 @@ export default function AdminAccountsPage() {
                         <div className="text-right">
                           <div className="flex items-center justify-end gap-2">
                             <div className="w-16">
-                              <div className="h-1.5 bg-[#151515] rounded-full overflow-hidden">
+                              <div className="h-1.5 bg-black rounded-full overflow-hidden">
                                 <div 
                                   className={`h-full transition-all duration-500 ${
                                     metrics && (metrics.maxDailyDrawdown || metrics.dailyDrawdown) > (config?.accountType === 'standard' || config?.accountType === 'gauntlet' ? 8 : config?.accountType === '1-step' ? 4 : 999)
@@ -3058,7 +3058,7 @@ export default function AdminAccountsPage() {
                         <div className="text-right">
                           <div className="flex items-center justify-end gap-2">
                             <div className="w-16">
-                              <div className="h-1.5 bg-[#151515] rounded-full overflow-hidden">
+                              <div className="h-1.5 bg-black rounded-full overflow-hidden">
                                 <div 
                                   className={`h-full transition-all duration-500 ${
                                     currentTradingDays >= minTradingDays
@@ -3094,7 +3094,7 @@ export default function AdminAccountsPage() {
                       <td className="p-4">
                         <div className="flex items-center justify-center gap-1">
                           {/* Primary Actions */}
-                          <div className="flex items-center gap-1 bg-[#151515] rounded-lg p-1">
+                          <div className="flex items-center gap-1 bg-black rounded-lg p-1">
                           <button
                             onClick={() => window.location.href = `/admin/accounts/${config?.accountId}`}
                               className="p-1.5 text-gray-400 hover:text-[#0FF1CE] hover:bg-[#0FF1CE]/10 rounded transition-all"
@@ -3140,7 +3140,7 @@ export default function AdminAccountsPage() {
                           
                           {/* Email Actions */}
                           {(config?.status === 'active' || config?.status === 'failed' || config?.status === 'passed' || config?.status === 'funded') && (
-                            <div className="flex items-center gap-1 bg-[#151515] rounded-lg p-1">
+                            <div className="flex items-center gap-1 bg-black rounded-lg p-1">
                               {config?.status === 'passed' && (
                                 <button
                                   onClick={() => sendEmailWithModal(() => sendPassEmail(account), 'pass email')}
@@ -3217,7 +3217,7 @@ export default function AdminAccountsPage() {
                           )}
                           
                           {/* Account Management Actions */}
-                          <div className="flex items-center gap-1 bg-[#151515] rounded-lg p-1">
+                          <div className="flex items-center gap-1 bg-black rounded-lg p-1">
                             <button
                               onClick={() => enableAccountFeatures(account)}
                               className="p-1.5 text-gray-400 hover:text-blue-400 hover:bg-blue-400/10 rounded transition-all"
@@ -3266,8 +3266,8 @@ export default function AdminAccountsPage() {
       {/* Edit Modal */}
       {showEditModal && selectedUser && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0D0D0D] border border-[#2F2F2F] rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-[#2F2F2F]">
+          <div className="bg-black border border-white/10 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-white/10">
               <h2 className="text-xl font-semibold text-white">Edit Account Configuration</h2>
               <p className="text-sm text-gray-400 mt-1">{selectedUser.email}</p>
             </div>
@@ -3283,7 +3283,7 @@ export default function AdminAccountsPage() {
                     value={accountForm.accountId}
                     onChange={(e) => setAccountForm({ ...accountForm, accountId: e.target.value })}
                     placeholder="e.g., 50e36bcb-f0c2-49d2-939f-4aea4ea8eb94"
-                    className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE]/50"
+                    className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE]/50"
                   />
                 </div>
 
@@ -3298,7 +3298,7 @@ export default function AdminAccountsPage() {
                       value={accountForm.accountToken}
                       onChange={(e) => setAccountForm({ ...accountForm, accountToken: e.target.value })}
                       placeholder="Enter MetaAPI token"
-                      className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE]/50"
+                      className="w-full bg-black border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE]/50"
                     />
                   </div>
                 </div>
@@ -3328,7 +3328,7 @@ export default function AdminAccountsPage() {
                       });
                       }
                     }}
-                    className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                    className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                   >
                     <option value="standard">Shockwave Standard</option>
                     <option value="instant">Shockwave Instant</option>
@@ -3345,7 +3345,7 @@ export default function AdminAccountsPage() {
                   <select
                     value={accountForm.accountSize}
                     onChange={(e) => setAccountForm({ ...accountForm, accountSize: parseInt(e.target.value) })}
-                    className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                    className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                   >
                     {getAccountSizes(accountForm.accountType).map((size) => (
                       <option key={size} value={size}>
@@ -3362,7 +3362,7 @@ export default function AdminAccountsPage() {
                   <select
                     value={accountForm.platform}
                     onChange={(e) => setAccountForm({ ...accountForm, platform: e.target.value as 'mt4' | 'mt5' })}
-                    className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                    className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                   >
                     <option value="mt4">MetaTrader 4</option>
                     <option value="mt5">MetaTrader 5</option>
@@ -3376,7 +3376,7 @@ export default function AdminAccountsPage() {
                   <select
                     value={accountForm.status}
                     onChange={(e) => setAccountForm({ ...accountForm, status: e.target.value as any })}
-                    className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                    className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                   >
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
@@ -3393,7 +3393,7 @@ export default function AdminAccountsPage() {
                   <select
                     value={accountForm.step}
                     onChange={(e) => setAccountForm({ ...accountForm, step: parseInt(e.target.value) as 1 | 2 | 3 })}
-                    className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                    className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                     disabled={accountForm.status === 'funded' || accountForm.step === 3}
                   >
                     <option value={1}>Step 1</option>
@@ -3452,8 +3452,8 @@ export default function AdminAccountsPage() {
       {/* Add Account Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0D0D0D] border border-[#2F2F2F] rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-[#2F2F2F]">
+          <div className="bg-black border border-white/10 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-white/10">
               <h2 className="text-xl font-semibold text-white">Add Existing MetaAPI Account</h2>
               <p className="text-sm text-gray-400 mt-1">Manually add an existing MetaAPI account by entering its credentials</p>
             </div>
@@ -3474,24 +3474,24 @@ export default function AdminAccountsPage() {
                       onChange={(e) => setSearchUserEmail(e.target.value)}
                           onFocus={() => setShowRecentOrdersDropdown(true)}
                           placeholder="Start typing to search users..."
-                          className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE]/50"
+                          className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE]/50"
                         />
                         
                         {/* Recent Orders Dropdown */}
                         {showRecentOrdersDropdown && searchUserEmail === '' && (
-                          <div className="absolute top-full left-0 right-0 mt-2 bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
-                            <div className="p-3 border-b border-[#2F2F2F] flex items-center justify-between">
+                          <div className="absolute top-full left-0 right-0 mt-2 bg-black border border-white/10 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
+                            <div className="p-3 border-b border-white/10 flex items-center justify-between">
                               <span className="text-sm text-gray-400">Recent Orders</span>
                               <div className="flex gap-2">
                                 <button
                                   onClick={() => setRecentOrdersType('crypto')}
-                                  className={`text-xs px-2 py-1 rounded ${recentOrdersType === 'crypto' ? 'bg-[#0FF1CE] text-black' : 'bg-[#151515] text-gray-400'}`}
+                                  className={`text-xs px-2 py-1 rounded ${recentOrdersType === 'crypto' ? 'bg-[#0FF1CE] text-black' : 'bg-black text-gray-400'}`}
                                 >
                                   Crypto
                                 </button>
                                 <button
                                   onClick={() => setRecentOrdersType('credit')}
-                                  className={`text-xs px-2 py-1 rounded ${recentOrdersType === 'credit' ? 'bg-[#0FF1CE] text-black' : 'bg-[#151515] text-gray-400'}`}
+                                  className={`text-xs px-2 py-1 rounded ${recentOrdersType === 'credit' ? 'bg-[#0FF1CE] text-black' : 'bg-black text-gray-400'}`}
                                 >
                                   Credit
                                 </button>
@@ -3531,7 +3531,7 @@ export default function AdminAccountsPage() {
                         
                         {/* User Search Results */}
                         {searchUserEmail && filteredUsers.length > 0 && (
-                          <div className="absolute top-full left-0 right-0 mt-2 bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
+                          <div className="absolute top-full left-0 right-0 mt-2 bg-black border border-white/10 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
                             {filteredUsers.map((user) => (
                               <button
                                 key={user.uid}
@@ -3577,7 +3577,7 @@ export default function AdminAccountsPage() {
               {/* User Found - Show Configuration Form */}
               {searchedUser && (
                 <>
-                  <div className="bg-[#151515] border border-[#2F2F2F] rounded-lg p-4 mb-6">
+                  <div className="bg-black border border-white/10 rounded-lg p-4 mb-6">
                     <p className="text-sm text-gray-400 mb-1">Configuring account for:</p>
                     <p className="text-white font-medium">{searchedUser.email || 'No email'}</p>
                     <p className="text-sm text-gray-400">
@@ -3595,7 +3595,7 @@ export default function AdminAccountsPage() {
                         value={accountForm.accountId}
                         onChange={(e) => setAccountForm({ ...accountForm, accountId: e.target.value })}
                         placeholder="e.g., 50e36bcb-f0c2-49d2-939f-4aea4ea8eb94"
-                        className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE]/50"
+                        className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE]/50"
                       />
                     </div>
 
@@ -3610,7 +3610,7 @@ export default function AdminAccountsPage() {
                           value={accountForm.accountToken}
                           onChange={(e) => setAccountForm({ ...accountForm, accountToken: e.target.value })}
                           placeholder="Enter MetaAPI token"
-                          className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE]/50"
+                          className="w-full bg-black border border-white/10 rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE]/50"
                         />
                       </div>
                     </div>
@@ -3640,7 +3640,7 @@ export default function AdminAccountsPage() {
                           });
                           }
                         }}
-                        className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                        className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                       >
                         <option value="standard">Shockwave Standard</option>
                         <option value="instant">Shockwave Instant</option>
@@ -3657,7 +3657,7 @@ export default function AdminAccountsPage() {
                       <select
                         value={accountForm.accountSize}
                         onChange={(e) => setAccountForm({ ...accountForm, accountSize: parseInt(e.target.value) })}
-                        className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                        className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                       >
                         {getAccountSizes(accountForm.accountType).map((size) => (
                           <option key={size} value={size}>
@@ -3674,7 +3674,7 @@ export default function AdminAccountsPage() {
                       <select
                         value={accountForm.platform}
                         onChange={(e) => setAccountForm({ ...accountForm, platform: e.target.value as 'mt4' | 'mt5' })}
-                        className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                        className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                       >
                         <option value="mt4">MetaTrader 4</option>
                         <option value="mt5">MetaTrader 5</option>
@@ -3688,7 +3688,7 @@ export default function AdminAccountsPage() {
                       <select
                         value={accountForm.step}
                         onChange={(e) => setAccountForm({ ...accountForm, step: parseInt(e.target.value) as 1 | 2 | 3 })}
-                        className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                        className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                         disabled={accountForm.status === 'funded' || accountForm.step === 3}
                       >
                         <option value={1}>Step 1</option>
@@ -3755,8 +3755,8 @@ export default function AdminAccountsPage() {
       {/* ConnectMetaAccountModal */}
       {showConnectModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0D0D0D] border border-[#2F2F2F] rounded-xl max-w-3xl w-full max-h-[90vh] overflow-visible relative">
-            <div className="p-6 border-b border-[#2F2F2F]">
+          <div className="bg-black border border-white/10 rounded-xl max-w-3xl w-full max-h-[90vh] overflow-visible relative">
+            <div className="p-6 border-b border-white/10">
               <h2 className="text-xl font-semibold text-white">
                 Connect Demo Account to MetaAPI
               </h2>
@@ -3812,7 +3812,7 @@ export default function AdminAccountsPage() {
                             step1: { ...prev.step1, login: e.target.value }
                           }))}
                           placeholder="Enter MT account login"
-                          className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE]/50"
+                          className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE]/50"
                         />
                       </div>
 
@@ -3828,7 +3828,7 @@ export default function AdminAccountsPage() {
                             step1: { ...prev.step1, password: e.target.value }
                           }))}
                           placeholder="Enter MT account password"
-                          className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE]/50"
+                          className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE]/50"
                         />
                       </div>
 
@@ -3842,7 +3842,7 @@ export default function AdminAccountsPage() {
                             ...prev,
                             step1: { ...prev.step1, server: e.target.value }
                           }))}
-                          className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                          className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                         >
                           <option value="">Select Server</option>
                           <option value="AXI-US03-DEMO">AXI-US03-DEMO</option>
@@ -3862,7 +3862,7 @@ export default function AdminAccountsPage() {
                             ...prev,
                             step1: { ...prev.step1, platform: e.target.value as 'mt4' | 'mt5' }
                           }))}
-                          className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                          className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                         >
                           <option value="mt5">MetaTrader 5</option>
                           <option value="mt4">MetaTrader 4</option>
@@ -3881,7 +3881,7 @@ export default function AdminAccountsPage() {
                             step1: { ...prev.step1, nickname: e.target.value }
                           }))}
                           placeholder="Enter a friendly name for this account"
-                          className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE]/50"
+                          className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE]/50"
                         />
                       </div>
                     </div>
@@ -3923,24 +3923,24 @@ export default function AdminAccountsPage() {
                             onChange={(e) => setSearchUserEmail(e.target.value)}
                                 onFocus={() => setShowRecentOrdersDropdown(true)}
                                 placeholder="Start typing to search users..."
-                                className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE]/50"
+                                className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE]/50"
                               />
                               
                               {/* Recent Orders Dropdown */}
                               {showRecentOrdersDropdown && searchUserEmail === '' && (
-                                <div className="absolute top-full left-0 right-0 mt-2 bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg shadow-xl z-[60] max-h-96 overflow-y-auto">
-                                  <div className="p-3 border-b border-[#2F2F2F] flex items-center justify-between">
+                                <div className="absolute top-full left-0 right-0 mt-2 bg-black border border-white/10 rounded-lg shadow-xl z-[60] max-h-96 overflow-y-auto">
+                                  <div className="p-3 border-b border-white/10 flex items-center justify-between">
                                     <span className="text-sm text-gray-400">Recent Orders</span>
                                     <div className="flex gap-2">
                                       <button
                                         onClick={() => setRecentOrdersType('crypto')}
-                                        className={`text-xs px-2 py-1 rounded ${recentOrdersType === 'crypto' ? 'bg-[#0FF1CE] text-black' : 'bg-[#151515] text-gray-400'}`}
+                                        className={`text-xs px-2 py-1 rounded ${recentOrdersType === 'crypto' ? 'bg-[#0FF1CE] text-black' : 'bg-black text-gray-400'}`}
                                       >
                                         Crypto
                                       </button>
                                       <button
                                         onClick={() => setRecentOrdersType('credit')}
-                                        className={`text-xs px-2 py-1 rounded ${recentOrdersType === 'credit' ? 'bg-[#0FF1CE] text-black' : 'bg-[#151515] text-gray-400'}`}
+                                        className={`text-xs px-2 py-1 rounded ${recentOrdersType === 'credit' ? 'bg-[#0FF1CE] text-black' : 'bg-black text-gray-400'}`}
                                       >
                                         Credit
                                       </button>
@@ -3980,7 +3980,7 @@ export default function AdminAccountsPage() {
                               
                               {/* User Search Results */}
                               {searchUserEmail && filteredUsers.length > 0 && (
-                                <div className="absolute top-full left-0 right-0 mt-2 bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg shadow-xl z-[60] max-h-96 overflow-y-auto">
+                                <div className="absolute top-full left-0 right-0 mt-2 bg-black border border-white/10 rounded-lg shadow-xl z-[60] max-h-96 overflow-y-auto">
                                   {filteredUsers.map((user) => (
                                     <button
                                       key={user.uid}
@@ -4026,7 +4026,7 @@ export default function AdminAccountsPage() {
                     {/* User Found */}
                     {searchedUser && (
                       <>
-                        <div className="bg-[#151515] border border-[#2F2F2F] rounded-lg p-4 mb-6">
+                        <div className="bg-black border border-white/10 rounded-lg p-4 mb-6">
                           <p className="text-sm text-gray-400 mb-1">Configuring account for:</p>
                           <p className="text-white font-medium">{searchedUser.email}</p>
                           <p className="text-sm text-gray-400">
@@ -4044,7 +4044,7 @@ export default function AdminAccountsPage() {
                               type="text"
                               value={connectModalData.accountId}
                               disabled
-                              className="w-full bg-[#0A0A0A] border border-[#2F2F2F] rounded-lg px-4 py-3 text-gray-400 cursor-not-allowed font-mono text-sm"
+                              className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg px-4 py-3 text-gray-400 cursor-not-allowed font-mono text-sm"
                             />
                           </div>
 
@@ -4056,7 +4056,7 @@ export default function AdminAccountsPage() {
                               type="text"
                               value={connectModalData.step1.platform.toUpperCase()}
                               disabled
-                              className="w-full bg-[#0A0A0A] border border-[#2F2F2F] rounded-lg px-4 py-3 text-gray-400 cursor-not-allowed"
+                              className="w-full bg-[#0A0A0A] border border-white/10 rounded-lg px-4 py-3 text-gray-400 cursor-not-allowed"
                             />
                           </div>
 
@@ -4085,7 +4085,7 @@ export default function AdminAccountsPage() {
                                 });
                                 }
                               }}
-                              className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                              className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                             >
                               <option value="standard">Shockwave Standard</option>
                               <option value="instant">Shockwave Instant</option>
@@ -4102,7 +4102,7 @@ export default function AdminAccountsPage() {
                             <select
                               value={accountForm.accountSize}
                               onChange={(e) => setAccountForm({ ...accountForm, accountSize: parseInt(e.target.value) })}
-                              className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                              className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                             >
                               {getAccountSizes(accountForm.accountType).map((size) => (
                                 <option key={size} value={size}>
@@ -4119,7 +4119,7 @@ export default function AdminAccountsPage() {
                             <select
                               value={accountForm.step}
                               onChange={(e) => setAccountForm({ ...accountForm, step: parseInt(e.target.value) as 1 | 2 | 3 })}
-                              className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                              className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                               disabled={accountForm.status === 'funded' || accountForm.step === 3}
                             >
                               <option value={1}>Step 1</option>
@@ -4154,7 +4154,7 @@ export default function AdminAccountsPage() {
                     </div>
                     
                     {/* Email Preview */}
-                    <div className="bg-[#151515] border border-[#2F2F2F] rounded-lg p-6">
+                    <div className="bg-black border border-white/10 rounded-lg p-6">
                       <h4 className="text-white font-medium mb-4">Email Preview</h4>
                       
                       <div className="space-y-3 mb-6">
@@ -4168,14 +4168,14 @@ export default function AdminAccountsPage() {
                         </div>
                       </div>
                       
-                      <div className="border border-[#2F2F2F] rounded-lg overflow-hidden">
+                      <div className="border border-white/10 rounded-lg overflow-hidden">
                         <div className="bg-[#0FF1CE] p-4 text-center">
                           <h2 className="text-[#0D0D0D] text-xl font-bold">Shockwave Capital</h2>
                         </div>
-                        <div className="p-6 bg-[#0D0D0D]">
+                        <div className="p-6 bg-black">
                           <h3 className="text-white text-lg font-semibold mb-4">Your Trading Challenge Details</h3>
                           
-                          <div className="bg-[#151515] border border-[#2F2F2F] rounded-lg overflow-hidden mb-4">
+                          <div className="bg-black border border-white/10 rounded-lg overflow-hidden mb-4">
                             <div className="bg-[#0FF1CE] p-3 text-center">
                               <p className="text-[#0D0D0D] font-semibold">Your Trading Account Credentials</p>
                             </div>
@@ -4382,7 +4382,7 @@ export default function AdminAccountsPage() {
       {/* Email Sending Modal */}
       {showEmailSendingModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0D0D0D] border border-[#2F2F2F] rounded-xl p-8 max-w-sm w-full">
+          <div className="bg-black border border-white/10 rounded-xl p-8 max-w-sm w-full">
             <div className="flex flex-col items-center">
               {emailSendingStatus === 'sending' && (
                 <>
@@ -4416,8 +4416,8 @@ export default function AdminAccountsPage() {
 
       {credentialsAccount && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-[#0D0D0D] border border-[#2F2F2F] rounded-xl max-w-md w-full">
-            <div className="flex items-center justify-between p-6 border-b border-[#2F2F2F]">
+          <div className="bg-black border border-white/10 rounded-xl max-w-md w-full">
+            <div className="flex items-center justify-between p-6 border-b border-white/10">
               <h2 className="text-xl font-semibold text-white">Login details</h2>
               <button onClick={() => setCredentialsAccount(null)} className="text-gray-400 hover:text-white">
                 <X size={18} />
@@ -4433,7 +4433,7 @@ export default function AdminAccountsPage() {
                   type="text"
                   value={credentialForm.login}
                   onChange={(e) => setCredentialForm((prev) => ({ ...prev, login: e.target.value }))}
-                  className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                  className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                 />
               </div>
               <div>
@@ -4442,7 +4442,7 @@ export default function AdminAccountsPage() {
                   type="password"
                   value={credentialForm.password}
                   onChange={(e) => setCredentialForm((prev) => ({ ...prev, password: e.target.value }))}
-                  className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                  className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                 />
               </div>
               <div>
@@ -4451,11 +4451,11 @@ export default function AdminAccountsPage() {
                   type="text"
                   value={credentialForm.server}
                   onChange={(e) => setCredentialForm((prev) => ({ ...prev, server: e.target.value }))}
-                  className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
+                  className="w-full bg-black border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#0FF1CE]/50"
                 />
               </div>
             </div>
-            <div className="p-6 border-t border-[#2F2F2F] flex justify-end gap-3">
+            <div className="p-6 border-t border-white/10 flex justify-end gap-3">
               <button onClick={() => setCredentialsAccount(null)} className="px-6 py-3 text-gray-400 hover:text-white transition-colors">
                 Cancel
               </button>

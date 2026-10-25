@@ -256,7 +256,7 @@ export default function CardOrdersPage() {
               className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg font-semibold whitespace-nowrap transition-all text-sm ${
                 challengeTypeFilter === type
                   ? 'bg-[#0FF1CE] text-black'
-                  : 'bg-[#1A1A1A] text-gray-400 hover:bg-[#2F2F2F] border border-[#2F2F2F]'
+                  : 'bg-black text-gray-400 hover:bg-white/5 border border-white/10'
               }`}
             >
               {type}
@@ -304,14 +304,14 @@ export default function CardOrdersPage() {
               placeholder="Search by email, name, ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 bg-[#1A1A1A] border border-[#2F2F2F] rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE] transition-colors"
+              className="w-full pl-9 pr-4 py-2.5 bg-black border border-white/10 rounded-lg text-white text-sm placeholder-gray-500 focus:outline-none focus:border-[#0FF1CE] transition-colors"
             />
           </div>
           <div className="relative md:min-w-[160px]">
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="w-full px-3 py-2.5 bg-[#1A1A1A] border border-[#2F2F2F] rounded-lg text-white text-sm focus:outline-none focus:border-[#0FF1CE] transition-colors appearance-none cursor-pointer"
+              className="w-full px-3 py-2.5 bg-black border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-[#0FF1CE] transition-colors appearance-none cursor-pointer"
             >
               <option value="ALL">All Status</option>
               <option value="pending">Pending</option>
@@ -323,19 +323,19 @@ export default function CardOrdersPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
-          <div className="bg-[#1A1A1A] border border-[#2F2F2F] rounded-lg p-3 md:p-4">
+          <div className="bg-black border border-white/10 rounded-lg p-3 md:p-4">
             <div className="text-gray-400 text-xs md:text-sm mb-0.5">Total</div>
             <div className="text-xl md:text-2xl font-bold text-white">{orders.length}</div>
           </div>
-          <div className="bg-[#1A1A1A] border border-[#2F2F2F] rounded-lg p-3 md:p-4">
+          <div className="bg-black border border-white/10 rounded-lg p-3 md:p-4">
             <div className="text-gray-400 text-xs md:text-sm mb-0.5">Pending</div>
             <div className="text-xl md:text-2xl font-bold text-yellow-500">{orders.filter(o => o.status === 'pending').length}</div>
           </div>
-          <div className="bg-[#1A1A1A] border border-[#2F2F2F] rounded-lg p-3 md:p-4">
+          <div className="bg-black border border-white/10 rounded-lg p-3 md:p-4">
             <div className="text-gray-400 text-xs md:text-sm mb-0.5">Completed</div>
             <div className="text-xl md:text-2xl font-bold text-green-500">{orders.filter(o => o.status === 'completed').length}</div>
           </div>
-          <div className="bg-[#1A1A1A] border border-[#2F2F2F] rounded-lg p-3 md:p-4">
+          <div className="bg-black border border-white/10 rounded-lg p-3 md:p-4">
             <div className="text-gray-400 text-xs md:text-sm mb-0.5">Revenue</div>
             <div className="text-xl md:text-2xl font-bold text-[#0FF1CE]">
               ${orders.filter(o => o.status === 'completed').reduce((sum, o) => sum + o.totalAmount, 0).toFixed(0)}
@@ -346,14 +346,14 @@ export default function CardOrdersPage() {
         {/* Orders: Mobile cards */}
         <div className="md:hidden space-y-2">
           {filteredOrders.length === 0 ? (
-            <div className="p-8 text-center text-gray-400 bg-[#1A1A1A] border border-[#2F2F2F] rounded-lg">
+            <div className="p-8 text-center text-gray-400 bg-black border border-white/10 rounded-lg">
               <CreditCard size={32} className="mx-auto mb-3 opacity-50" />
               <p>No card orders found</p>
             </div>
           ) : filteredOrders.map((order) => {
             const isExpanded = expandedRows.has(order.id);
             return (
-              <div key={order.id} className={`rounded-xl border transition-all ${isExpanded ? 'border-[#0FF1CE]/30 bg-[#0FF1CE]/5' : 'border-[#2F2F2F] bg-[#1A1A1A]'}`}>
+              <div key={order.id} className={`rounded-xl border transition-all ${isExpanded ? 'border-[#0FF1CE]/30 bg-[#0FF1CE]/5' : 'border-white/10 bg-black'}`}>
                 <div className="p-3">
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
@@ -387,7 +387,7 @@ export default function CardOrdersPage() {
                   </div>
                 </div>
                 {isExpanded && (
-                  <div className="border-t border-[#2F2F2F] p-3 grid grid-cols-2 gap-2 text-xs">
+                  <div className="border-t border-white/10 p-3 grid grid-cols-2 gap-2 text-xs">
                     <div className="text-gray-500">Phone: <span className="text-white">{order.phone}</span></div>
                     <div className="text-gray-500">Country: <span className="text-white">{order.country}</span></div>
                     {order.discordUsername && <div className="text-gray-500">Discord: <span className="text-white">{order.discordUsername}</span></div>}
@@ -401,7 +401,7 @@ export default function CardOrdersPage() {
         </div>
 
         {/* Orders Table - Desktop */}
-        <div className="hidden md:block bg-[#1A1A1A] border border-[#2F2F2F] rounded-lg overflow-hidden">
+        <div className="hidden md:block bg-black border border-white/10 rounded-lg overflow-hidden">
           {filteredOrders.length === 0 ? (
             <div className="p-8 text-center text-gray-400">
               <CreditCard size={48} className="mx-auto mb-4 opacity-50" />
@@ -410,7 +410,7 @@ export default function CardOrdersPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-[#0D0D0D] border-b border-[#2F2F2F]">
+                <thead className="bg-black border-b border-white/10">
                   <tr>
                     <th className="px-4 py-3 text-left" onClick={(e) => e.stopPropagation()}>
                       <button
@@ -540,7 +540,7 @@ export default function CardOrdersPage() {
                         </td>
                       </tr>
                       {expandedRows.has(order.id) && (
-                        <tr className="bg-[#0D0D0D]">
+                        <tr className="bg-black">
                           <td colSpan={8} className="px-4 py-4">
                             <div className="grid grid-cols-2 gap-4 text-sm">
                               <div>

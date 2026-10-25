@@ -1,13 +1,11 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Particles from '../components/Particles';
 import { 
   Eye, 
   EyeOff, 
   Mail, 
   Lock,
-  Shield,
   AlertCircle
 } from 'lucide-react';
 import { signInWithEmailAndPassword, onAuthStateChanged, getIdToken } from 'firebase/auth';
@@ -58,9 +56,9 @@ const FloatingLabelInput = ({
           id={id}
           type={showPassword ? 'text' : type}
           className={`
-            w-full bg-[#1A1A1A] border rounded-lg pl-10 pr-4 py-3 text-white 
+            w-full bg-black border rounded-lg pl-10 pr-4 py-3 text-white 
             transition-all focus:outline-none placeholder-transparent
-            ${isFloating ? 'border-[#0FF1CE]' : 'border-[#2F2F2F]'}
+            ${isFloating ? 'border-[#0FF1CE]/60' : 'border-white/10'}
           `}
           placeholder={label}
           value={value}
@@ -74,7 +72,7 @@ const FloatingLabelInput = ({
           className={`
             absolute left-10 transition-all pointer-events-none
             ${isFloating 
-              ? '-top-2 text-xs text-[#0FF1CE] bg-[#0D0D0D] px-2' 
+              ? '-top-2 text-xs text-[#0FF1CE] bg-black px-2' 
               : 'top-3 text-gray-400'
             }
           `}
@@ -172,26 +170,13 @@ export default function AdminAuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0D0D0D] text-white flex flex-col">
-      {/* Background Effects */}
-      <div className="absolute top-0 left-0 w-full h-full bg-[#0FF1CE]/[0.02] background-noise"></div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:w-3/4 h-full rounded-full bg-[#0FF1CE]/[0.03] blur-[150px] opacity-60"></div>
-      <Particles />
+    <div className="min-h-screen bg-black text-white flex items-center justify-center px-4">
+      <div className="w-full max-w-sm">
+        <div className="mb-8 text-center">
+          <h1 className="text-2xl font-semibold text-white">Sign in</h1>
+        </div>
 
-      {/* Main Content */}
-      <div className="relative flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8">
-        <div className="w-full max-w-md space-y-8">
-          {/* Header */}
-          <div className="text-center">
-            <div className="mx-auto w-16 h-16 bg-[#0FF1CE]/10 rounded-full flex items-center justify-center mb-4">
-              <Shield className="w-8 h-8 text-[#0FF1CE]" />
-            </div>
-            <h2 className="text-3xl font-bold">Admin Access</h2>
-            <p className="mt-2 text-gray-400">Sign in to access the admin dashboard</p>
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl border border-white/10 p-5">
             {errors.general && (
               <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm flex items-center gap-2">
                 <AlertCircle size={16} />
@@ -226,9 +211,9 @@ export default function AdminAuthPage() {
               type="submit"
               disabled={loading}
               className={`
-                w-full bg-[#0FF1CE] text-black font-semibold py-3 px-4 rounded-lg
-                transition duration-200 relative overflow-hidden
-                ${loading ? 'opacity-80 cursor-not-allowed' : 'hover:bg-[#0FF1CE]/90'}
+                w-full bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] text-black font-semibold py-3 px-4 rounded-lg
+                transition duration-200
+                ${loading ? 'opacity-80 cursor-not-allowed' : 'hover:brightness-110'}
               `}
             >
               {loading ? (
@@ -240,16 +225,8 @@ export default function AdminAuthPage() {
                 'Sign In'
               )}
             </button>
-          </form>
-        </div>
+        </form>
       </div>
-
-      <style jsx global>{`
-        .background-noise {
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-          opacity: 0.15;
-        }
-      `}</style>
     </div>
   );
 } 

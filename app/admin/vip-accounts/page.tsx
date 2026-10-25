@@ -846,7 +846,7 @@ export default function AdminVipAccountsPage() {
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => { resetModals(); setShowAddModal(true); }}
-            className="px-4 py-2 bg-[#151515] border border-[#2F2F2F] text-white rounded-lg hover:border-[#0FF1CE]/40 transition-colors inline-flex items-center gap-2 text-sm"
+            className="px-4 py-2 bg-black border border-white/10 text-white rounded-lg hover:border-[#0FF1CE]/40 transition-colors inline-flex items-center gap-2 text-sm"
           >
             <Server size={16} />
             Add Existing
@@ -880,7 +880,7 @@ export default function AdminVipAccountsPage() {
           { label: 'Passed', value: stats.passed },
           { label: 'Failed', value: stats.failed }
         ].map((stat) => (
-          <div key={stat.label} className="bg-[#1A1A1A] border border-[#2F2F2F] rounded-xl p-4">
+          <div key={stat.label} className="bg-black border border-white/10 rounded-xl p-4">
             <p className="text-gray-400 text-xs mb-1">{stat.label}</p>
             <p className="text-white text-xl font-semibold">{stat.value}</p>
           </div>
@@ -894,13 +894,13 @@ export default function AdminVipAccountsPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search email, name, or account ID"
-            className="w-full bg-[#151515] border border-[#2F2F2F] rounded-lg pl-10 pr-4 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+            className="w-full bg-black border border-white/10 rounded-lg pl-10 pr-4 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
           />
         </div>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="bg-[#151515] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+          className="bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
         >
           <option value="all">All statuses</option>
           <option value="active">Active</option>
@@ -911,7 +911,7 @@ export default function AdminVipAccountsPage() {
         </select>
         <button
           onClick={loadAccounts}
-          className="px-4 py-2 bg-[#151515] border border-[#2F2F2F] text-white rounded-lg hover:border-[#0FF1CE]/40 inline-flex items-center gap-2 text-sm"
+          className="px-4 py-2 bg-black border border-white/10 text-white rounded-lg hover:border-[#0FF1CE]/40 inline-flex items-center gap-2 text-sm"
         >
           <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
           Reload
@@ -923,7 +923,7 @@ export default function AdminVipAccountsPage() {
           <Loader2 className="w-8 h-8 text-[#0FF1CE] animate-spin" />
         </div>
       ) : filteredAccounts.length === 0 ? (
-        <div className="bg-[#1A1A1A] border border-[#2F2F2F] rounded-xl p-10 text-center">
+        <div className="bg-black border border-white/10 rounded-xl p-10 text-center">
           <Crown className="w-10 h-10 text-[#0FF1CE] mx-auto mb-3" />
           <h2 className="text-white font-semibold mb-2">No VIP trading accounts yet</h2>
           <p className="text-gray-400 text-sm mb-4">
@@ -943,7 +943,7 @@ export default function AdminVipAccountsPage() {
             const profitTracker = getVipProfitTracker(profitAmount, account.metaApiAccount.profitSplit);
 
             return (
-              <div key={account.metaApiAccount.accountId} className="bg-[#1A1A1A] border border-[#2F2F2F] rounded-xl p-4 md:p-5">
+              <div key={account.metaApiAccount.accountId} className="bg-black border border-white/10 rounded-xl p-4 md:p-5">
                 <div className="flex flex-col lg:flex-row lg:items-start gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -998,7 +998,7 @@ export default function AdminVipAccountsPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-[#2F2F2F]">
+                <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-white/10">
                   <button
                     onClick={() => router.push(`/admin/vip-accounts/${account.metaApiAccount.accountId}`)}
                     className="px-3 py-1.5 bg-[#0FF1CE]/10 text-[#0FF1CE] rounded-lg text-xs inline-flex items-center gap-1 hover:bg-[#0FF1CE]/20"
@@ -1008,7 +1008,7 @@ export default function AdminVipAccountsPage() {
                   <button
                     onClick={() => refreshAccount(account)}
                     disabled={isRefreshing || account.metaApiAccount.status === 'failed'}
-                    className="px-3 py-1.5 bg-[#151515] border border-[#2F2F2F] text-white rounded-lg text-xs inline-flex items-center gap-1 disabled:opacity-50"
+                    className="px-3 py-1.5 bg-black border border-white/10 text-white rounded-lg text-xs inline-flex items-center gap-1 disabled:opacity-50"
                   >
                     <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} /> Refresh
                   </button>
@@ -1018,13 +1018,13 @@ export default function AdminVipAccountsPage() {
                       setSizeForm(String(account.metaApiAccount.accountSize || ''));
                       setSplitForm(String(normalizeVipProfitSplit(account.metaApiAccount.profitSplit)));
                     }}
-                    className="px-3 py-1.5 bg-[#151515] border border-[#2F2F2F] text-white rounded-lg text-xs inline-flex items-center gap-1"
+                    className="px-3 py-1.5 bg-black border border-white/10 text-white rounded-lg text-xs inline-flex items-center gap-1"
                   >
                     <DollarSign size={14} /> Size / Split
                   </button>
                   <button
                     onClick={() => enableFeatures(account.metaApiAccount.accountId)}
-                    className="px-3 py-1.5 bg-[#151515] border border-[#2F2F2F] text-white rounded-lg text-xs"
+                    className="px-3 py-1.5 bg-black border border-white/10 text-white rounded-lg text-xs"
                   >
                     Enable Features
                   </button>
@@ -1042,7 +1042,7 @@ export default function AdminVipAccountsPage() {
                   </button>
                   <button
                     onClick={() => handleStatusChange(account.uid, account.metaApiAccount.accountId, 'inactive')}
-                    className="px-3 py-1.5 bg-[#151515] border border-[#2F2F2F] text-white rounded-lg text-xs inline-flex items-center gap-1"
+                    className="px-3 py-1.5 bg-black border border-white/10 text-white rounded-lg text-xs inline-flex items-center gap-1"
                   >
                     <Power size={14} /> Disconnect
                   </button>
@@ -1055,7 +1055,7 @@ export default function AdminVipAccountsPage() {
                         server: account.metaApiAccount.loginCredentials?.server || ''
                       });
                     }}
-                    className="px-3 py-1.5 bg-[#151515] border border-[#2F2F2F] text-white rounded-lg text-xs inline-flex items-center gap-1"
+                    className="px-3 py-1.5 bg-black border border-white/10 text-white rounded-lg text-xs inline-flex items-center gap-1"
                   >
                     <KeyRound size={14} /> Login details
                   </button>
@@ -1074,8 +1074,8 @@ export default function AdminVipAccountsPage() {
 
       {(showConnectModal || showAddModal) && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#151515] border border-[#2F2F2F] rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-5 border-b border-[#2F2F2F]">
+          <div className="bg-black border border-white/10 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-5 border-b border-white/10">
               <h2 className="text-white font-semibold">
                 {showAddModal ? 'Link Existing VIP Account' : `Connect VIP Account${connectStep ? ` • Step ${connectStep}` : ''}`}
               </h2>
@@ -1093,7 +1093,7 @@ export default function AdminVipAccountsPage() {
                       value={searchUserEmail}
                       onChange={(e) => setSearchUserEmail(e.target.value)}
                       placeholder="vip.customer@email.com"
-                      className="flex-1 bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-sm"
+                      className="flex-1 bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm"
                     />
                     <button
                       onClick={searchUserByEmail}
@@ -1122,7 +1122,7 @@ export default function AdminVipAccountsPage() {
                     <select
                       value={connectStep1.platform}
                       onChange={(e) => setConnectStep1((prev) => ({ ...prev, platform: e.target.value as 'mt4' | 'mt5' }))}
-                      className="w-full bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-sm"
+                      className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm"
                     >
                       <option value="mt5">MT5</option>
                       <option value="mt4">MT4</option>
@@ -1141,7 +1141,7 @@ export default function AdminVipAccountsPage() {
                         <select
                           value={accountForm.platform}
                           onChange={(e) => setAccountForm((prev) => ({ ...prev, platform: e.target.value as 'mt4' | 'mt5' }))}
-                          className="w-full bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-sm"
+                          className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm"
                         >
                           <option value="mt5">MT5</option>
                           <option value="mt4">MT4</option>
@@ -1163,7 +1163,7 @@ export default function AdminVipAccountsPage() {
                           setAccountForm((prev) => ({ ...prev, accountSize: Number(e.target.value), customSize: '', useCustomSize: false }));
                         }
                       }}
-                      className="w-full bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-sm"
+                      className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm"
                     >
                       {VIP_SIZE_PRESETS.map((preset) => (
                         <option key={preset.size} value={preset.size}>
@@ -1186,7 +1186,7 @@ export default function AdminVipAccountsPage() {
                     onChange={(value) => setAccountForm((prev) => ({ ...prev, profitSplit: value }))}
                   />
                   {selectedObjectiveAmounts && (
-                    <div className="bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg p-3 space-y-1">
+                    <div className="bg-black border border-white/10 rounded-lg p-3 space-y-1">
                       <p className="text-white text-xs font-medium">
                         Trackers and payout for {formatVipAllocation(selectedObjectiveAmounts.accountSize)}
                       </p>
@@ -1206,7 +1206,7 @@ export default function AdminVipAccountsPage() {
                     <select
                       value={accountForm.status}
                       onChange={(e) => setAccountForm((prev) => ({ ...prev, status: e.target.value as UserMetaApiAccount['status'] }))}
-                      className="w-full bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-sm"
+                      className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm"
                     >
                       <option value="active">Active</option>
                       <option value="inactive">Inactive</option>
@@ -1237,7 +1237,7 @@ export default function AdminVipAccountsPage() {
               )}
             </div>
 
-            <div className="p-5 border-t border-[#2F2F2F] flex justify-end gap-2">
+            <div className="p-5 border-t border-white/10 flex justify-end gap-2">
               <button onClick={resetModals} className="px-4 py-2 text-gray-300 text-sm">
                 {connectStep === 3 ? 'Close' : 'Cancel'}
               </button>
@@ -1286,8 +1286,8 @@ export default function AdminVipAccountsPage() {
 
       {credentialsAccount && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#151515] border border-[#2F2F2F] rounded-2xl w-full max-w-md">
-            <div className="flex items-center justify-between p-5 border-b border-[#2F2F2F]">
+          <div className="bg-black border border-white/10 rounded-2xl w-full max-w-md">
+            <div className="flex items-center justify-between p-5 border-b border-white/10">
               <h2 className="text-white font-semibold">VIP login details</h2>
               <button onClick={() => setCredentialsAccount(null)} className="text-gray-400 hover:text-white">
                 <X size={18} />
@@ -1301,7 +1301,7 @@ export default function AdminVipAccountsPage() {
               <TextField label="Password" type="password" value={credentialForm.password} onChange={(value) => setCredentialForm((prev) => ({ ...prev, password: value }))} />
               <TextField label="Server" value={credentialForm.server} onChange={(value) => setCredentialForm((prev) => ({ ...prev, server: value }))} />
             </div>
-            <div className="p-5 border-t border-[#2F2F2F] flex justify-end gap-2">
+            <div className="p-5 border-t border-white/10 flex justify-end gap-2">
               <button onClick={() => setCredentialsAccount(null)} className="px-4 py-2 text-gray-300 text-sm">
                 Cancel
               </button>
@@ -1320,8 +1320,8 @@ export default function AdminVipAccountsPage() {
 
       {sizeAccount && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-[#151515] border border-[#2F2F2F] rounded-2xl w-full max-w-md">
-            <div className="flex items-center justify-between p-5 border-b border-[#2F2F2F]">
+          <div className="bg-black border border-white/10 rounded-2xl w-full max-w-md">
+            <div className="flex items-center justify-between p-5 border-b border-white/10">
               <h2 className="text-white font-semibold">Update VIP allocation</h2>
               <button onClick={() => setSizeAccount(null)} className="text-gray-400 hover:text-white">
                 <X size={18} />
@@ -1342,7 +1342,7 @@ export default function AdminVipAccountsPage() {
                 onChange={(value) => setSplitForm(String(value))}
               />
               {parseVipCustomSize(sizeForm) >= 10_000 && (
-                <div className="bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg p-3 space-y-1">
+                <div className="bg-black border border-white/10 rounded-lg p-3 space-y-1">
                   <p className="text-white text-xs font-medium">
                     Trackers and payout for {formatVipAllocation(parseVipCustomSize(sizeForm))}
                   </p>
@@ -1358,7 +1358,7 @@ export default function AdminVipAccountsPage() {
                 </div>
               )}
             </div>
-            <div className="p-5 border-t border-[#2F2F2F] flex justify-end gap-2">
+            <div className="p-5 border-t border-white/10 flex justify-end gap-2">
               <button onClick={() => setSizeAccount(null)} className="px-4 py-2 text-gray-300 text-sm">
                 Cancel
               </button>
@@ -1389,7 +1389,7 @@ function MetricChip({
   warn?: boolean;
 }) {
   return (
-    <div className="bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg p-3">
+    <div className="bg-black border border-white/10 rounded-lg p-3">
       <p className="text-gray-500 text-[10px] uppercase tracking-wide mb-1">{label}</p>
       <p className={`text-sm font-medium ${danger ? 'text-red-400' : warn ? 'text-green-400' : 'text-white'}`}>{value}</p>
     </div>
@@ -1409,7 +1409,7 @@ function ProfitSplitField({
       <select
         value={normalizeVipProfitSplit(value)}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-sm"
+        className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm"
       >
         {VIP_PROFIT_SPLIT_OPTIONS.map((split) => (
           <option key={split} value={split}>
@@ -1442,7 +1442,7 @@ function TextField({
         value={value}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full bg-[#0D0D0D] border border-[#2F2F2F] rounded-lg px-3 py-2 text-white text-sm"
+        className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm"
       />
     </div>
   );

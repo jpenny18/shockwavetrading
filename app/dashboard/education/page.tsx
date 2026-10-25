@@ -1,6 +1,5 @@
 'use client';
 import React, { useState } from 'react';
-import Particles from '../../components/Particles';
 import { 
   BookOpen, 
   Play, 
@@ -384,10 +383,10 @@ const ModuleCard = ({ module, skillLevel }: ModuleCardProps) => {
   const IconComponent = module.icon;
 
   return (
-    <div className={`bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-6 hover:border-[#0FF1CE]/50 transition-all duration-300 group`}>
+    <div className={`bg-black rounded-2xl border border-white/10 p-6 hover:border-[#0FF1CE]/50 transition-all duration-300 group`}>
       <div className="flex items-start gap-4 mb-4">
-        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${module.color} flex items-center justify-center border ${module.borderColor} group-hover:scale-110 transition-transform duration-300`}>
-          <IconComponent className="w-6 h-6 text-white" />
+        <div className="w-12 h-12 rounded-xl bg-black border border-[#0FF1CE]/40 flex items-center justify-center">
+          <IconComponent className="w-6 h-6 text-[#0FF1CE]" />
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="text-xl font-bold text-white mb-2 group-hover:text-[#0FF1CE] transition-colors">
@@ -411,14 +410,14 @@ const ModuleCard = ({ module, skillLevel }: ModuleCardProps) => {
 
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between p-3 bg-[#151515]/50 backdrop-blur-sm rounded-lg border border-[#2F2F2F]/50 hover:border-[#0FF1CE]/50 transition-all duration-300 mb-4"
+        className="w-full flex items-center justify-between p-3 bg-black rounded-lg border border-white/10 hover:border-[#0FF1CE]/50 transition-all duration-300 mb-4"
       >
         <span className="text-white font-medium">View Course Outline</span>
         <ChevronRight className={`w-4 h-4 text-[#0FF1CE] transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} />
       </button>
 
       {isExpanded && (
-        <div className="space-y-2 mb-4 bg-[#0D0D0D]/40 rounded-lg p-4 border border-[#2F2F2F]/30">
+        <div className="space-y-2 mb-4 bg-black rounded-lg p-4 border border-white/10">
           {module.lessons_list.map((lesson: string, index: number) => (
             <div key={index} className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#1A1A1A]/30 transition-colors">
               <div className="w-6 h-6 rounded-full bg-[#0FF1CE]/10 border border-[#0FF1CE]/30 flex items-center justify-center flex-shrink-0">
@@ -450,12 +449,6 @@ export default function EducationHub() {
 
   return (
     <div className="relative min-h-screen">
-      {/* Background Effects */}
-      <div className="fixed inset-0 bg-[#0FF1CE]/[0.02] background-noise"></div>
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:w-3/4 h-full rounded-full bg-[#0FF1CE]/[0.03] blur-[150px] opacity-60"></div>
-      <div className="absolute top-1/4 -left-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse"></div>
-      <div className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-[#0FF1CE]/10 rounded-full blur-[150px] animate-pulse delay-1000"></div>
-      <Particles />
 
       {/* Content - Blurred when coming soon */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 blur-sm pointer-events-none">
@@ -465,7 +458,7 @@ export default function EducationHub() {
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#0FF1CE]/20 to-[#0FF1CE]/10 flex items-center justify-center border border-[#0FF1CE]/20">
               <BookOpen className="w-6 h-6 text-[#0FF1CE]" />
             </div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent">Educational Hub</h1>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold text-white">Educational Hub</h1>
           </div>
           <p className="text-gray-400 text-sm sm:text-base lg:text-lg max-w-3xl mx-auto leading-relaxed">
             Master trading with our comprehensive education program. From fundamentals to advanced strategies, 
@@ -481,7 +474,7 @@ export default function EducationHub() {
             { label: 'Learning Hours', value: '200+', icon: Clock },
             { label: 'Success Rate', value: '94%', icon: Star }
           ].map((stat, index) => (
-            <div key={index} className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-xl border border-[#2F2F2F]/50 p-4 sm:p-6 text-center hover:border-[#0FF1CE]/50 transition-all duration-300">
+            <div key={index} className="bg-black rounded-xl border border-white/10 p-4 sm:p-6 text-center hover:border-[#0FF1CE]/50 transition-all duration-300">
               <div className="flex justify-center mb-3">
                 <stat.icon className="w-6 h-6 text-[#0FF1CE]" />
               </div>
@@ -493,7 +486,7 @@ export default function EducationHub() {
 
         {/* Skill Level Selector */}
         <div className="mb-8 sm:mb-12">
-          <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent mb-6 text-center">Choose Your Learning Path</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold text-white mb-6 text-center">Choose Your Learning Path</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
             {SKILL_LEVELS.map((level) => {
               const IconComponent = level.icon;
@@ -505,15 +498,15 @@ export default function EducationHub() {
                   onClick={() => setActiveLevel(level.id)}
                   className={`p-6 rounded-2xl border-2 transition-all duration-300 text-left group ${
                     isActive 
-                      ? 'border-[#0FF1CE] bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 shadow-[0_0_20px_rgba(15,241,206,0.3)]' 
-                      : 'border-[#2F2F2F] bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm hover:border-[#0FF1CE]/50'
+                      ? 'border-[#0FF1CE]/60 bg-black' 
+                      : 'border-white/10 bg-black hover:border-[#0FF1CE]/40'
                   }`}
                 >
                   <div className="flex items-center gap-4 mb-3">
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                       isActive 
-                        ? 'bg-gradient-to-br from-[#0FF1CE]/20 to-[#0FF1CE]/10 border border-[#0FF1CE]/30' 
-                        : 'bg-gradient-to-br from-[#2F2F2F]/50 to-[#1A1A1A]/50 border border-[#2F2F2F]/30 group-hover:border-[#0FF1CE]/30'
+                        ? 'bg-black border border-[#0FF1CE]/50' 
+                        : 'bg-black border border-white/10 group-hover:border-[#0FF1CE]/40'
                     }`}>
                       <IconComponent className={`w-6 h-6 ${isActive ? 'text-[#0FF1CE]' : 'text-gray-400 group-hover:text-[#0FF1CE]'}`} />
                     </div>
@@ -539,7 +532,7 @@ export default function EducationHub() {
         {/* Active Level Modules */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent">
+            <h2 className="text-xl sm:text-2xl font-semibold text-white">
               {SKILL_LEVELS.find(level => level.id === activeLevel)?.name} Modules
             </h2>
             <div className="text-gray-400 text-sm">
@@ -556,7 +549,7 @@ export default function EducationHub() {
 
         {/* Learning Resources */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 mb-8">
-          <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-6 sm:p-8 hover:border-[#0FF1CE]/50 transition-all duration-300">
+          <div className="bg-black rounded-2xl border border-white/10 p-6 sm:p-8 hover:border-[#0FF1CE]/50 transition-all duration-300">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#0FF1CE]/20 to-[#0FF1CE]/10 flex items-center justify-center border border-[#0FF1CE]/20">
                 <FileText className="w-6 h-6 text-[#0FF1CE]" />
@@ -579,7 +572,7 @@ export default function EducationHub() {
             </div>
           </div>
 
-          <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-6 sm:p-8 hover:border-[#0FF1CE]/50 transition-all duration-300">
+          <div className="bg-black rounded-2xl border border-white/10 p-6 sm:p-8 hover:border-[#0FF1CE]/50 transition-all duration-300">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#0FF1CE]/20 to-[#0FF1CE]/10 flex items-center justify-center border border-[#0FF1CE]/20">
                 <Users className="w-6 h-6 text-[#0FF1CE]" />
@@ -604,9 +597,9 @@ export default function EducationHub() {
         </div>
 
         {/* Success Stories */}
-        <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm border border-[#0FF1CE]/20 rounded-2xl p-6 sm:p-8 mb-8" style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
+        <div className="bg-black border border-[#0FF1CE]/20 rounded-2xl p-6 sm:p-8 mb-8">
           <div className="text-center mb-6">
-            <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent mb-2">Student Success Stories</h2>
+            <h2 className="text-xl sm:text-2xl font-semibold text-white mb-2">Student Success Stories</h2>
             <p className="text-gray-400">Real results from our education program</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -634,8 +627,8 @@ export default function EducationHub() {
 
         {/* Call to Action */}
         <div className="text-center">
-          <div className="bg-gradient-to-br from-[#1A1A1A]/80 to-[#151515]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-8 sm:p-12 hover:border-[#0FF1CE]/50 transition-all duration-300">
-            <h2 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent mb-4">Ready to Start Your Trading Journey?</h2>
+          <div className="bg-black rounded-2xl border border-white/10 p-8 sm:p-12 hover:border-[#0FF1CE]/50 transition-all duration-300">
+            <h2 className="text-2xl sm:text-3xl font-semibold text-white mb-4">Ready to Start Your Trading Journey?</h2>
             <p className="text-gray-400 mb-8 max-w-2xl mx-auto leading-relaxed">
               Join thousands of successful traders who started with our comprehensive education program. 
               Begin with any skill level and progress at your own pace.
@@ -659,7 +652,7 @@ export default function EducationHub() {
           <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-[#0FF1CE]/20 to-[#0FF1CE]/10 flex items-center justify-center border border-[#0FF1CE]/30">
             <Lock className="w-10 h-10 text-[#0FF1CE]" />
           </div>
-          <h2 className="text-3xl font-bold bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] bg-clip-text text-transparent mb-4">Educational Hub</h2>
+          <h2 className="text-3xl font-semibold text-white mb-4">Educational Hub</h2>
           <h3 className="text-xl font-semibold text-[#0FF1CE] mb-4">Coming Soon</h3>
           <p className="text-gray-400 leading-relaxed mb-6">
             We're building something amazing! Our comprehensive educational platform with expert-designed modules, 
@@ -673,30 +666,7 @@ export default function EducationHub() {
         </div>
       </div>
 
-      <style jsx global>{`
-        .background-noise {
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-          opacity: 0.15;
-        }
-        
-        /* Scrollbar styling */
-        ::-webkit-scrollbar {
-          width: 6px;
-        }
-        
-        ::-webkit-scrollbar-track {
-          background: #0D0D0D;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-          background: #2F2F2F;
-          border-radius: 3px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-          background: #0FF1CE;
-        }
-      `}</style>
+
     </div>
   );
 } 

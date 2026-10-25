@@ -505,7 +505,7 @@ export default function VipCheckout({ publishableKey }: { publishableKey: string
                 />
               </label>
 
-              <div className="rounded-lg border border-[#2F2F2F] bg-[#151515]/40 p-4">
+              <div id="vip-reset" className="scroll-mt-24 rounded-lg border border-[#2F2F2F] bg-[#151515]/40 p-4">
                 <label className="flex items-start gap-3 text-sm text-white">
                   <input
                     type="checkbox"

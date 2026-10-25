@@ -156,7 +156,7 @@ export default function PayoutsPage() {
     return (
       <div className="max-w-xl mx-auto py-8 md:py-16">
         <Toaster position="top-center" />
-        <div className="rounded-3xl border border-white/10 bg-[#111111]/80 p-8 md:p-10 text-center">
+        <div className="rounded-3xl border border-white/10 bg-black p-8 md:p-10 text-center">
           <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 text-gray-400">
             <Lock size={26} />
           </div>
@@ -217,7 +217,7 @@ export default function PayoutsPage() {
       </div>
 
       {!withdrawalRequest ? (
-        <div className="rounded-3xl border border-white/10 bg-[#111111]/80 p-8 md:p-12">
+        <div className="rounded-3xl border border-white/10 bg-black p-8 md:p-12">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#0FF1CE]/10 text-[#0FF1CE]">
             <ShieldCheck size={22} />
           </div>
@@ -243,7 +243,7 @@ export default function PayoutsPage() {
               </div>
             )}
 
-            <section className="rounded-3xl border border-[#0FF1CE]/20 bg-[#0FF1CE]/[0.04] p-6">
+            <section className="rounded-3xl border border-white/10 bg-black p-6">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-sm text-gray-400">You receive</p>
@@ -269,7 +269,7 @@ export default function PayoutsPage() {
             </section>
 
             {needsWallet && (
-              <section className="rounded-3xl border border-white/10 bg-[#111111]/80 p-6">
+              <section className="rounded-3xl border border-white/10 bg-black p-6">
                 <h2 className="text-lg font-semibold text-white">Where should we send it?</h2>
                 <p className="mt-1 text-sm text-gray-400">USDC on Solana is the payout method for this request.</p>
 
@@ -321,7 +321,7 @@ export default function PayoutsPage() {
             )}
 
             {submitted && (
-              <section className="rounded-3xl border border-white/10 bg-[#111111]/80 p-6">
+              <section className="rounded-3xl border border-white/10 bg-black p-6">
                 <h2 className="text-lg font-semibold text-white">Destination</h2>
                 <div className="mt-4 space-y-4">
                   <div>
@@ -366,7 +366,7 @@ export default function PayoutsPage() {
           </div>
 
           <aside className="space-y-6">
-            <section className="rounded-3xl border border-white/10 bg-[#111111]/80 p-6">
+            <section className="rounded-3xl border border-white/10 bg-black p-6">
               <h2 className="text-sm font-semibold text-white">Progress</h2>
               <ol className="mt-5 space-y-4">
                 {steps.map((step, index) => (
@@ -399,7 +399,7 @@ export default function PayoutsPage() {
               </div>
             </section>
 
-            <section className="rounded-3xl border border-white/10 bg-[#111111]/80 p-6">
+            <section className="rounded-3xl border border-white/10 bg-black p-6">
               <h2 className="text-sm font-semibold text-white">Before you submit</h2>
               <ul className="mt-4 space-y-3 text-sm leading-6 text-gray-400">
                 <li>Payouts are processed within 1–3 business days after review.</li>
@@ -408,7 +408,7 @@ export default function PayoutsPage() {
               </ul>
             </section>
 
-            <section className="rounded-3xl border border-white/10 bg-[#111111]/80 p-6">
+            <section className="rounded-3xl border border-white/10 bg-black p-6">
               <h2 className="text-sm font-semibold text-white">Need help?</h2>
               <a
                 href="mailto:support@shockwavecapital.com"

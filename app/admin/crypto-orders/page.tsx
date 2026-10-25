@@ -239,7 +239,7 @@ export default function CryptoOrdersPage() {
           { label: 'Failed', value: getStats().failedChallenges, color: 'text-red-400' },
           { label: 'In Progress', value: getStats().inProgressChallenges, color: 'text-yellow-400' },
         ].map(({ label, value, color }) => (
-          <div key={label} className="bg-[#151515] p-2.5 md:p-4 rounded-lg border border-[#2F2F2F]/50">
+          <div key={label} className="bg-black p-2.5 md:p-4 rounded-lg border border-white/10">
             <div className="text-gray-400 text-[10px] md:text-sm truncate">{label}</div>
             <div className={`text-base md:text-2xl font-bold ${color} truncate`}>{value}</div>
           </div>
@@ -255,7 +255,7 @@ export default function CryptoOrdersPage() {
             placeholder="Search by email, name, phrase, or order ID..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 bg-[#151515] border border-[#2F2F2F]/50 rounded-lg text-white text-sm placeholder-gray-400 focus:outline-none focus:border-[#0FF1CE]/50"
+            className="w-full pl-9 pr-4 py-2 bg-black border border-white/10 rounded-lg text-white text-sm placeholder-gray-400 focus:outline-none focus:border-[#0FF1CE]/50"
           />
         </div>
         <div className="grid grid-cols-3 gap-2 md:contents">
@@ -263,7 +263,7 @@ export default function CryptoOrdersPage() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="w-full pl-3 pr-7 py-2 bg-[#151515] border border-[#2F2F2F]/50 rounded-lg text-white text-sm appearance-none focus:outline-none focus:border-[#0FF1CE]/50"
+              className="w-full pl-3 pr-7 py-2 bg-black border border-white/10 rounded-lg text-white text-sm appearance-none focus:outline-none focus:border-[#0FF1CE]/50"
             >
               <option value="ALL">All Status</option>
               <option value="PENDING">Pending</option>
@@ -276,7 +276,7 @@ export default function CryptoOrdersPage() {
             <select
               value={cryptoFilter}
               onChange={(e) => setCryptoFilter(e.target.value as any)}
-              className="w-full pl-3 pr-7 py-2 bg-[#151515] border border-[#2F2F2F]/50 rounded-lg text-white text-sm appearance-none focus:outline-none focus:border-[#0FF1CE]/50"
+              className="w-full pl-3 pr-7 py-2 bg-black border border-white/10 rounded-lg text-white text-sm appearance-none focus:outline-none focus:border-[#0FF1CE]/50"
             >
               <option value="ALL">All Crypto</option>
               <option value="BTC">Bitcoin</option>
@@ -289,7 +289,7 @@ export default function CryptoOrdersPage() {
             <select
               value={challengeStatusFilter}
               onChange={(e) => setChallengeStatusFilter(e.target.value as any)}
-              className="w-full pl-3 pr-7 py-2 bg-[#151515] border border-[#2F2F2F]/50 rounded-lg text-white text-sm appearance-none focus:outline-none focus:border-[#0FF1CE]/50"
+              className="w-full pl-3 pr-7 py-2 bg-black border border-white/10 rounded-lg text-white text-sm appearance-none focus:outline-none focus:border-[#0FF1CE]/50"
             >
               <option value="ALL">All Challenge</option>
               <option value="IN_PROGRESS">In Progress</option>
@@ -312,7 +312,7 @@ export default function CryptoOrdersPage() {
         ) : filteredOrders.map((order) => {
           const isExpanded = expandedRows.has(order.id);
           return (
-            <div key={order.id} className={`rounded-xl border transition-all ${isExpanded ? 'border-[#0FF1CE]/30 bg-[#0FF1CE]/5' : 'border-[#2F2F2F]/50 bg-[#151515]/40'}`}>
+            <div key={order.id} className={`rounded-xl border transition-all ${isExpanded ? 'border-[#0FF1CE]/30 bg-[#0FF1CE]/5' : 'border-white/10 bg-black/40'}`}>
               <div className="p-3">
                 <div className="flex items-start justify-between mb-2">
                   <div>
@@ -353,9 +353,9 @@ export default function CryptoOrdersPage() {
                     </span>
                   ) : <span />}
                   <div className="flex items-center gap-1">
-                    <button onClick={() => handleChallengeStatusChange(order.id, 'IN_PROGRESS')} className={`p-1.5 rounded text-xs ${order.challengeStatus === 'IN_PROGRESS' ? 'bg-yellow-400/20 text-yellow-400' : 'text-gray-400 hover:bg-[#2F2F2F]/20'}`} title="In Progress"><Clock size={13} /></button>
-                    <button onClick={() => handleChallengeStatusChange(order.id, 'FAILED')} className={`p-1.5 rounded text-xs ${order.challengeStatus === 'FAILED' ? 'bg-red-400/20 text-red-400' : 'text-gray-400 hover:bg-[#2F2F2F]/20'}`} title="Failed"><X size={13} /></button>
-                    <button onClick={() => handleChallengeStatusChange(order.id, 'PASSED')} className={`p-1.5 rounded text-xs ${order.challengeStatus === 'PASSED' ? 'bg-green-400/20 text-green-400' : 'text-gray-400 hover:bg-[#2F2F2F]/20'}`} title="Passed"><Check size={13} /></button>
+                    <button onClick={() => handleChallengeStatusChange(order.id, 'IN_PROGRESS')} className={`p-1.5 rounded text-xs ${order.challengeStatus === 'IN_PROGRESS' ? 'bg-yellow-400/20 text-yellow-400' : 'text-gray-400 hover:bg-white/5/20'}`} title="In Progress"><Clock size={13} /></button>
+                    <button onClick={() => handleChallengeStatusChange(order.id, 'FAILED')} className={`p-1.5 rounded text-xs ${order.challengeStatus === 'FAILED' ? 'bg-red-400/20 text-red-400' : 'text-gray-400 hover:bg-white/5/20'}`} title="Failed"><X size={13} /></button>
+                    <button onClick={() => handleChallengeStatusChange(order.id, 'PASSED')} className={`p-1.5 rounded text-xs ${order.challengeStatus === 'PASSED' ? 'bg-green-400/20 text-green-400' : 'text-gray-400 hover:bg-white/5/20'}`} title="Passed"><Check size={13} /></button>
                     {order.status === 'PENDING' && (
                       <>
                         <button onClick={() => handleStatusChange(order.id, 'COMPLETED')} className="p-1.5 rounded text-green-400 hover:bg-green-400/10" title="Complete"><Check size={13} /></button>
@@ -367,7 +367,7 @@ export default function CryptoOrdersPage() {
                 </div>
               </div>
               {isExpanded && (
-                <div className="border-t border-[#2F2F2F]/50 p-3 grid grid-cols-2 gap-3 text-xs">
+                <div className="border-t border-white/10 p-3 grid grid-cols-2 gap-3 text-xs">
                   <div>
                     <div className="text-[#0FF1CE] font-medium mb-1 text-xs uppercase tracking-wide">Customer</div>
                     <div className="space-y-1 text-gray-300">
@@ -395,7 +395,7 @@ export default function CryptoOrdersPage() {
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="border-b border-[#2F2F2F]/50">
+            <tr className="border-b border-white/10">
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-400"></th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Date</th>
               <th className="px-4 py-3 text-left text-sm font-medium text-gray-400">Customer</th>
@@ -424,11 +424,11 @@ export default function CryptoOrdersPage() {
             ) : (
               filteredOrders.map((order) => (
                 <>
-                  <tr key={order.id} className="border-b border-[#2F2F2F]/50 hover:bg-[#151515]">
+                  <tr key={order.id} className="border-b border-white/10 hover:bg-black">
                     <td className="px-4 py-4">
                       <button
                         onClick={() => toggleRowExpansion(order.id)}
-                        className="p-1 hover:bg-[#2F2F2F]/20 rounded"
+                        className="p-1 hover:bg-white/5/20 rounded"
                       >
                         {expandedRows.has(order.id) ? (
                           <ChevronUp size={16} className="text-gray-400" />
@@ -453,7 +453,7 @@ export default function CryptoOrdersPage() {
                               e.stopPropagation();
                               handleCopy(order.customerName);
                             }}
-                            className="p-1 hover:bg-[#2F2F2F]/20 rounded transition-colors"
+                            className="p-1 hover:bg-white/5/20 rounded transition-colors"
                             title="Copy name"
                           >
                             {copiedText === order.customerName ? (
@@ -467,7 +467,7 @@ export default function CryptoOrdersPage() {
                               e.stopPropagation();
                               handleCopy(order.customerEmail);
                             }}
-                            className="p-1 hover:bg-[#2F2F2F]/20 rounded transition-colors"
+                            className="p-1 hover:bg-white/5/20 rounded transition-colors"
                             title="Copy email"
                           >
                             {copiedText === order.customerEmail ? (
@@ -528,13 +528,13 @@ export default function CryptoOrdersPage() {
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-2">
                         {/* Challenge Status Controls */}
-                        <div className="flex items-center gap-1 border-r border-[#2F2F2F]/50 pr-2 mr-2">
+                        <div className="flex items-center gap-1 border-r border-white/10 pr-2 mr-2">
                           <button
                             onClick={() => handleChallengeStatusChange(order.id, 'IN_PROGRESS')}
                             className={`p-1.5 rounded transition-colors ${
                               order.challengeStatus === 'IN_PROGRESS' 
                                 ? 'bg-yellow-400/20 text-yellow-400' 
-                                : 'text-gray-400 hover:bg-[#2F2F2F]/20'
+                                : 'text-gray-400 hover:bg-white/5/20'
                             }`}
                             title="Mark Challenge as In Progress"
                           >
@@ -545,7 +545,7 @@ export default function CryptoOrdersPage() {
                             className={`p-1.5 rounded transition-colors ${
                               order.challengeStatus === 'FAILED' 
                                 ? 'bg-red-400/20 text-red-400' 
-                                : 'text-gray-400 hover:bg-[#2F2F2F]/20'
+                                : 'text-gray-400 hover:bg-white/5/20'
                             }`}
                             title="Mark Challenge as Failed"
                           >
@@ -556,7 +556,7 @@ export default function CryptoOrdersPage() {
                             className={`p-1.5 rounded transition-colors ${
                               order.challengeStatus === 'PASSED' 
                                 ? 'bg-green-400/20 text-green-400' 
-                                : 'text-gray-400 hover:bg-[#2F2F2F]/20'
+                                : 'text-gray-400 hover:bg-white/5/20'
                             }`}
                             title="Mark Challenge as Passed"
                           >
@@ -594,7 +594,7 @@ export default function CryptoOrdersPage() {
                     </td>
                   </tr>
                   {expandedRows.has(order.id) && (
-                    <tr className="bg-[#151515]/50">
+                    <tr className="bg-black/50">
                       <td colSpan={7} className="px-8 py-4">
                         <div className={`grid ${order.applicationData ? 'grid-cols-1 md:grid-cols-4' : 'grid-cols-2 md:grid-cols-3'} gap-6`}>
                           {/* Customer Details */}
@@ -607,7 +607,7 @@ export default function CryptoOrdersPage() {
                                   <span className="text-white">{order.customerName}</span>
                                   <button
                                     onClick={() => handleCopy(order.customerName)}
-                                    className="p-1 hover:bg-[#2F2F2F]/20 rounded"
+                                    className="p-1 hover:bg-white/5/20 rounded"
                                     title="Copy name"
                                   >
                                     {copiedText === order.customerName ? (
@@ -624,7 +624,7 @@ export default function CryptoOrdersPage() {
                                   <span className="text-white">{order.customerEmail}</span>
                                   <button
                                     onClick={() => handleCopy(order.customerEmail)}
-                                    className="p-1 hover:bg-[#2F2F2F]/20 rounded"
+                                    className="p-1 hover:bg-white/5/20 rounded"
                                     title="Copy email"
                                   >
                                     {copiedText === order.customerEmail ? (
@@ -726,7 +726,7 @@ export default function CryptoOrdersPage() {
                                   <span className="font-mono text-xs truncate text-white">{order.cryptoAddress}</span>
                                   <button
                                     onClick={() => handleCopy(order.cryptoAddress)}
-                                    className="p-1 hover:bg-[#2F2F2F]/20 rounded"
+                                    className="p-1 hover:bg-white/5/20 rounded"
                                   >
                                     {copiedText === order.cryptoAddress ? (
                                       <Check size={14} className="text-green-400" />
@@ -794,7 +794,7 @@ export default function CryptoOrdersPage() {
                                 </div>
                                 <div>
                                   <div className="text-gray-400">Priority Access Reason</div>
-                                  <div className="text-white text-xs bg-[#1A1A1A] p-2 rounded mt-1 max-h-24 overflow-y-auto">
+                                  <div className="text-white text-xs bg-black p-2 rounded mt-1 max-h-24 overflow-y-auto">
                                     {order.applicationData.q10_priority}
                                   </div>
                                 </div>
