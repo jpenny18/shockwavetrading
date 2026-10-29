@@ -21,6 +21,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import AccountResetButton from '../../components/AccountResetModal';
 
 // Dynamically import ApexCharts to avoid SSR issues
 const ApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
@@ -644,7 +645,7 @@ export default function AccountDetailsPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="mb-8 flex items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold text-white">Account Metrics</h1>
           {lastUpdate && (
@@ -653,6 +654,12 @@ export default function AccountDetailsPage() {
             </p>
           )}
         </div>
+        {userAccount && (
+          <AccountResetButton
+            account={userAccount}
+            className="shrink-0 rounded-xl border border-[#0FF1CE]/40 px-4 py-2 text-sm font-semibold text-[#0FF1CE] transition hover:bg-[#0FF1CE]/10"
+          />
+        )}
       </div>
 
       {/* Failed Account Notice */}

@@ -23,6 +23,7 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { formatVipAllocation, formatVipDollars, getVipObjectiveAmounts, isVipMetaApiAccount, normalizeVipProfitSplit } from '../../../../../lib/vip-accounts';
 import { VIP_PAYMENT_PORTAL_URL } from '../../../../../lib/vip-portal';
+import AccountResetButton from '../../../components/AccountResetModal';
 import VipProfitTracker from '../../../../components/VipProfitTracker';
 
 // Dynamically import ApexCharts to avoid SSR issues
@@ -670,14 +671,13 @@ export default function VipAccountDetailsPage() {
           </div>
         </div>
         <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2 sm:flex">
-          <a
-            href={VIP_PAYMENT_PORTAL_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-lg border border-[#2F2F2F] px-3 py-2.5 text-center text-xs font-medium text-white hover:border-[#0FF1CE]/40"
-          >
-            Reset an account
-          </a>
+          {userAccount ? (
+            <AccountResetButton
+              account={userAccount}
+              label="Reset this account"
+              className="w-full rounded-lg border border-[#2F2F2F] px-3 py-2.5 text-center text-xs font-medium text-white hover:border-[#0FF1CE]/40"
+            />
+          ) : null}
           <a
             href={VIP_PAYMENT_PORTAL_URL}
             target="_blank"
@@ -700,14 +700,13 @@ export default function VipAccountDetailsPage() {
                 This VIP account has been marked as failed. The data shown below represents the final state of your account.
                 No new updates will be fetched.
               </p>
-              <a
-                href={VIP_PAYMENT_PORTAL_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 inline-flex w-full items-center justify-center rounded-lg bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] px-3 py-2.5 text-xs font-semibold text-black sm:w-auto"
-              >
-                Reset on the payment portal
-              </a>
+              {userAccount && (
+                <AccountResetButton
+                  account={userAccount}
+                  label="Reset this account"
+                  className="mt-3 inline-flex w-full items-center justify-center rounded-lg bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] px-3 py-2.5 text-xs font-semibold text-black sm:w-auto"
+                />
+              )}
             </div>
           </div>
         </div>

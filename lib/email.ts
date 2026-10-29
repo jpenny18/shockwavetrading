@@ -283,9 +283,12 @@ export async function sendCryptoOrderEmail(order: {
   customerCountry: string;
   customerDiscordUsername?: string;
   createdAt: string;
+  accountId?: string;
+  orderKind?: string;
 }) {
   try {
     console.log('Sending crypto order notification emails for:', order.id);
+    const isReset = order.orderKind === 'account-reset';
     
     // Define add-on names mapping
     const addOnNames: { [key: string]: string } = {
@@ -299,9 +302,13 @@ export async function sendCryptoOrderEmail(order: {
     const adminResult = await resend.emails.send({
       from: 'support@shockwave-capital.com',
       to: 'support@shockwave-capital.com',
-      subject: order.status === 'COMPLETED' 
-        ? `Crypto Payment Confirmed: ${order.challengeType} Challenge (${order.challengeAmount})`
-        : `New Crypto Order: ${order.challengeType} Challenge (${order.challengeAmount})`,
+      subject: order.status === 'COMPLETED'
+        ? (isReset
+          ? `Crypto Payment Confirmed: ${order.challengeType} (${order.challengeAmount})`
+          : `Crypto Payment Confirmed: ${order.challengeType} Challenge (${order.challengeAmount})`)
+        : (isReset
+          ? `New Crypto Order: ${order.challengeType} (${order.challengeAmount})`
+          : `New Crypto Order: ${order.challengeType} Challenge (${order.challengeAmount})`),
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
           <div style="background-color: #0D0D0D; padding: 15px; margin-bottom: 20px; border-radius: 5px;">
@@ -330,6 +337,7 @@ export async function sendCryptoOrderEmail(order: {
             <p style="margin-bottom: 5px;"><strong>Challenge Type:</strong> ${order.challengeType}</p>
             <p style="margin-bottom: 5px;"><strong>Account Size:</strong> ${order.challengeAmount}</p>
             <p style="margin-bottom: 5px;"><strong>Platform:</strong> ${order.platform}</p>
+            ${order.accountId ? `<p style="margin-bottom: 5px;"><strong>Account ID:</strong> ${order.accountId}</p>` : ''}
             ${order.addOns && order.addOns.length > 0 ? `
               <p style="margin-bottom: 5px;"><strong>Add-ons:</strong></p>
               <ul style="margin: 0 0 5px 20px; padding: 0;">
@@ -351,8 +359,12 @@ export async function sendCryptoOrderEmail(order: {
       from: 'support@shockwave-capital.com',
       to: order.customerEmail,
       subject: order.status === 'COMPLETED'
-        ? `Payment Confirmed - Your Shockwave Capital ${order.challengeType} Challenge`
-        : `Your Shockwave Capital ${order.challengeType} Challenge Order`,
+        ? (isReset
+          ? `Payment Confirmed - Your Shockwave Capital ${order.challengeType}`
+          : `Payment Confirmed - Your Shockwave Capital ${order.challengeType} Challenge`)
+        : (isReset
+          ? `Your Shockwave Capital ${order.challengeType} Order`
+          : `Your Shockwave Capital ${order.challengeType} Challenge Order`),
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
           <div style="background-color: #0D0D0D; padding: 20px; margin-bottom: 20px; border-radius: 5px; text-align: center;">
@@ -363,11 +375,15 @@ export async function sendCryptoOrderEmail(order: {
           
           <div style="margin-bottom: 30px;">
             <p>Hello ${order.customerName.split(' ')[0]},</p>
-            ${order.status === 'COMPLETED' 
-              ? `<p>Great news! We've confirmed your crypto payment for the ${order.challengeType} Challenge. Your order is now being processed.</p>
-                 <p>Due to high demand, please allow up to 1 hour for your login credentials to be generated. In some cases, this might take up to 24 hours.</p>`
-              : `<p>Thank you for purchasing our ${order.challengeType} Challenge. We're excited to see how you perform!</p>
-                 <p>We've received your crypto payment request and will verify the transaction. Once confirmed, we'll prepare your trading account credentials.</p>`
+            ${order.status === 'COMPLETED'
+              ? (isReset
+                ? `<p>Great news! We've confirmed your crypto payment for this account reset. We'll return the profit and loss to zero so you can start fresh on the same account.</p>`
+                : `<p>Great news! We've confirmed your crypto payment for the ${order.challengeType} Challenge. Your order is now being processed.</p>
+                 <p>Due to high demand, please allow up to 1 hour for your login credentials to be generated. In some cases, this might take up to 24 hours.</p>`)
+              : (isReset
+                ? `<p>Thank you for your ${order.challengeType} request. We've received your crypto payment and will verify the transaction. Once it is confirmed, we'll reset this account's starting balance.</p>`
+                : `<p>Thank you for purchasing our ${order.challengeType} Challenge. We're excited to see how you perform!</p>
+                 <p>We've received your crypto payment request and will verify the transaction. Once confirmed, we'll prepare your trading account credentials.</p>`)
             }
           </div>
           
@@ -378,6 +394,7 @@ export async function sendCryptoOrderEmail(order: {
             <p style="margin-bottom: 5px;"><strong>Challenge Type:</strong> ${order.challengeType}</p>
             <p style="margin-bottom: 5px;"><strong>Account Size:</strong> ${order.challengeAmount}</p>
             <p style="margin-bottom: 5px;"><strong>Platform:</strong> ${order.platform}</p>
+            ${order.accountId ? `<p style="margin-bottom: 5px;"><strong>Account ID:</strong> ${order.accountId}</p>` : ''}
             ${order.addOns && order.addOns.length > 0 ? `
               <p style="margin-bottom: 5px;"><strong>Add-ons:</strong></p>
               <ul style="margin: 0 0 5px 20px; padding: 0;">
@@ -399,7 +416,15 @@ export async function sendCryptoOrderEmail(order: {
           <div style="margin-bottom: 30px;">
             <h2 style="color: #0FF1CE; font-size: 18px; margin-bottom: 15px;">Next Steps</h2>
             
-            ${order.status === 'COMPLETED' ? `
+            ${order.status === 'COMPLETED' ? (isReset ? `
+            <div style="margin-bottom: 15px; display: flex; align-items: flex-start;">
+              <div style="background-color: #0FF1CE; color: #000; border-radius: 50%; width: 25px; height: 25px; display: flex; justify-content: center; align-items: center; margin-right: 10px; flex-shrink: 0;">1</div>
+              <div>
+                <h3 style="margin: 0 0 5px 0; color: #333;">Fresh Start</h3>
+                <p style="margin: 0; color: #666;">Your payment is confirmed. We reset the starting balance on this same account.</p>
+              </div>
+            </div>
+            ` : `
             <div style="margin-bottom: 15px; display: flex; align-items: flex-start;">
               <div style="background-color: #0FF1CE; color: #000; border-radius: 50%; width: 25px; height: 25px; display: flex; justify-content: center; align-items: center; margin-right: 10px; flex-shrink: 0;">1</div>
               <div>
@@ -413,6 +438,22 @@ export async function sendCryptoOrderEmail(order: {
               <div>
                 <h3 style="margin: 0 0 5px 0; color: #333;">Start Trading</h3>
                 <p style="margin: 0; color: #666;">Once you receive your credentials, you can begin trading. Remember to follow the challenge rules to maximize your chances of success!</p>
+              </div>
+            </div>
+            `) : isReset ? `
+            <div style="margin-bottom: 15px; display: flex; align-items: flex-start;">
+              <div style="background-color: #0FF1CE; color: #000; border-radius: 50%; width: 25px; height: 25px; display: flex; justify-content: center; align-items: center; margin-right: 10px; flex-shrink: 0;">1</div>
+              <div>
+                <h3 style="margin: 0 0 5px 0; color: #333;">Payment Verification</h3>
+                <p style="margin: 0; color: #666;">We'll verify your crypto payment. This usually takes 30-60 minutes but may take longer depending on network conditions.</p>
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 15px; display: flex; align-items: flex-start;">
+              <div style="background-color: #0FF1CE; color: #000; border-radius: 50%; width: 25px; height: 25px; display: flex; justify-content: center; align-items: center; margin-right: 10px; flex-shrink: 0;">2</div>
+              <div>
+                <h3 style="margin: 0 0 5px 0; color: #333;">Fresh Start</h3>
+                <p style="margin: 0; color: #666;">Once payment is confirmed, we reset the starting balance on this same account.</p>
               </div>
             </div>
             ` : `

@@ -8,6 +8,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import { formatMetaApiAccountName, isVipMetaApiAccount } from '../../../lib/vip-accounts';
 import { Lock, Plus, AlertTriangle, TrendingUp, Loader2, ChevronRight, DollarSign, BarChart } from 'lucide-react';
 import VipLoginCredentialsAccordion from '../../components/VipLoginCredentials';
+import AccountResetButton from '../components/AccountResetModal';
 
 interface AccountWithMetrics extends UserMetaApiAccount {
   cachedMetrics?: any;
@@ -19,6 +20,14 @@ export default function MyAccountsPage() {
   const [loading, setLoading] = useState(true);
   const [accounts, setAccounts] = useState<AccountWithMetrics[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [resetNotice, setResetNotice] = useState<string | null>(null);
+
+  useEffect(() => {
+    const reset = new URLSearchParams(window.location.search).get('reset');
+    if (reset === 'paid') {
+      setResetNotice('Your card payment was sent to the payment portal. We will reset this account after the payment is confirmed.');
+    }
+  }, []);
 
   // Check if user is admin
   useEffect(() => {
@@ -255,6 +264,12 @@ export default function MyAccountsPage() {
             </div>
           </div> */}
 
+          {resetNotice && (
+            <div className="mb-6 rounded-xl border border-[#0FF1CE]/30 bg-[#0FF1CE]/10 px-4 py-3 text-sm text-gray-200">
+              {resetNotice}
+            </div>
+          )}
+
           <div className="flex items-center justify-between mb-8">
             <div>
               <h1 className="text-2xl font-semibold text-white">My Trading Accounts</h1>
@@ -352,6 +367,13 @@ export default function MyAccountsPage() {
                     <ChevronRight className="text-gray-400" size={16} />
                   </div>
                   </div>
+
+                  {!isPlaceholder && (
+                    <AccountResetButton
+                      account={account}
+                      className="mt-4 w-full rounded-xl border border-[#0FF1CE]/30 py-2.5 text-sm font-semibold text-[#0FF1CE] transition hover:bg-[#0FF1CE]/10"
+                    />
+                  )}
 
                   <VipLoginCredentialsAccordion
                     credentials={account.loginCredentials}

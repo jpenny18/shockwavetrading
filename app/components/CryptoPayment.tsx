@@ -12,6 +12,7 @@ interface CryptoPaymentProps {
   cryptoPrices: CryptoPrice;
   beforeSubmit?: () => boolean | Promise<boolean>;
   onPaymentSubmitted?: (orderId: string) => void | Promise<void>;
+  getAuthToken?: () => Promise<string | null>;
 }
 
 interface CryptoPrice {
@@ -72,7 +73,7 @@ const getQrValue = (symbol: keyof CryptoPrice, amount: number, address: string):
   return `ethereum:${address}?value=${ethToWeiString(amount)}`;
 };
 
-export default function CryptoPayment({ challengeData, successRedirectPath, onProcessingStateChange, cryptoPrices, beforeSubmit, onPaymentSubmitted }: CryptoPaymentProps) {
+export default function CryptoPayment({ challengeData, successRedirectPath, onProcessingStateChange, cryptoPrices, beforeSubmit, onPaymentSubmitted, getAuthToken }: CryptoPaymentProps) {
   const router = useRouter();
   const [selectedCrypto, setSelectedCrypto] = useState<'BTC' | 'ETH' | 'USDT' | 'USDC'>('BTC');
   const [cryptoAmount, setCryptoAmount] = useState<CryptoPrice>({ BTC: 0, ETH: 0, USDT: 0, USDC: 0 });
@@ -134,6 +135,21 @@ export default function CryptoPayment({ challengeData, successRedirectPath, onPr
       return;
     }
 
+    let authHeader: Record<string, string> = {};
+    if (getAuthToken) {
+      try {
+        const token = await getAuthToken();
+        if (!token) {
+          setError('Sign in again before submitting this reset payment.');
+          return;
+        }
+        authHeader = { Authorization: `Bearer ${token}` };
+      } catch {
+        setError('Sign in again before submitting this reset payment.');
+        return;
+      }
+    }
+
     setIsLoading(true);
     onProcessingStateChange(true);
 
@@ -142,6 +158,7 @@ export default function CryptoPayment({ challengeData, successRedirectPath, onPr
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...authHeader,
         },
         body: JSON.stringify({
           challengeData,
@@ -156,7 +173,9 @@ export default function CryptoPayment({ challengeData, successRedirectPath, onPr
       });
 
       if (!response.ok) {
-        throw new Error('Failed to submit order');
+        const data = await response.json().catch(() => ({}));
+        const message = data && typeof data.error === 'string' ? data.error : '';
+        throw new Error(message || 'Failed to submit order. Please try again.');
       }
 
       const { orderId } = await response.json();
@@ -185,6 +204,8 @@ export default function CryptoPayment({ challengeData, successRedirectPath, onPr
             customerPhone: challengeData.formData.phone,
             customerCountry: challengeData.formData.country,
             customerDiscordUsername: challengeData.formData.discordUsername,
+            accountId: challengeData.accountId,
+            orderKind: challengeData.orderKind,
             createdAt: new Date().toISOString()
           }),
         });
@@ -202,7 +223,7 @@ export default function CryptoPayment({ challengeData, successRedirectPath, onPr
 
       router.push(successRedirectPath);
     } catch (error) {
-      setError('Failed to submit order. Please try again.');
+      setError(error instanceof Error ? error.message : 'Failed to submit order. Please try again.');
       setIsLoading(false);
       onProcessingStateChange(false);
     }

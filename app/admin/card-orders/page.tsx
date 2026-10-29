@@ -36,6 +36,11 @@ interface CardOrder {
   paymentStatus: string;
   createdAt: string;
   updatedAt: string;
+  accountId?: string;
+  orderKind?: string;
+  resetCategory?: string;
+  handoffStatus?: string;
+  userId?: string;
 }
 
 type ChallengeTypeFilter = 'ALL' | 'Standard' | '1-Step' | 'Instant' | 'Gauntlet';
@@ -559,6 +564,15 @@ export default function CardOrdersPage() {
                                 <div className="space-y-1">
                                   <div><span className="text-gray-500">Payment Method:</span> <span className="text-white">Card</span></div>
                                   <div><span className="text-gray-500">Payment Status:</span> <span className="text-white">{order.paymentStatus}</span></div>
+                                  {order.accountId && (
+                                    <div><span className="text-gray-500">Account to reset:</span> <span className="text-white break-all">{order.accountId}</span></div>
+                                  )}
+                                  {order.resetCategory && (
+                                    <div><span className="text-gray-500">Reset type:</span> <span className="text-white capitalize">{order.resetCategory}</span></div>
+                                  )}
+                                  {order.handoffStatus && (
+                                    <div><span className="text-gray-500">Portal handoff:</span> <span className="text-white">{order.handoffStatus}</span></div>
+                                  )}
                                   {order.addOns && order.addOns.length > 0 && (
                                     <div><span className="text-gray-500">Add-ons:</span> <span className="text-white">{order.addOns.join(', ')}</span></div>
                                   )}

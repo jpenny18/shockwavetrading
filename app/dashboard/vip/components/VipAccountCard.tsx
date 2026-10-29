@@ -3,8 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { ChevronRight } from 'lucide-react';
 import VipLoginCredentialsAccordion from '@/app/components/VipLoginCredentials';
+import AccountResetButton from '@/app/dashboard/components/AccountResetModal';
 import { UserMetaApiAccount } from '@/lib/firebase';
-import { VIP_PAYMENT_PORTAL_URL } from '@/lib/vip-portal';
 import {
   formatVipAllocation,
   formatVipDollars,
@@ -94,22 +94,16 @@ export default function VipAccountCard({ account }: { account: VipAccountListIte
         </span>
       </button>
 
+      <AccountResetButton
+        account={account}
+        className="mt-3 w-full rounded-xl border border-[#0FF1CE]/30 py-2.5 text-sm font-semibold text-[#0FF1CE] transition hover:bg-[#0FF1CE]/10"
+      />
+
       <VipLoginCredentialsAccordion
         credentials={account.loginCredentials}
         platform={account.platform}
         emptyMessage="Login details will appear here after your VIP account is connected with broker credentials."
       />
-
-      {account.status === 'failed' && (
-        <a
-          href={VIP_PAYMENT_PORTAL_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-3 inline-flex text-sm text-[#0FF1CE] hover:underline"
-        >
-          Reset this account
-        </a>
-      )}
     </article>
   );
 }

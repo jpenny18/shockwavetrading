@@ -39,6 +39,9 @@ interface CryptoOrder {
   discountCode?: string;
   discountId?: string;
   originalAmount?: number;
+  accountId?: string;
+  orderKind?: string;
+  resetCategory?: string;
   createdAt: string;
   updatedAt: string;
   applicationType?: string;
@@ -668,6 +671,18 @@ export default function CryptoOrdersPage() {
                                 <div className="text-gray-400">Platform</div>
                                 <div className="text-white">{order.platform}</div>
                               </div>
+                              {order.accountId && (
+                                <div>
+                                  <div className="text-gray-400">Account to reset</div>
+                                  <div className="text-white break-all">{order.accountId}</div>
+                                </div>
+                              )}
+                              {order.resetCategory && (
+                                <div>
+                                  <div className="text-gray-400">Reset type</div>
+                                  <div className="text-white capitalize">{order.resetCategory}</div>
+                                </div>
+                              )}
                               {order.addOns && order.addOns.length > 0 && (
                                 <div>
                                   <div className="text-gray-400">Add-ons</div>
