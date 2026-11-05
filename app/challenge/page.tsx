@@ -10,6 +10,7 @@ import { updateProfile } from 'firebase/auth';
 import { countries, countryName } from '@/lib/countries';
 import { Check, Zap, ChevronRight, AlertCircle, CreditCard, CalendarOff, Percent, Tag, Gift, ChevronDown, Bitcoin, Mail, Lock, User, Phone, Eye, EyeOff, LogOut } from 'lucide-react';
 import Link from 'next/link';
+import { trackInitiateCheckout } from '@/lib/meta-pixel';
 
 // Define the type for challenge options
 type ChallengeType = 'Standard' | '1-Step' | 'Instant' | 'Gauntlet';
@@ -842,6 +843,7 @@ export default function ChallengePage() {
       const account = await ensureAccount();
       if (!account) return;
 
+      const checkoutPrice = getCurrentPrice();
       sessionStorage.setItem('challengeData', JSON.stringify({
         type: selectedType,
         amount: selectedAmount,
@@ -849,7 +851,7 @@ export default function ChallengePage() {
         addOns: selectedAddOns,
         userId: account.uid,
         formData: account.customer,
-        price: getCurrentPrice(),
+        price: checkoutPrice,
         discount: appliedDiscount ? {
           id: appliedDiscount.id,
           code: appliedDiscount.code,
@@ -857,6 +859,16 @@ export default function ChallengePage() {
           value: appliedDiscount.value
         } : null
       }));
+
+      if (selectedType && selectedAmount && checkoutPrice !== null) {
+        trackInitiateCheckout({
+          paymentMethod: 'crypto',
+          challengeType: selectedType,
+          accountSize: selectedAmount,
+          value: checkoutPrice,
+          platform: selectedPlatform,
+        });
+      }
 
       router.push('/challenge/payment');
     } finally {
@@ -920,6 +932,16 @@ export default function ChallengePage() {
 
       if (!response?.ok || !data.checkoutUrl) {
         throw new Error(data.error || 'Unable to start card checkout');
+      }
+
+      if (selectedType && selectedAmount) {
+        trackInitiateCheckout({
+          paymentMethod: 'card',
+          challengeType: selectedType,
+          accountSize: selectedAmount,
+          value: expectedAmount,
+          platform: selectedPlatform,
+        });
       }
 
       window.location.href = data.checkoutUrl;

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import CryptoPayment from '../../components/CryptoPayment';
 import StripeCardForm from '../../components/StripeCardForm';
+import { trackCryptoPurchase } from '@/lib/meta-pixel';
 
 interface ChallengeData {
   type: string;
@@ -384,6 +385,16 @@ export default function PaymentPage() {
                         successRedirectPath="/challenge/cryptopending"
                         onProcessingStateChange={setIsProcessingPayment}
                         cryptoPrices={cryptoPrices}
+                        onPaymentSubmitted={(orderId) => {
+                          trackCryptoPurchase({
+                            orderId,
+                            paymentMethod: 'crypto',
+                            challengeType: challengeData.type,
+                            accountSize: challengeData.amount,
+                            value: challengeData.price,
+                            platform: challengeData.platform,
+                          });
+                        }}
                       />
                     </div>
                   </div>
