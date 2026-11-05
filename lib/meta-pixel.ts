@@ -1,4 +1,6 @@
-export const META_PIXEL_ID = '2350128719094802';
+export const META_PIXEL_IDS = ['2350128719094802', '1542635254297665'] as const;
+
+const pixelInits = META_PIXEL_IDS.map((id) => `fbq('init', '${id}');`).join('\n');
 
 export const META_PIXEL_BOOTSTRAP = `!function(f,b,e,v,n,t,s)
 {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -8,8 +10,12 @@ n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
-fbq('init', '${META_PIXEL_ID}');
+${pixelInits}
 fbq('track', 'PageView');`;
+
+export const META_PIXEL_NOSCRIPT = META_PIXEL_IDS
+  .map((id) => `<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=${id}&ev=PageView&noscript=1" alt="" />`)
+  .join('');
 
 type MetaPixelCommand = (
   command: 'track' | 'init',
