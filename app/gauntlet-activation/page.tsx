@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Particles from '../components/Particles';
 import Header from '../components/Header';
-import { Check, ChevronDown, ChevronUp, Bitcoin, Copy, CreditCard } from 'lucide-react';
+import { Check, ChevronDown, Bitcoin, CreditCard } from 'lucide-react';
 import CryptoPayment from '../components/CryptoPayment';
 
 interface CryptoPrice {
@@ -341,30 +341,32 @@ function GauntletActivationContent() {
     // If crypto payment method is selected, show crypto payment
     if (paymentMethod === 'crypto') {
       return (
-        <div className="bg-gradient-to-b from-[#0D0D0D] via-[#121212] to-[#151515] text-white min-h-screen font-sans">
+        <div className="relative min-h-screen overflow-hidden bg-black font-sans text-white">
+          <div className="pointer-events-none absolute left-1/2 top-0 h-64 w-[70%] -translate-x-1/2 rounded-full bg-[#0FF1CE]/10 blur-[120px]" />
           <Header />
           <Particles />
           
-          <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
-            <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 overflow-hidden">
+          <div className="relative z-10 mx-auto max-w-4xl px-4 py-32 sm:px-6 lg:px-8">
+            <div className="relative overflow-hidden rounded-[22px] border border-white/10 bg-white/[0.04] backdrop-blur-xl">
               {isProcessingPayment && (
-                <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 rounded-2xl">
+                <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[22px] bg-black/60 backdrop-blur-sm">
                   <div className="text-center">
-                    <div className="w-12 h-12 border-2 border-[#0FF1CE] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-2 border-[#0FF1CE] border-t-transparent"></div>
                     <p className="text-white">Processing payment...</p>
                   </div>
                 </div>
               )}
               
-              <div className="p-6 md:p-8 border-b border-[#0FF1CE]/20">
-                <div className="flex items-center justify-between">
+              <div className="border-b border-white/10 p-6 md:p-8">
+                <div className="flex items-center justify-between gap-4">
                   <div>
-                    <h2 className="text-2xl font-bold text-[#0FF1CE]">{isReset ? 'Reset Your Gauntlet Account' : 'Activate Your Gauntlet Account'}</h2>
-                    <p className="text-gray-400 mt-1">{orderLabel} - {selectedOption.level}</p>
+                    <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.22em] text-[#0FF1CE]">Crypto checkout</p>
+                    <h2 className="text-2xl font-semibold tracking-tight text-white md:text-3xl">{isReset ? 'Reset Your Gauntlet Account' : 'Activate Your Gauntlet Account'}</h2>
+                    <p className="mt-1 text-sm text-white/50">{orderLabel} - {selectedOption.level}</p>
                   </div>
-                  <div className="text-right">
+                  <div className="shrink-0 text-right">
                     <div className="text-2xl font-bold text-[#0FF1CE]">${getEffectivePrice(selectedOption).toLocaleString()}</div>
-                    <div className="text-gray-400 text-sm">{feeLabel}</div>
+                    <div className="text-sm text-white/45">{feeLabel}</div>
                   </div>
                 </div>
               </div>
@@ -383,41 +385,43 @@ function GauntletActivationContent() {
 
     // Payment method selection
     return (
-      <div className="bg-gradient-to-b from-[#0D0D0D] via-[#121212] to-[#151515] text-white min-h-screen font-sans">
+      <div className="relative min-h-screen overflow-hidden bg-black font-sans text-white">
+        <div className="pointer-events-none absolute left-1/2 top-0 h-64 w-[70%] -translate-x-1/2 rounded-full bg-[#0FF1CE]/10 blur-[120px]" />
         <Header />
         <Particles />
         
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
-          <div className="bg-[#0D0D0D]/80 backdrop-blur-sm rounded-2xl border border-[#2F2F2F]/50 p-8">
+        <div className="relative z-10 mx-auto max-w-4xl px-4 py-32 sm:px-6 lg:px-8">
+          <div className="relative overflow-hidden rounded-[22px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl md:p-8">
             {isProcessingPayment && (
-              <div className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 rounded-2xl">
+              <div className="absolute inset-0 z-50 flex items-center justify-center rounded-[22px] bg-black/60 backdrop-blur-sm">
                 <div className="text-center">
-                  <div className="w-12 h-12 border-2 border-[#0FF1CE] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                  <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-2 border-[#0FF1CE] border-t-transparent"></div>
                   <p className="text-white">Processing payment...</p>
                 </div>
               </div>
             )}
             
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#0FF1CE] mb-2">Select Payment Method</h2>
-              <p className="text-gray-400">{orderLabel} - {selectedOption.level}</p>
+              <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.22em] text-[#0FF1CE]">Checkout</p>
+              <h2 className="mb-2 text-2xl font-semibold tracking-tight text-white md:text-3xl">Select Payment Method</h2>
+              <p className="text-sm text-white/50">{orderLabel} - {selectedOption.level}</p>
             </div>
 
-            <div className="space-y-4 mb-8">
+            <div className="mb-8 space-y-4">
               {/* Card Payment Option - hidden until payment processor is restored */}
               <div className="hidden">
                 <button
                   onClick={handleCardPayment}
-                  className="w-full bg-gradient-to-r from-[#0FF1CE]/10 to-[#00D9FF]/10 hover:from-[#0FF1CE]/20 hover:to-[#00D9FF]/20 border-2 border-[#0FF1CE]/30 hover:border-[#0FF1CE] rounded-xl p-6 transition-all duration-300 group"
+                  className="group w-full rounded-[18px] border border-white/10 bg-white/[0.04] p-6 text-left transition-colors duration-300 hover:border-white/20 hover:bg-white/[0.07]"
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-[#0FF1CE]/20 rounded-lg flex items-center justify-center group-hover:bg-[#0FF1CE]/30 transition-colors">
-                        <CreditCard size={24} className="text-[#0FF1CE]" />
+                      <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-black/30 text-[#0FF1CE] transition-colors group-hover:border-[#0FF1CE]/40 group-hover:bg-[#0FF1CE]/15">
+                        <CreditCard size={24} />
                       </div>
                       <div className="text-left">
-                        <div className="text-lg font-bold text-white">Credit/Debit Card</div>
-                        <div className="text-sm text-gray-400">Secure checkout via Whop</div>
+                        <div className="text-lg font-semibold text-white">Credit/Debit Card</div>
+                        <div className="text-sm text-white/50">Secure checkout via Whop</div>
                       </div>
                     </div>
                     <div className="text-2xl font-bold text-[#0FF1CE]">${getEffectivePrice(selectedOption).toLocaleString()}</div>
@@ -428,56 +432,56 @@ function GauntletActivationContent() {
               {/* Crypto Payment Option */}
               <button
                 onClick={() => setPaymentMethod('crypto')}
-                className="w-full bg-gradient-to-r from-[#0FF1CE]/10 to-[#00D9FF]/10 hover:from-[#0FF1CE]/20 hover:to-[#00D9FF]/20 border-2 border-[#0FF1CE]/30 hover:border-[#0FF1CE] rounded-xl p-6 transition-all duration-300 group"
+                className="group w-full rounded-[18px] border border-white/10 bg-white/[0.04] p-6 text-left transition-colors duration-300 hover:border-white/20 hover:bg-white/[0.07]"
               >
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-[#0FF1CE]/20 rounded-lg flex items-center justify-center group-hover:bg-[#0FF1CE]/30 transition-colors">
-                      <Bitcoin size={24} className="text-[#0FF1CE]" />
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-black/30 text-[#0FF1CE] transition-colors group-hover:border-[#0FF1CE]/40 group-hover:bg-[#0FF1CE]/15">
+                      <Bitcoin size={24} />
                     </div>
                     <div className="text-left">
-                      <div className="text-lg font-bold text-white">Cryptocurrency</div>
-                      <div className="text-sm text-gray-400">Pay with BTC, ETH, USDT, or USDC</div>
+                      <div className="text-lg font-semibold text-white">Cryptocurrency</div>
+                      <div className="text-sm text-white/50">Pay with BTC, ETH, USDT, or USDC</div>
                     </div>
                   </div>
-                  <div className="text-2xl font-bold text-[#0FF1CE]">${getEffectivePrice(selectedOption).toLocaleString()}</div>
+                  <div className="shrink-0 text-2xl font-bold text-[#0FF1CE]">${getEffectivePrice(selectedOption).toLocaleString()}</div>
                 </div>
               </button>
             </div>
 
             {/* Order Summary */}
-            <div className="bg-[#151515]/50 rounded-xl p-6 border border-[#2F2F2F]/30">
-              <h3 className="text-lg font-semibold text-white mb-4">Order Summary</h3>
+            <div className="rounded-[18px] border border-white/10 bg-black/30 p-6">
+              <h3 className="mb-4 text-lg font-semibold text-white">Order Summary</h3>
               <div className="space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Customer:</span>
-                  <span className="text-white">{formData.firstName} {formData.lastName}</span>
+                <div className="flex justify-between gap-4 text-sm">
+                  <span className="text-white/50">Customer:</span>
+                  <span className="text-right text-white">{formData.firstName} {formData.lastName}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Email:</span>
-                  <span className="text-white">{formData.email}</span>
+                <div className="flex justify-between gap-4 text-sm">
+                  <span className="text-white/50">Email:</span>
+                  <span className="break-all text-right text-white">{formData.email}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Account Size:</span>
+                <div className="flex justify-between gap-4 text-sm">
+                  <span className="text-white/50">Account Size:</span>
                   <span className="text-white">{selectedOption.level}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Platform:</span>
+                <div className="flex justify-between gap-4 text-sm">
+                  <span className="text-white/50">Platform:</span>
                   <span className="text-white">{formData.platform}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Option:</span>
+                <div className="flex justify-between gap-4 text-sm">
+                  <span className="text-white/50">Option:</span>
                   <span className="text-white">{isReset ? 'Reset Account' : 'Activate Account'}</span>
                 </div>
                 {isReset && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-400">Reset Discount (12%):</span>
+                  <div className="flex justify-between gap-4 text-sm">
+                    <span className="text-white/50">Reset Discount (12%):</span>
                     <span className="text-[#0FF1CE]">-${(selectedOption.price - getEffectivePrice(selectedOption)).toLocaleString()}</span>
                   </div>
                 )}
-                <div className="border-t border-[#2F2F2F]/50 pt-3 flex justify-between">
-                  <span className="text-white font-semibold">Total:</span>
-                  <span className="text-[#0FF1CE] font-bold text-xl">${getEffectivePrice(selectedOption).toLocaleString()}</span>
+                <div className="flex justify-between border-t border-white/10 pt-3">
+                  <span className="font-semibold text-white">Total:</span>
+                  <span className="text-xl font-bold text-[#0FF1CE]">${getEffectivePrice(selectedOption).toLocaleString()}</span>
                 </div>
               </div>
             </div>
@@ -488,24 +492,23 @@ function GauntletActivationContent() {
   }
 
   return (
-    <div className="bg-gradient-to-b from-[#0D0D0D] via-[#121212] to-[#151515] text-white min-h-screen font-sans">
+    <div className="relative min-h-screen overflow-hidden bg-black font-sans text-white">
       <Header />
       
       {/* Hero Section */}
-      <section className="relative px-4 md:px-6 pt-24 md:pt-40 pb-10 md:pb-32 text-center overflow-hidden bg-gradient-to-b from-[#121212] to-[#131313]">
-        <div className="absolute top-0 left-0 w-full h-full bg-[#0FF1CE]/[0.02] background-noise"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full md:w-3/4 h-full rounded-full bg-[#0FF1CE]/[0.03] blur-[150px] opacity-60"></div>
+      <section className="relative z-10 overflow-hidden bg-black px-6 pb-12 pt-36 text-center md:pb-16 md:pt-44">
+        <div className="pointer-events-none absolute left-1/2 top-0 h-64 w-[70%] -translate-x-1/2 rounded-full bg-[#0FF1CE]/10 blur-[120px]" />
         <Particles />
         
-        <div className="relative z-10 max-w-5xl mx-auto">
-          <div className="inline-block bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-black px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-bold mb-3 md:mb-4">
+        <div className="relative z-10 mx-auto max-w-5xl">
+          <div className="mb-4 inline-block rounded-full bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] px-4 py-1.5 text-xs font-bold text-black md:mb-5 md:text-sm">
             FUNDED ACTIVATION
           </div>
           
-          <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-transparent bg-clip-text mb-3 md:mb-6">
+          <h1 className="mb-4 bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] bg-clip-text text-4xl font-extrabold leading-tight text-transparent md:mb-6 md:text-6xl">
             Activate Your Funded Account
           </h1>
-          <p className="text-sm md:text-lg lg:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed mb-4 md:mb-8">
+          <p className="mx-auto mb-8 max-w-2xl text-sm text-white/60 md:text-base">
             Skip the challenge, Pay your activation fee to unlock your funded account with zero restrictions.
           </p>
 
@@ -514,37 +517,30 @@ function GauntletActivationContent() {
             <span className="w-2 h-2 rounded-full bg-orange-400"></span>
             PRICES INCREASE TOMORROW — LOCK IN TODAY
           </div> */}
-     
 
-          {/* Floating Stats Cards */}
-          <div className="grid grid-cols-3 gap-2 md:flex md:flex-row md:justify-center md:items-center md:gap-8 px-1 md:px-0 mb-6 md:mb-8">
+          <div className="mb-8 grid grid-cols-3 gap-2 px-2 md:flex md:flex-row md:items-center md:justify-center md:gap-8 md:px-0">
             {[
-              { value: "15%", label: "Max Drawdown", delay: "0s" },
-              { value: "8%", label: "Daily Drawdown", delay: "0.1s" },
-              { value: "1:200", label: "Leverage", delay: "0.2s" }
-            ].map(({ value, label, delay }) => (
+              { value: "15%", label: "Max Drawdown" },
+              { value: "8%", label: "Daily Drawdown" },
+              { value: "1:200", label: "Leverage" }
+            ].map(({ value, label }) => (
               <div
                 key={label}
-                className="group relative w-full bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-xl p-3 md:p-4 md:w-44 hover:scale-105 transition-all duration-300 animate-float"
-                style={{
-                  animation: `float 3s ease-in-out infinite`,
-                  animationDelay: delay,
-                  boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)'
-                }}
+                className="group relative w-full rounded-xl bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 p-3 backdrop-blur-sm md:w-44 md:p-4"
+                style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}
               >
-                <div className="text-xl md:text-3xl font-bold text-[#0FF1CE] mb-1">{value}</div>
-                <div className="text-xs md:text-sm text-gray-400">{label}</div>
-                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#0FF1CE]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="mb-1 text-xl font-bold text-[#0FF1CE] md:text-3xl">{value}</div>
+                <div className="text-xs text-gray-400 md:text-sm">{label}</div>
+                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-[#0FF1CE]/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
               </div>
             ))}
           </div>
 
-          {/* NO BS Rules Card */}
-          <div className="max-w-2xl mx-auto mb-6 md:mb-8">
-            <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-4 md:p-8 border border-[#0FF1CE]/20"
-              style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
-              <h3 className="text-lg md:text-2xl font-bold text-[#0FF1CE] mb-4 md:mb-6 text-center">NO BS Funded Account RULES</h3>
-              <div className="grid grid-cols-2 gap-2 md:gap-4 text-left">
+          <div className="mx-auto mb-8 max-w-2xl">
+            <div className="rounded-[22px] border border-white/10 bg-white/[0.04] p-5 text-left backdrop-blur-xl md:p-8">
+              <p className="mb-2 text-center text-[11px] font-bold uppercase tracking-[0.22em] text-[#0FF1CE]">Funded rules</p>
+              <h3 className="mb-6 text-center text-xl font-semibold tracking-tight text-white md:text-2xl">NO BS Funded Account RULES</h3>
+              <div className="grid grid-cols-1 gap-3 text-left sm:grid-cols-2">
                 {[
                   "No consistency rules",
                   "News trading allowed",
@@ -552,12 +548,12 @@ function GauntletActivationContent() {
                   "EAs & Bots allowed",
                   "No Profit Caps",
                   "No Position size caps"
-                ].map((rule, index) => (
-                  <div key={index} className="flex items-center space-x-2 md:space-x-3 group">
-                    <div className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-[#0FF1CE]/10 flex items-center justify-center group-hover:scale-110 transition-transform shrink-0">
-                      <span className="text-[#0FF1CE] text-xs md:text-sm">✓</span>
+                ].map((rule) => (
+                  <div key={rule} className="group flex items-center gap-3">
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#0FF1CE]/10 transition-transform group-hover:scale-110">
+                      <span className="text-sm text-[#0FF1CE]">✓</span>
                     </div>
-                    <span className="text-gray-300 text-xs md:text-base group-hover:text-white transition-colors">{rule}</span>
+                    <span className="text-sm text-white/70 transition-colors group-hover:text-white md:text-base">{rule}</span>
                   </div>
                 ))}
               </div>
@@ -567,7 +563,7 @@ function GauntletActivationContent() {
           {/* Mobile CTA - scrolls to account selector */}
           <button
             onClick={() => document.getElementById('account-selector')?.scrollIntoView({ behavior: 'smooth' })}
-            className="md:hidden w-full max-w-xs mx-auto flex items-center justify-center gap-2 px-8 py-3.5 bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-black text-sm font-bold rounded-xl active:scale-[0.98] transition-transform shadow-[0_0_20px_rgba(15,241,206,0.3)]"
+            className="mx-auto flex w-full max-w-xs items-center justify-center gap-2 rounded-2xl bg-[#0FF1CE] px-8 py-3.5 text-sm font-bold text-black shadow-[0_8px_30px_rgba(15,241,206,0.22)] transition-transform duration-300 active:scale-[0.98] md:hidden"
           >
             <span>Choose Your Account</span>
             <ChevronDown size={18} />
@@ -576,87 +572,91 @@ function GauntletActivationContent() {
       </section>
 
       {/* Activation Options Section */}
-      <section id="account-selector" className="py-12 md:py-20 px-6 bg-gradient-to-b from-[#131313] to-[#111111] relative overflow-hidden scroll-mt-20">
-        <div className="absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-[#131313] to-transparent"></div>
+      <section id="account-selector" className="relative scroll-mt-20 overflow-hidden bg-black px-6 py-16 md:py-24">
+        <div className="pointer-events-none absolute left-1/2 top-0 h-64 w-[70%] -translate-x-1/2 rounded-full bg-[#0FF1CE]/10 blur-[120px]" />
         <div className="relative z-10">
-          <h2 className="text-4xl font-bold text-center text-[#0FF1CE] mb-8">
-            Activate your Funded Account
-            {levelParam && <span className="block text-xl text-gray-400 mt-2">{levelParam.toUpperCase()} Account Activation</span>}
-          </h2>
+          <div className="mx-auto mb-8 max-w-3xl text-center md:mb-12">
+            <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.22em] text-[#0FF1CE]">Account size</p>
+            <h2 className="text-3xl font-semibold tracking-tight text-white md:text-5xl">
+              Activate your Funded Account
+            </h2>
+            {levelParam && (
+              <p className="mt-3 text-sm text-white/50">{levelParam.toUpperCase()} Account Activation</p>
+            )}
+          </div>
 
           {/* Activate / Reset Mode Selection (shown only when enabled by admin) */}
           {resetFeatureEnabled && (
-          <div className="max-w-xl mx-auto grid grid-cols-2 gap-4 mb-12">
+          <div className="mx-auto mb-10 grid max-w-xl grid-cols-2 gap-3 md:mb-12">
             <button
+              type="button"
               onClick={() => handleModeSelect('activate')}
-              className={`p-4 rounded-xl border-2 transition-all duration-300 text-center ${
+              className={`rounded-[18px] border px-4 py-4 text-center font-semibold transition-colors duration-300 ${
                 activationMode === 'activate'
-                  ? 'border-[#0FF1CE] bg-[#0FF1CE]/10 shadow-[0_0_15px_rgba(15,241,206,0.2)]'
-                  : 'border-[#2F2F2F]/50 hover:border-[#0FF1CE]/30'
+                  ? 'border-[#0FF1CE] bg-[#0FF1CE] text-black shadow-[0_8px_30px_rgba(15,241,206,0.22)]'
+                  : 'border-white/10 bg-white/[0.04] text-white hover:border-white/20'
               }`}
             >
-              <div className={`font-bold ${activationMode === 'activate' ? 'text-[#0FF1CE]' : 'text-white'}`}>Activate Account</div>
-         
+              Activate Account
             </button>
             <button
+              type="button"
               onClick={() => handleModeSelect('reset')}
-              className={`p-4 rounded-xl border-2 transition-all duration-300 text-center ${
+              className={`rounded-[18px] border px-4 py-4 text-center font-semibold transition-colors duration-300 ${
                 activationMode === 'reset'
-                  ? 'border-[#0FF1CE] bg-[#0FF1CE]/10 shadow-[0_0_15px_rgba(15,241,206,0.2)]'
-                  : 'border-[#2F2F2F]/50 hover:border-[#0FF1CE]/30'
+                  ? 'border-[#0FF1CE] bg-[#0FF1CE] text-black shadow-[0_8px_30px_rgba(15,241,206,0.22)]'
+                  : 'border-white/10 bg-white/[0.04] text-white hover:border-white/20'
               }`}
             >
-              <div className={`font-bold ${activationMode === 'reset' ? 'text-[#0FF1CE]' : 'text-white'}`}>Reset Account</div>
-             
+              Reset Account
             </button>
           </div>
           )}
           
           {filteredOptions.length > 0 ? (
             <>
-              <div className="max-w-7xl -mx-6 px-6 md:mx-auto md:px-0 flex md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-6 gap-4 md:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory md:snap-none pb-4 md:pb-0 hide-scrollbar">
-                {filteredOptions.map((option, index) => (
+              <div className="hide-scrollbar -mx-6 flex max-w-7xl snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-4 md:mx-auto md:grid md:snap-none md:grid-cols-2 md:gap-6 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-6">
+                {filteredOptions.map((option) => {
+                  const isSelected = selectedOption?.level === option.level;
+                  return (
                   <div
                     key={option.level}
-                    className={`group relative shrink-0 w-[70%] max-w-[260px] snap-center md:w-auto md:max-w-none bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-6 border border-[#0FF1CE]/20 hover:scale-105 transition-all duration-300 cursor-pointer ${
-                      selectedOption?.level === option.level ? 'ring-2 ring-[#0FF1CE]' : ''
+                    className={`group relative w-[70%] max-w-[260px] shrink-0 cursor-pointer snap-center rounded-[22px] border p-6 backdrop-blur-xl transition-colors duration-300 md:w-auto md:max-w-none ${
+                      isSelected
+                        ? 'border-[#0FF1CE]/70 bg-white/[0.07]'
+                        : 'border-white/10 bg-white/[0.04] hover:border-white/20'
                     }`}
-                    style={{
-                      boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)'
-                    }}
                     onClick={() => handleSelectOption(option)}
                   >
                     <div className="text-center">
-                      <div className="text-2xl font-bold text-[#0FF1CE] mb-2">{option.level}</div>
+                      <div className="mb-2 text-2xl font-bold text-[#0FF1CE]">{option.level}</div>
                       {isReset && (
-                        <div className="text-sm text-gray-500 line-through">${option.price.toLocaleString()}</div>
+                        <div className="text-sm text-white/40 line-through">${option.price.toLocaleString()}</div>
                       )}
                       <div className="text-3xl font-bold text-white">${getEffectivePrice(option).toLocaleString()}</div>
-                      <div className="text-sm text-gray-400 mt-1">{feeLabel}</div>
+                      <div className="mt-1 text-sm text-white/45">{feeLabel}</div>
                     </div>
 
-                    {selectedOption?.level === option.level && (
-                      <div className="absolute top-2 right-2">
-                        <div className="w-6 h-6 bg-[#0FF1CE] rounded-full flex items-center justify-center">
+                    {isSelected && (
+                      <div className="absolute right-3 top-3">
+                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#0FF1CE]">
                           <Check size={14} className="text-black" />
                         </div>
                       </div>
                     )}
-
-                    <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#0FF1CE]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
               {filteredOptions.length > 1 && (
-                <p className="md:hidden text-center text-gray-500 text-xs mt-2">← Swipe to explore account sizes →</p>
+                <p className="mt-2 text-center text-xs text-white/40 md:hidden">← Swipe to explore account sizes →</p>
               )}
             </>
           ) : (
-            <div className="max-w-2xl mx-auto text-center">
-              <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-8 border border-[#0FF1CE]/20"
-                style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
-                <p className="text-gray-400 mb-4">No activation options found for the specified level.</p>
-                <a href="/gauntlet-activation" className="text-[#0FF1CE] hover:underline">
+            <div className="mx-auto max-w-2xl text-center">
+              <div className="rounded-[22px] border border-white/10 bg-white/[0.04] p-8 backdrop-blur-xl">
+                <p className="mb-4 text-white/60">No activation options found for the specified level.</p>
+                <a href="/gauntlet-activation" className="font-semibold text-[#0FF1CE] hover:underline">
                   View all activation options
                 </a>
               </div>
@@ -667,85 +667,88 @@ function GauntletActivationContent() {
 
       {/* Form Section */}
       {selectedOption && (
-        <section id="information-section" className="py-12 md:py-20 px-6 bg-gradient-to-b from-[#111111] to-[#131313] relative overflow-hidden scroll-mt-20">
+        <section id="information-section" className="relative scroll-mt-20 overflow-hidden bg-black px-6 py-16 md:py-24">
+          <div className="pointer-events-none absolute left-1/2 top-0 h-64 w-[50%] -translate-x-1/2 rounded-full bg-[#0FF1CE]/[0.08] blur-[120px]" />
           <div className="relative z-10">
-            <h2 className="text-4xl font-bold text-center text-[#0FF1CE] mb-16">Complete Your Information</h2>
+            <div className="mx-auto mb-10 max-w-2xl text-center md:mb-14">
+              <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.22em] text-[#0FF1CE]">Checkout</p>
+              <h2 className="text-3xl font-semibold tracking-tight text-white md:text-5xl">Complete Your Information</h2>
+            </div>
             
-            <div className="max-w-2xl mx-auto">
-              <div className="bg-gradient-to-br from-[#0FF1CE]/10 to-[#0FF1CE]/5 backdrop-blur-sm rounded-2xl p-8 border border-[#0FF1CE]/20"
-                style={{ boxShadow: '0 0 20px rgba(15, 241, 206, 0.1)' }}>
-                <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="mx-auto max-w-2xl">
+              <div className="rounded-[22px] border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl md:p-8">
+                <div className="space-y-5">
+                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                     <div>
-                      <label className="block text-white mb-2">First Name *</label>
+                      <label className="mb-2 block text-sm font-medium text-white">First Name *</label>
                       <input
                         type="text"
                         name="firstName"
                         value={formData.firstName}
                         onChange={handleInputChange}
-                        className={`w-full px-4 py-3 bg-[#181818] border rounded-lg focus:outline-none focus:border-[#0FF1CE] text-white placeholder-gray-400 ${
-                          formErrors.firstName ? 'border-red-500' : 'border-[#0FF1CE]/20'
+                        className={`w-full rounded-2xl border bg-black/40 px-4 py-3.5 text-base text-white placeholder:text-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none ${
+                          formErrors.firstName ? 'border-red-500' : 'border-white/10'
                         }`}
                         placeholder="Enter your first name"
                       />
-                      {formErrors.firstName && <p className="text-red-500 text-sm mt-1">{formErrors.firstName}</p>}
+                      {formErrors.firstName && <p className="mt-1 text-sm text-red-400">{formErrors.firstName}</p>}
                     </div>
 
                     <div>
-                      <label className="block text-white mb-2">Last Name *</label>
+                      <label className="mb-2 block text-sm font-medium text-white">Last Name *</label>
                       <input
                         type="text"
                         name="lastName"
                         value={formData.lastName}
                         onChange={handleInputChange}
-                        className={`w-full px-4 py-3 bg-[#181818] border rounded-lg focus:outline-none focus:border-[#0FF1CE] text-white placeholder-gray-400 ${
-                          formErrors.lastName ? 'border-red-500' : 'border-[#0FF1CE]/20'
+                        className={`w-full rounded-2xl border bg-black/40 px-4 py-3.5 text-base text-white placeholder:text-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none ${
+                          formErrors.lastName ? 'border-red-500' : 'border-white/10'
                         }`}
                         placeholder="Enter your last name"
                       />
-                      {formErrors.lastName && <p className="text-red-500 text-sm mt-1">{formErrors.lastName}</p>}
+                      {formErrors.lastName && <p className="mt-1 text-sm text-red-400">{formErrors.lastName}</p>}
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-white mb-2">Email Address *</label>
+                    <label className="mb-2 block text-sm font-medium text-white">Email Address *</label>
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-3 bg-[#181818] border rounded-lg focus:outline-none focus:border-[#0FF1CE] text-white placeholder-gray-400 ${
-                        formErrors.email ? 'border-red-500' : 'border-[#0FF1CE]/20'
+                      className={`w-full rounded-2xl border bg-black/40 px-4 py-3.5 text-base text-white placeholder:text-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none ${
+                        formErrors.email ? 'border-red-500' : 'border-white/10'
                       }`}
                       placeholder="Enter your email address"
                     />
-                    {formErrors.email && <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>}
+                    {formErrors.email && <p className="mt-1 text-sm text-red-400">{formErrors.email}</p>}
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                     <div>
-                      <label className="block text-white mb-2">Phone Number *</label>
+                      <label className="mb-2 block text-sm font-medium text-white">Phone Number *</label>
                       <input
                         type="tel"
                         name="phone"
                         value={formData.phone}
                         onChange={handleInputChange}
-                        className={`w-full px-4 py-3 bg-[#181818] border rounded-lg focus:outline-none focus:border-[#0FF1CE] text-white placeholder-gray-400 ${
-                          formErrors.phone ? 'border-red-500' : 'border-[#0FF1CE]/20'
+                        className={`w-full rounded-2xl border bg-black/40 px-4 py-3.5 text-base text-white placeholder:text-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none ${
+                          formErrors.phone ? 'border-red-500' : 'border-white/10'
                         }`}
                         placeholder="Enter your phone number"
                       />
-                      {formErrors.phone && <p className="text-red-500 text-sm mt-1">{formErrors.phone}</p>}
+                      {formErrors.phone && <p className="mt-1 text-sm text-red-400">{formErrors.phone}</p>}
                     </div>
 
                     <div>
-                      <label className="block text-white mb-2">Country *</label>
+                      <label className="mb-2 block text-sm font-medium text-white">Country *</label>
                       <select
                         name="country"
                         value={formData.country}
                         onChange={handleInputChange}
-                        className={`w-full px-4 py-3 bg-[#181818] border rounded-lg focus:outline-none focus:border-[#0FF1CE] text-white ${
-                          formErrors.country ? 'border-red-500' : 'border-[#0FF1CE]/20'
+                        className={`w-full rounded-2xl border bg-black/40 px-4 py-3.5 text-base text-white focus:border-[#0FF1CE]/60 focus:outline-none ${
+                          formErrors.country ? 'border-red-500' : 'border-white/10'
                         }`}
                       >
                         <option value="">Select your country</option>
@@ -757,57 +760,58 @@ function GauntletActivationContent() {
                         <option value="France">France</option>
                         <option value="Other">Other</option>
                       </select>
-                      {formErrors.country && <p className="text-red-500 text-sm mt-1">{formErrors.country}</p>}
+                      {formErrors.country && <p className="mt-1 text-sm text-red-400">{formErrors.country}</p>}
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-white mb-2">Trading Platform *</label>
+                    <label className="mb-2 block text-sm font-medium text-white">Trading Platform *</label>
                     <select
                       name="platform"
                       value={formData.platform}
                       onChange={handleInputChange}
-                      className={`w-full px-4 py-3 bg-[#181818] border rounded-lg focus:outline-none focus:border-[#0FF1CE] text-white ${
-                        formErrors.platform ? 'border-red-500' : 'border-[#0FF1CE]/20'
+                      className={`w-full rounded-2xl border bg-black/40 px-4 py-3.5 text-base text-white focus:border-[#0FF1CE]/60 focus:outline-none ${
+                        formErrors.platform ? 'border-red-500' : 'border-white/10'
                       }`}
                     >
                       <option value="MT5">MetaTrader 5 (MT5)</option>
                       <option value="MT4">MetaTrader 4 (MT4)</option>
                     </select>
-                    {formErrors.platform && <p className="text-red-500 text-sm mt-1">{formErrors.platform}</p>}
-                    <p className="text-gray-400 text-xs mt-1">Select your preferred trading platform</p>
+                    {formErrors.platform && <p className="mt-1 text-sm text-red-400">{formErrors.platform}</p>}
+                    <p className="mt-1 text-xs text-white/40">Select your preferred trading platform</p>
                   </div>
 
                   <div>
-                    <label className="block text-white mb-2">Discord Username (Optional)</label>
+                    <label className="mb-2 block text-sm font-medium text-white">Discord Username (Optional)</label>
                     <input
                       type="text"
                       name="discordUsername"
                       value={formData.discordUsername}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 bg-[#181818] border border-[#0FF1CE]/20 rounded-lg focus:outline-none focus:border-[#0FF1CE] text-white placeholder-gray-400"
+                      className="w-full rounded-2xl border border-white/10 bg-black/40 px-4 py-3.5 text-base text-white placeholder:text-gray-500 focus:border-[#0FF1CE]/60 focus:outline-none"
                       placeholder="Your Discord username"
                     />
                   </div>
 
-                  <div className="pt-6 border-t border-[#0FF1CE]/20">
-                    <div className="flex justify-between items-center mb-6">
+                  <div className="border-t border-white/10 pt-6">
+                    <div className="mb-6 flex items-center justify-between gap-4">
                       <div>
                         <div className="text-lg font-semibold text-white">{orderLabel}</div>
                         <div className="text-[#0FF1CE]">{selectedOption.level} Funded Account</div>
                       </div>
                       <div className="text-right">
                         {isReset && (
-                          <div className="text-sm text-gray-500 line-through">${selectedOption.price.toLocaleString()}</div>
+                          <div className="text-sm text-white/40 line-through">${selectedOption.price.toLocaleString()}</div>
                         )}
                         <div className="text-2xl font-bold text-[#0FF1CE]">${getEffectivePrice(selectedOption).toLocaleString()}</div>
-                        <div className="text-gray-400 text-sm">{feeLabel}</div>
+                        <div className="text-sm text-white/45">{feeLabel}</div>
                       </div>
                     </div>
 
                     <button
+                      type="button"
                       onClick={handleProceedToPayment}
-                      className="w-full bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] hover:scale-105 text-black font-bold py-4 rounded-xl transition-all"
+                      className="w-full rounded-2xl bg-[#0FF1CE] px-8 py-3.5 text-base font-bold text-black shadow-[0_8px_30px_rgba(15,241,206,0.22)] transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98]"
                     >
                       {isReset ? 'Reset Gauntlet Account' : 'Activate Gauntlet Account'}
                     </button>
@@ -820,16 +824,6 @@ function GauntletActivationContent() {
       )}
 
       <style jsx global>{`
-        .background-noise {
-          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 250 250' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
-          opacity: 0.15;
-        }
-
-        @keyframes float {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-10px); }
-        }
-
         .hide-scrollbar {
           -ms-overflow-style: none;
           scrollbar-width: none;
@@ -846,7 +840,7 @@ function GauntletActivationContent() {
 export default function GauntletActivationPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-[#0D0D0D]">
+      <div className="flex min-h-screen items-center justify-center bg-black">
         <div className="w-8 h-8 border-4 border-[#0FF1CE] border-t-transparent rounded-full animate-spin"></div>
       </div>
     }>
