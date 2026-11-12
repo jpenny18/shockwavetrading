@@ -27,7 +27,11 @@ import {
   FlaskConical,
   ToggleLeft,
   Crown,
-  LineChart
+  LineChart,
+  CircleDollarSign,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Beaker
 } from 'lucide-react';
 
 const navItems = [
@@ -44,6 +48,8 @@ const navItems = [
   { name: 'Email Templates', href: '/admin/emails', icon: Mail },
   { name: 'Pulse Management', href: '/admin/pulse', icon: MessageSquare },
   { name: 'Discount Codes', href: '/admin/discounts', icon: Tag },
+  { name: 'Reset Prices', href: '/admin/reset-prices', icon: CircleDollarSign },
+  { name: 'Test Accounts', href: '/admin/test-accounts', icon: Beaker },
   { name: 'VIP Reset Codes', href: '/admin/vip-reset-codes', icon: Tag },
   { name: 'Feature Toggles', href: '/admin/feature-toggles', icon: ToggleLeft },
   { name: 'Settings', href: '/admin/settings', icon: Settings }
@@ -86,6 +92,7 @@ export default function AdminLayout({
   const searchRef = useRef<HTMLDivElement>(null);
   const alertsRef = useRef<HTMLDivElement>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [desktopCollapsed, setDesktopCollapsed] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [logoutError, setLogoutError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -100,6 +107,20 @@ export default function AdminLayout({
   const searchResults = searchableItems.filter((item) =>
     !normalizedSearch || item.name.toLowerCase().includes(normalizedSearch)
   );
+
+  useEffect(() => {
+    if (window.localStorage.getItem('admin-sidebar-collapsed') === '1') {
+      setDesktopCollapsed(true);
+    }
+  }, []);
+
+  const toggleDesktopSidebar = () => {
+    setDesktopCollapsed((current) => {
+      const next = !current;
+      window.localStorage.setItem('admin-sidebar-collapsed', next ? '1' : '0');
+      return next;
+    });
+  };
 
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
@@ -249,15 +270,18 @@ export default function AdminLayout({
       {/* Sidebar */}
       <aside
         className={`
-          fixed md:sticky top-0 md:top-0 left-0 h-screen w-72 md:w-64 bg-black z-50
-          transform transition-transform duration-300 ease-in-out
-          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-          md:translate-x-0 md:flex md:flex-col
+          fixed md:sticky top-0 left-0 h-screen w-72 bg-black z-50
+          transform transition-all duration-300 ease-in-out
           border-r border-white/10
+          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+          md:flex md:flex-col
+          ${desktopCollapsed
+            ? 'md:-translate-x-full md:w-0 md:min-w-0 md:overflow-hidden md:border-transparent'
+            : 'md:translate-x-0 md:w-64'}
         `}
       >
         <div className="flex flex-col h-full p-4">
-          <div className="mb-6 pt-2">
+          <div className="mb-6 pt-2 flex items-start justify-between gap-2">
             <Image
               src="/logo.png"
               alt={siteName}
@@ -265,6 +289,14 @@ export default function AdminLayout({
               height={48}
               className="h-auto w-40"
             />
+            <button
+              type="button"
+              onClick={toggleDesktopSidebar}
+              className="hidden md:inline-flex mt-1 p-1.5 rounded-lg text-gray-400 hover:text-[#0FF1CE] transition-colors"
+              aria-label="Collapse sidebar"
+            >
+              <PanelLeftClose size={18} />
+            </button>
           </div>
           
           <nav className="flex-1 space-y-0.5 overflow-y-auto">
@@ -343,8 +375,18 @@ export default function AdminLayout({
       <div className="flex-1 flex flex-col min-w-0 pt-[58px] md:pt-0">
         {/* Desktop Header */}
         <header className="hidden md:flex h-16 bg-black border-b border-white/10 items-center justify-between px-8">
-          <div className="flex-1 max-w-md" ref={searchRef}>
-            <div className="relative">
+          <div className="flex flex-1 items-center max-w-md gap-3" ref={searchRef}>
+            {desktopCollapsed && (
+              <button
+                type="button"
+                onClick={toggleDesktopSidebar}
+                className="shrink-0 p-2 rounded-lg text-gray-400 hover:text-[#0FF1CE] transition-colors"
+                aria-label="Show sidebar"
+              >
+                <PanelLeftOpen size={20} />
+              </button>
+            )}
+            <div className="relative flex-1">
               <input 
                 type="text"
                 value={searchQuery}

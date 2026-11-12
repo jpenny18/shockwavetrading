@@ -1,6 +1,7 @@
 import { auth, db } from '@/lib/firebase-admin';
+import { resolveResetQuote } from '@/lib/reset-price-config';
+import { loadResetPriceConfig } from '@/lib/reset-price-store';
 import {
-  getResetQuote,
   normalizeResetCustomer,
   resetCustomerFieldErrors,
   resetPriceCents,
@@ -53,7 +54,7 @@ export async function loadOwnedReset(userId: string, accountId: string): Promise
   }
 
   const data = match.data() as ResetAccountInput & { accountId?: string; status?: string; step?: number };
-  const quote = getResetQuote(data);
+  const quote = resolveResetQuote({ ...data, accountId: id }, await loadResetPriceConfig(), userId);
   if (!quote) {
     return {
       ok: false,

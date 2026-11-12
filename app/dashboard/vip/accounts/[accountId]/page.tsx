@@ -22,8 +22,8 @@ import {
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { formatVipAllocation, formatVipDollars, getVipObjectiveAmounts, isVipMetaApiAccount, normalizeVipProfitSplit } from '../../../../../lib/vip-accounts';
-import { VIP_PAYMENT_PORTAL_URL } from '../../../../../lib/vip-portal';
 import AccountResetButton from '../../../components/AccountResetModal';
+import VipPurchaseModal from '../../components/VipPurchaseModal';
 import VipProfitTracker from '../../../../components/VipProfitTracker';
 
 // Dynamically import ApexCharts to avoid SSR issues
@@ -422,6 +422,7 @@ export default function VipAccountDetailsPage() {
   const [userAccount, setUserAccount] = useState<any>(null);
   const [accountInfoOpen, setAccountInfoOpen] = useState(false);
   const [vipAllocationOpen, setVipAllocationOpen] = useState(false);
+  const [buyOpen, setBuyOpen] = useState(false);
 
   // Chart configuration
   const chartOptions = {
@@ -678,15 +679,15 @@ export default function VipAccountDetailsPage() {
               className="w-full rounded-lg border border-[#2F2F2F] px-3 py-2.5 text-center text-xs font-medium text-white hover:border-[#0FF1CE]/40"
             />
           ) : null}
-          <a
-            href={VIP_PAYMENT_PORTAL_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            type="button"
+            onClick={() => setBuyOpen(true)}
             className="rounded-lg bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] px-3 py-2.5 text-center text-xs font-semibold text-black"
           >
             Buy another allocation
-          </a>
+          </button>
         </div>
+        {buyOpen && <VipPurchaseModal onClose={() => setBuyOpen(false)} />}
       </div>
 
       {/* Failed Account Notice */}

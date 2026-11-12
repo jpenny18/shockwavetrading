@@ -121,6 +121,7 @@ export default function AdminVipAccountsPage() {
       const snapshot = await getDocs(accountsRef);
       const loaded = await Promise.all(snapshot.docs.map(async (accountDoc) => {
         const accountData = accountDoc.data() as UserMetaApiAccount;
+        if ((accountData as UserMetaApiAccount & { testAccount?: boolean }).testAccount === true) return null;
         if (!isVipMetaApiAccount(accountData)) return null;
         if (!isVipAccountType(accountData.accountType)) {
           try {

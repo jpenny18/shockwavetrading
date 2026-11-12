@@ -5,6 +5,10 @@
  * Funded: the gauntlet activation price itself, with no extra discount.
  * VIP: 20% off the VIP allocation fee. A $1.5M allocation is half of the $3M fee, then 20% off.
  *
+ * These tables are the built-in prices. Admin overrides — global, per customer, and per
+ * account — are applied by resolveResetQuote in lib/reset-price-config.ts. Checkout and
+ * the dashboard reset dialog both use that resolved price.
+ *
  * Keep these tables aligned with:
  * - app/components/PricingTable.tsx
  * - app/challenge/page.tsx calculatePrice

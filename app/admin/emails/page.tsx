@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import { getAllUsers, UserData, db, getCachedMetrics } from '@/lib/firebase';
 import { isVipMetaApiAccount } from '@/lib/vip-accounts';
+import { formatResetUsd } from '@/lib/reset-pricing';
+import { resolveResetQuote } from '@/lib/reset-price-config';
 import { collection, query, orderBy, limit, getDocs, where } from 'firebase/firestore';
 
 interface EmailTemplate {
@@ -30,7 +32,7 @@ interface EmailTemplate {
   variables: string[];
   lastUpdated: string;
   isBulkTemplate?: boolean;
-  bulkSource?: 'gauntlet-activation' | 'active-accounts';
+  bulkSource?: 'gauntlet-activation' | 'active-accounts' | 'reset-prices';
 }
 
 // Enhanced email templates with improved login credentials template
@@ -807,6 +809,30 @@ const initialTemplates: EmailTemplate[] = [
     lastUpdated: new Date().toISOString().split('T')[0],
     isBulkTemplate: true,
     bulkSource: 'active-accounts'
+  },
+  {
+    id: 8,
+    name: 'Reset Price Update',
+    subject: 'Your Shockwave Capital reset prices',
+    body: `<div style="font-family: Arial, Helvetica, sans-serif; color: #333; line-height: 1.6;">
+  <h2 style="margin: 0 0 16px; color: #1a1a1a; font-size: 24px;">Your reset prices</h2>
+  <p style="margin: 0 0 16px;">Hi {{firstName}},</p>
+  <p style="margin: 0 0 16px;">You can reset an account from your dashboard. These are the current reset prices on your accounts:</p>
+  {{priceList}}
+  <p style="margin: 16px 0; color: #555; font-size: 14px;">{{discountNote}}</p>
+  <p style="margin: 0 0 8px;">
+    <a href="{{dashboardLink}}" style="display: inline-block; background: #0FF1CE; color: #0D0D0D; font-weight: 700; text-decoration: none; padding: 12px 22px; border-radius: 8px;">Open your accounts</a>
+  </p>
+  <p style="margin: 0 0 16px; font-size: 13px;">
+    VIP accounts: <a href="{{vipLink}}" style="color: #0a8f7a;">{{vipLink}}</a>
+  </p>
+  <p style="margin: 0 0 16px;">Choose Reset account on the account you want to restart. The price on your dashboard matches this email.</p>
+  <p style="margin: 0;">Warm regards,<br><strong>The Shockwave Capital Team</strong></p>
+</div>`,
+    variables: ['firstName', 'priceList', 'discountNote', 'dashboardLink', 'vipLink'],
+    lastUpdated: '2026-11-12',
+    isBulkTemplate: true,
+    bulkSource: 'reset-prices'
   }
 ];
 
@@ -1155,6 +1181,12 @@ export default function EmailTemplatesPage() {
                          variable === 'displayName' ? 'John Doe' :
                          variable === 'challengeType' ? (template.bulkSource === 'active-accounts' ? '2-Step' : 'Standard Challenge') :
                          variable === 'accountSize' ? '$10,000' :
+                         variable === 'resetPrice' ? '$346.80' :
+                         variable === 'originalPrice' ? '$433.50' :
+                         variable === 'discountNote' ? '20% off the challenge fee' :
+                         variable === 'dashboardLink' ? 'https://shockwave-capital.com/dashboard/accounts' :
+                         variable === 'vipLink' ? 'https://shockwave-capital.com/dashboard/vip' :
+                         variable === 'priceList' ? '<table role="presentation" width="100%" style="border-collapse:collapse;background:#f6fffd;border:1px solid #b7f7ea;"><tr><td style="padding:12px;">Shockwave Standard · $50,000</td><td style="padding:12px;font-weight:700;color:#0a8f7a;">$346.80</td></tr></table>' :
                          variable === 'orderNumber' ? 'OSK1234' :
                          variable === 'platform' ? 'MetaTrader 4' :
                          variable === 'loginId' ? '12345678' :
@@ -1436,7 +1468,7 @@ export default function EmailTemplatesPage() {
 
       const recipientResults = await Promise.all(accountsSnapshot.docs.map(async (accountDoc) => {
         const data = accountDoc.data();
-        if (!data.userId || isVipMetaApiAccount(data)) return null;
+        if (!data.userId || data.testAccount === true || isVipMetaApiAccount(data)) return null;
 
         try {
           const userSnapshot = await getDocs(query(collection(db, 'users'), where('uid', '==', data.userId), limit(1)));
@@ -1508,13 +1540,6 @@ export default function EmailTemplatesPage() {
     }
   };
 
-  const refreshBulkRecipients = () => {
-    if (currentTemplate?.bulkSource === 'active-accounts') {
-      return loadActiveAccountHolders();
-    }
-    return loadGauntletActivationRecipients();
-  };
-
   // Toggle individual recipient selection
   const toggleRecipient = (key: string) => {
     const newSelected = new Set(selectedRecipients);
@@ -1542,8 +1567,171 @@ export default function EmailTemplatesPage() {
     setSelectedRecipients(new Set());
   };
 
+  const escapeHtml = (value: string) => value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+
+  const resetPriceListHtml = (rows: Array<{ label: string; price: string; note: string }>) => {
+    const body = rows.map((row) => `
+      <tr>
+        <td style="padding:12px;border-bottom:1px solid #e5e5e5;color:#333;font-family:Arial,Helvetica,sans-serif;font-size:14px;">${escapeHtml(row.label)}</td>
+        <td style="padding:12px;border-bottom:1px solid #e5e5e5;color:#0a8f7a;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;text-align:right;">${escapeHtml(row.price)}</td>
+      </tr>
+      <tr>
+        <td colspan="2" style="padding:0 12px 12px;color:#777;font-family:Arial,Helvetica,sans-serif;font-size:12px;">${escapeHtml(row.note)}</td>
+      </tr>`).join('');
+    return `<table role="presentation" width="100%" style="border-collapse:collapse;background:#f6fffd;border:1px solid #b7f7ea;">${body}</table>`;
+  };
+
+  const buildResetPriceRecipient = (
+    userId: string,
+    userData: { email?: string; firstName?: string; lastName?: string; displayName?: string },
+    rows: Array<{ label: string; price: string; note: string; category: string; original: string }>
+  ) => {
+    const email = (userData.email || '').trim();
+    const vipOnly = rows.length > 0 && rows.every((row) => row.category === 'vip');
+    const accountsUrl = 'https://shockwave-capital.com/dashboard/accounts';
+    const vipUrl = 'https://shockwave-capital.com/dashboard/vip';
+    return {
+      id: userId,
+      recipientKey: userId,
+      email,
+      firstName: userData.firstName || userData.displayName?.split(' ')[0] || email.split('@')[0] || 'Valued Customer',
+      lastName: userData.lastName || '',
+      displayName: userData.displayName || `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || email,
+      challengeType: 'Reset prices',
+      accountSize: rows.length === 1 ? rows[0].label : `${rows.length} accounts`,
+      resetPrice: rows.map((row) => row.price).join(', '),
+      originalPrice: rows.length === 1 ? rows[0].original : '',
+      discountNote: rows.length === 1 ? rows[0].note : 'Each line is the reset fee for that account.',
+      priceList: resetPriceListHtml(rows),
+      resetSummary: rows.map((row) => `${row.label} ${row.price}`).join(' · '),
+      dashboardLink: vipOnly ? vipUrl : accountsUrl,
+      vipLink: vipUrl,
+      inDrawdown: false,
+      createdAt: new Date().toISOString()
+    };
+  };
+
+  const loadResetPriceRecipients = async () => {
+    try {
+      setLoadingBulkRecipients(true);
+      let pricingConfig: { global?: Record<string, any>; users?: Record<string, any> } | null = null;
+      try {
+        const pricingResponse = await fetch('/api/admin/reset-prices', { cache: 'no-store' });
+        if (pricingResponse.ok) pricingConfig = await pricingResponse.json();
+      } catch (pricingError) {
+        console.warn('Could not load reset price overrides for email:', pricingError);
+      }
+
+      const accountsRef = collection(db, 'userMetaApiAccounts');
+      const statuses = ['active', 'inactive', 'funded', 'passed'];
+      const snapshots = await Promise.all(statuses.map((status) => getDocs(query(accountsRef, where('status', '==', status)))));
+      const grouped = new Map<string, Array<{ label: string; price: string; note: string; category: string; original: string }>>();
+      const seenAccounts = new Set<string>();
+
+      snapshots.flatMap((snapshot) => snapshot.docs).forEach((accountDoc) => {
+        const data = accountDoc.data();
+        const accountId = String(data.accountId || '');
+        const userId = String(data.userId || '');
+        if (!userId || !accountId || data.testAccount === true || accountId.startsWith('PLACEHOLDER_') || seenAccounts.has(accountId)) return;
+        const quote = resolveResetQuote({
+          accountId,
+          accountType: data.accountType,
+          accountSize: data.accountSize,
+          platform: data.platform,
+          status: data.status,
+          step: data.step,
+          profitSplit: data.profitSplit
+        }, pricingConfig, userId);
+        if (!quote) return;
+        seenAccounts.add(accountId);
+        const rows = grouped.get(userId) || [];
+        rows.push({
+          label: `${quote.productLabel} · ${quote.amountLabel}`,
+          price: formatResetUsd(quote.price),
+          note: quote.feeNote,
+          category: quote.category,
+          original: formatResetUsd(quote.originalPrice)
+        });
+        grouped.set(userId, rows);
+      });
+
+      const recipients = (await Promise.all(Array.from(grouped.entries()).map(async ([userId, rows]) => {
+        try {
+          const userSnapshot = await getDocs(query(collection(db, 'users'), where('uid', '==', userId), limit(1)));
+          if (userSnapshot.empty) return null;
+          const userData = userSnapshot.docs[0].data();
+          if (!(userData.email || '').trim()) return null;
+          return buildResetPriceRecipient(userId, userData, rows);
+        } catch (userError) {
+          console.error(`Error loading user ${userId}:`, userError);
+          return null;
+        }
+      }))).filter(Boolean) as any[];
+
+      recipients.sort((a, b) => String(a.email).localeCompare(String(b.email)));
+      setBulkRecipients(recipients);
+      setSelectedRecipients(new Set(recipients.map((recipient) => getBulkRecipientKey(recipient))));
+      return recipients;
+    } catch (error) {
+      console.error('Error loading reset price recipients:', error);
+      alert('Failed to load reset price recipients. Please try again.');
+      return [];
+    } finally {
+      setLoadingBulkRecipients(false);
+    }
+  };
+
+  const addResetPriceRecipients = async (user: Customer) => {
+    if (!user.uid) {
+      alert('This customer record has no login id.');
+      return;
+    }
+    if (bulkRecipients.some((recipient) => getBulkRecipientKey(recipient) === user.uid || recipient.email === user.email)) {
+      alert('This user is already in the recipients list');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/admin/reset-prices/users/${encodeURIComponent(user.uid)}`, { cache: 'no-store' });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'Failed to load this customer.');
+      const rows = (data.accounts || []).map((account: any) => ({
+        label: `${account.productLabel} · ${account.amountLabel}`,
+        price: formatResetUsd(account.price),
+        note: account.feeNote || '',
+        category: account.category,
+        original: formatResetUsd(account.originalPrice)
+      }));
+      if (rows.length === 0) {
+        alert('This customer has no open accounts with a reset price.');
+        return;
+      }
+      const recipient = {
+        ...buildResetPriceRecipient(user.uid, user, rows),
+        addedManually: true
+      };
+      setBulkRecipients([recipient, ...bulkRecipients]);
+      const nextSelected = new Set(selectedRecipients);
+      nextSelected.add(user.uid);
+      setSelectedRecipients(nextSelected);
+      setBulkUserSearch('');
+      setShowBulkUserSearch(false);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : 'Failed to load this customer.');
+    }
+  };
+
   // Add user from search to bulk recipients
   const addUserToBulk = (user: Customer) => {
+    if (currentTemplate?.bulkSource === 'reset-prices') {
+      void addResetPriceRecipients(user);
+      return;
+    }
+
     // Check if user already exists
     const exists = bulkRecipients.some(r => r.email === user.email);
     if (exists) {
@@ -1613,7 +1801,13 @@ export default function EmailTemplatesPage() {
               email: recipient.email,
               displayName: recipient.displayName || recipient.firstName || 'Valued Customer',
               accountSize: recipient.accountSize || '$10,000',
-              challengeType: recipient.challengeType || ''
+              challengeType: recipient.challengeType || '',
+              resetPrice: recipient.resetPrice || '',
+              originalPrice: recipient.originalPrice || '',
+              discountNote: recipient.discountNote || '',
+              priceList: recipient.priceList || '',
+              dashboardLink: recipient.dashboardLink || 'https://shockwave-capital.com/dashboard/accounts',
+              vipLink: recipient.vipLink || 'https://shockwave-capital.com/dashboard/vip'
             };
 
             // Recipient values win over preview placeholders so bulk sends stay personalized
@@ -1665,10 +1859,22 @@ export default function EmailTemplatesPage() {
     }
   };
 
+  const refreshBulkRecipients = () => {
+    if (currentTemplate?.bulkSource === 'reset-prices') {
+      return loadResetPriceRecipients();
+    }
+    if (currentTemplate?.bulkSource === 'active-accounts') {
+      return loadActiveAccountHolders();
+    }
+    return loadGauntletActivationRecipients();
+  };
+
   // Load bulk recipients when template with bulk flag is selected
   useEffect(() => {
     if (currentTemplate?.isBulkTemplate && isEditing) {
-      if (currentTemplate.bulkSource === 'active-accounts') {
+      if (currentTemplate.bulkSource === 'reset-prices') {
+        loadResetPriceRecipients();
+      } else if (currentTemplate.bulkSource === 'active-accounts') {
         loadActiveAccountHolders();
       } else {
         loadGauntletActivationRecipients();
@@ -1676,6 +1882,7 @@ export default function EmailTemplatesPage() {
     }
   }, [currentTemplate?.id, isEditing]);
 
+  const isResetPriceBulk = currentTemplate?.bulkSource === 'reset-prices';
   const isActiveAccountsBulk = currentTemplate?.bulkSource === 'active-accounts';
   const visibleBulkRecipients = bulkRecipients.filter((recipient) => {
     if (isActiveAccountsBulk && bulkListFilter === 'drawdown' && !recipient.inDrawdown) {
@@ -1721,7 +1928,9 @@ export default function EmailTemplatesPage() {
               <div>
                 <h3 className="text-white font-bold text-lg">Bulk Email Campaign</h3>
                 <p className="text-gray-400 text-sm">
-                  {isActiveAccountsBulk
+                  {isResetPriceBulk
+                    ? 'One email per customer, with the reset price for each open account'
+                    : isActiveAccountsBulk
                     ? 'Active account holders — drawdown accounts are highlighted'
                     : 'Send to all gauntlet activation users'}
                 </p>
@@ -1976,6 +2185,9 @@ export default function EmailTemplatesPage() {
                         )}
                       </div>
                       <div className="text-gray-400 text-xs truncate">{recipient.email}</div>
+                      {recipient.resetSummary && (
+                        <div className="text-[#0FF1CE] text-xs truncate">{recipient.resetSummary}</div>
+                      )}
                     </div>
                     <button
                       onClick={() => removeRecipient(getBulkRecipientKey(recipient))}
@@ -2257,6 +2469,11 @@ export default function EmailTemplatesPage() {
                         {template.bulkSource === 'active-accounts' && (
                           <span className="px-2 py-0.5 text-xs font-bold bg-red-500/20 text-red-400 rounded-full border border-red-500/30">
                             DRAWDOWN
+                          </span>
+                        )}
+                        {template.bulkSource === 'reset-prices' && (
+                          <span className="px-2 py-0.5 text-xs font-bold bg-[#0FF1CE]/20 text-[#0FF1CE] rounded-full border border-[#0FF1CE]/30">
+                            RESET PRICES
                           </span>
                         )}
                       </div>

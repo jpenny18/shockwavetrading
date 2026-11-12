@@ -74,7 +74,7 @@ export default function VipAccountsPage() {
           </p>
         </div>
         {hasVipAccess && (
-          <PortalActions buyLabel={accounts.length > 0 ? 'Buy another allocation' : 'Buy an allocation'} />
+          <PortalActions showReset={false} buyLabel={accounts.length > 0 ? 'Buy another allocation' : 'Buy an allocation'} />
         )}
       </div>
 

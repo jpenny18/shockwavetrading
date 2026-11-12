@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebase-admin';
 import { authenticateResetRequest, customerForReset, loadOwnedReset } from '@/lib/reset-order-server';
+import { resolveVipPurchase } from '@/lib/vip-purchase-server';
 
 export async function POST(req: Request) {
   try {
@@ -52,6 +53,42 @@ export async function POST(req: Request) {
         orderKind: 'account-reset',
         activationMode: 'reset',
         formData: customerResult.customer,
+      };
+    }
+
+    if (challengeData?.orderKind === 'vip-allocation') {
+      if (!cryptoDetails) {
+        return NextResponse.json({ error: 'Payment details are missing.' }, { status: 400 });
+      }
+      const authResult = await authenticateResetRequest(req);
+      if (!authResult.ok) {
+        return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+      }
+      const priced = await resolveVipPurchase({
+        level: challengeData.amount,
+        platform: challengeData.platform,
+        discountCode: challengeData.discount?.code,
+        expectedAmount: challengeData.price,
+      });
+      if (!priced.ok) {
+        return NextResponse.json({ error: priced.error }, { status: priced.status });
+      }
+      cryptoDetails = { ...cryptoDetails, usdAmount: priced.price };
+      challengeData = {
+        ...challengeData,
+        type: 'VIP Activation',
+        amount: priced.option.level,
+        platform: priced.platform,
+        price: priced.price,
+        originalPrice: priced.originalPrice,
+        userId: authResult.uid,
+        addOns: [],
+        discount: priced.discount,
+        orderKind: 'vip-allocation',
+        formData: {
+          ...challengeData.formData,
+          email: authResult.email,
+        },
       };
     }
 

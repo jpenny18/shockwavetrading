@@ -117,7 +117,7 @@ export default function VIPPortalPage() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#0FF1CE]">Shockwave VIP</p>
             <h1 className="mt-2 text-2xl font-semibold text-white sm:text-3xl">Your allocations</h1>
           </div>
-          <PortalActions buyLabel={accounts.length > 0 ? 'Buy another allocation' : 'Buy an allocation'} />
+          <PortalActions showReset={false} buyLabel={accounts.length > 0 ? 'Buy another allocation' : 'Buy an allocation'} />
         </header>
 
         {activation?.reviewNotes && (

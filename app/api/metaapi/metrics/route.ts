@@ -177,6 +177,26 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Database error' }, { status: 500 });
     }
 
+    const testSnapshot = String(accountId).startsWith('TEST_')
+      ? await adminDb.collection('userMetaApiAccounts').where('accountId', '==', accountId).limit(5).get()
+      : null;
+    const testMatch = testSnapshot?.docs.find((entry) => entry.data().testAccount === true);
+    if (testMatch) {
+      const testData = testMatch.data();
+      if (!isAdmin && testData.userId !== userId) {
+        return NextResponse.json({ error: 'Account not found or access denied' }, { status: 403 });
+      }
+      const cachedMetricsDoc = await adminDb.collection('cachedMetrics').doc(accountId).get();
+      return NextResponse.json(buildTestAccountMetricsResponse(
+        testData,
+        cachedMetricsDoc.exists ? cachedMetricsDoc.data() : {},
+        accountId,
+        accountType,
+        accountSize,
+        step
+      ));
+    }
+
     // Use mock data for testing
     if (USE_MOCK_DATA) {
       const mockResponse = generateMockData(accountId, accountType, accountSize, step);
@@ -1097,6 +1117,84 @@ async function getCachedMaxDailyDrawdown(accountId: string): Promise<number | un
     console.error('Error fetching cached max daily drawdown:', error);
   }
   return undefined;
+}
+
+function buildTestAccountMetricsResponse(
+  accountDoc: FirebaseFirestore.DocumentData,
+  cachedData: FirebaseFirestore.DocumentData | undefined,
+  accountId: string,
+  accountType: string,
+  accountSize: number,
+  step: number | string | undefined
+) {
+  const data = cachedData || {};
+  const status = String(accountDoc.status || 'active');
+  const failed = status === 'failed';
+  const resolvedStep = Number(step) || Number(accountDoc.step) || 1;
+  let objectives = null;
+  try {
+    objectives = calculateTradingObjectives(
+      {
+        balance: data.balance || accountSize,
+        maxDrawdown: data.maxDrawdown || 0,
+        dailyDrawdown: data.dailyDrawdown || 0,
+        maxDailyDrawdown: data.maxDailyDrawdown || 0,
+        trades: data.numberOfTrades || 0,
+        tradingDays: data.tradingDays || 0,
+      },
+      (accountType || accountDoc.accountType || 'standard') as 'standard' | 'instant' | '1-step' | 'gauntlet' | 'vip',
+      accountSize,
+      resolvedStep,
+      undefined,
+      data.lastTrades || [],
+      data.lastRiskEvents || [],
+      data.lastPeriodStats || [],
+      data.maxDailyDrawdown
+    );
+  } catch (error) {
+    console.error('Test account objectives failed:', error);
+  }
+
+  return {
+    metrics: {
+      balance: data.balance || accountSize,
+      equity: data.equity || data.balance || accountSize,
+      averageProfit: data.averageProfit || 0,
+      averageLoss: data.averageLoss || 0,
+      numberOfTrades: data.numberOfTrades || 0,
+      wonTrades: data.wonTrades || 0,
+      lostTrades: data.lostTrades || 0,
+      averageRRR: data.averageRRR || 0,
+      lots: data.lots || 0,
+      expectancy: data.expectancy || 0,
+      winRate: data.winRate || 0,
+      profitFactor: data.profitFactor || 0,
+      maxDrawdown: data.maxDrawdown || 0,
+      dailyDrawdown: data.dailyDrawdown || 0,
+      trades: data.numberOfTrades || 0,
+      avgRRR: data.averageRRR || 0,
+    },
+    accountInfo: {
+      accountId,
+      name: data.accountName || 'Test account',
+      broker: data.broker || 'Shockwave Test',
+      server: data.server || 'Shockwave-Test',
+      balance: data.balance || accountSize,
+      equity: data.equity || data.balance || accountSize,
+      currency: 'USD',
+      leverage: 100,
+      type: 'ACCOUNT_TRADE_MODE_DEMO',
+      platform: accountDoc.platform || 'mt5',
+      state: failed ? 'FAILED' : 'CONNECTED',
+      connectionStatus: failed ? 'DISCONNECTED' : 'CONNECTED',
+    },
+    trades: data.lastTrades || [],
+    equityChart: data.lastEquityChart || [],
+    objectives,
+    riskEvents: data.lastRiskEvents || [],
+    periodStats: data.lastPeriodStats || [],
+    accountStatus: status,
+  };
 }
 
 function calculateTradingObjectives(

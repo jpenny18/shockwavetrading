@@ -16,6 +16,7 @@ import {
   resetCustomerFieldErrors,
   type ResetAccountInput,
   type ResetCustomer,
+  type ResetQuote,
 } from '@/lib/reset-pricing';
 
 export interface ResetAccountRef extends ResetAccountInput {
@@ -106,7 +107,8 @@ function AccountResetDialog({
   email: string;
   onClose: () => void;
 }) {
-  const quote = getResetQuote(account);
+  const [quote, setQuote] = useState<ResetQuote | null>(() => getResetQuote(account));
+  const [priceReady, setPriceReady] = useState(false);
   const [step, setStep] = useState<'details' | 'crypto'>('details');
   const [profileLoading, setProfileLoading] = useState(true);
   const [customer, setCustomer] = useState<ResetCustomer>({ ...EMPTY_CUSTOMER, email });
@@ -157,6 +159,32 @@ function AccountResetDialog({
       cancelled = true;
     };
   }, [email, userId]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setQuote(getResetQuote(account));
+    setPriceReady(false);
+    (async () => {
+      try {
+        const current = auth.currentUser;
+        if (!current) return;
+        const response = await fetch(`/api/reset-prices/quote?accountId=${encodeURIComponent(account.accountId)}`, {
+          headers: { Authorization: `Bearer ${await current.getIdToken()}` },
+          cache: 'no-store',
+        });
+        const data = await response.json().catch(() => ({}));
+        if (cancelled || !response.ok || typeof data.quote?.price !== 'number') return;
+        setQuote(data.quote as ResetQuote);
+      } catch (error) {
+        console.error('Could not load the live reset price:', error);
+      } finally {
+        if (!cancelled) setPriceReady(true);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [account.accountId, account.accountSize, account.accountType, account.platform, account.profitSplit, account.status, account.step]);
 
   useEffect(() => {
     if (step !== 'crypto') return;
@@ -368,11 +396,15 @@ function AccountResetDialog({
                       </p>
                     </div>
                     <div className="text-right">
-                      {quote.discountPercent > 0 && (
+                      {priceReady && quote.price < quote.originalPrice && (
                         <p className="text-xs text-gray-500 line-through">{formatResetUsd(quote.originalPrice)}</p>
                       )}
-                      <p className="text-lg font-semibold text-[#0FF1CE]">{formatResetUsd(quote.price)}</p>
-                      <p className="text-[11px] text-gray-500">{quote.feeNote}</p>
+                      <p className="text-lg font-semibold text-[#0FF1CE]">
+                        {priceReady ? formatResetUsd(quote.price) : 'Confirming...'}
+                      </p>
+                      <p className="text-[11px] text-gray-500">
+                        {priceReady ? quote.feeNote : 'Checking the current reset price'}
+                      </p>
                     </div>
                   </div>
                   <p className="mt-3 text-xs leading-relaxed text-gray-400">
@@ -511,7 +543,7 @@ function AccountResetDialog({
                   <button
                     type="button"
                     onClick={handleCard}
-                    disabled={profileLoading || isRedirecting}
+                    disabled={profileLoading || isRedirecting || !priceReady}
                     className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0FF1CE] px-4 py-3.5 text-sm font-bold text-black shadow-[0_8px_30px_rgba(15,241,206,0.22)] transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
                   >
                     <CreditCard size={18} />
@@ -521,7 +553,7 @@ function AccountResetDialog({
                   <button
                     type="button"
                     onClick={handleCrypto}
-                    disabled={profileLoading || isRedirecting}
+                    disabled={profileLoading || isRedirecting || !priceReady}
                     className="flex w-full items-center justify-center gap-2 rounded-2xl border border-[#0FF1CE] px-4 py-3.5 text-sm font-bold text-[#0FF1CE] transition hover:bg-[#0FF1CE]/10 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <Bitcoin size={18} />

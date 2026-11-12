@@ -190,8 +190,8 @@ export default function AdminAccountsPage() {
       
       const accountPromises = accountsSnapshot.docs.map(async (doc) => {
         const accountData = doc.data() as UserMetaApiAccount;
-        // VIP accounts are managed on /admin/vip-accounts
-        if (isVipMetaApiAccount(accountData)) return null;
+        // VIP accounts are managed on /admin/vip-accounts. Test accounts stay on the Test Accounts page.
+        if (isVipMetaApiAccount(accountData) || (accountData as UserMetaApiAccount & { testAccount?: boolean }).testAccount === true) return null;
         
         // Get user data for this account
         const userRef = collection(db, 'users');
