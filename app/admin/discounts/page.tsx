@@ -10,7 +10,8 @@ import {
   query,
   orderBy,
   Timestamp,
-  where
+  where,
+  writeBatch
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { 
@@ -25,7 +26,8 @@ import {
   Hash,
   Percent,
   DollarSign,
-  Loader
+  Loader,
+  Zap
 } from 'lucide-react';
 
 interface DiscountCode {
@@ -34,6 +36,7 @@ interface DiscountCode {
   type: 'percentage' | 'fixed';
   value: number;
   active: boolean;
+  autoApply?: boolean;
   expiresAt: Timestamp | null;
   usageLimit: number | null;
   usageCount: number;
@@ -46,6 +49,7 @@ interface FormData {
   type: 'percentage' | 'fixed';
   value: number;
   active: boolean;
+  autoApply: boolean;
   expiresAt: string;
   usageLimit: number | null;
 }
@@ -69,6 +73,7 @@ export default function DiscountsPage() {
     type: 'percentage',
     value: 0,
     active: true,
+    autoApply: false,
     expiresAt: '',
     usageLimit: null
   });
@@ -127,34 +132,38 @@ export default function DiscountsPage() {
     
     try {
       const now = Timestamp.now();
+      const existing = editingId ? discounts.find(d => d.id === editingId) : undefined;
       const discountData = {
         code: formData.code.toUpperCase(),
         type: formData.type,
         value: formData.value,
         active: formData.active,
+        autoApply: formData.autoApply,
         expiresAt: formData.expiresAt ? Timestamp.fromDate(new Date(formData.expiresAt)) : null,
         usageLimit: formData.usageLimit,
-        usageCount: 0,
-        createdAt: now,
+        usageCount: existing?.usageCount ?? 0,
+        createdAt: existing?.createdAt || now,
         updatedAt: now
       };
-      
-      if (editingId) {
-        await updateDoc(doc(db, 'discounts', editingId), {
-          ...discountData,
-          createdAt: discounts.find(d => d.id === editingId)?.createdAt || now
-        });
-      } else {
-        // Check if code already exists
+
+      if (!editingId) {
         const existingCode = await getDocs(
           query(collection(db, 'discounts'), where('code', '==', formData.code.toUpperCase()))
         );
-        
+
         if (!existingCode.empty) {
           setFormErrors({ code: 'This code already exists' });
           return;
         }
-        
+      }
+
+      if (formData.autoApply) {
+        await clearOtherAutoApply(editingId || undefined);
+      }
+      
+      if (editingId) {
+        await updateDoc(doc(db, 'discounts', editingId), discountData);
+      } else {
         await addDoc(collection(db, 'discounts'), discountData);
       }
       
@@ -165,12 +174,28 @@ export default function DiscountsPage() {
     }
   };
 
+  const clearOtherAutoApply = async (exceptId?: string) => {
+    const others = discounts.filter((discount) => discount.autoApply && discount.id !== exceptId);
+    if (!others.length) return;
+
+    const batch = writeBatch(db);
+    const now = Timestamp.now();
+    others.forEach((discount) => {
+      batch.update(doc(db, 'discounts', discount.id), {
+        autoApply: false,
+        updatedAt: now
+      });
+    });
+    await batch.commit();
+  };
+
   const handleEdit = (discount: DiscountCode) => {
     setFormData({
       code: discount.code,
       type: discount.type,
       value: discount.value,
       active: discount.active,
+      autoApply: Boolean(discount.autoApply),
       expiresAt: discount.expiresAt ? discount.expiresAt.toDate().toISOString().split('T')[0] : '',
       usageLimit: discount.usageLimit
     });
@@ -195,6 +220,7 @@ export default function DiscountsPage() {
       type: 'percentage',
       value: 0,
       active: true,
+      autoApply: false,
       expiresAt: '',
       usageLimit: null
     });
@@ -214,6 +240,24 @@ export default function DiscountsPage() {
       console.error('Error toggling discount status:', error);
     }
   };
+
+  const handleToggleAutoApply = async (id: string, currentlyOn: boolean) => {
+    try {
+      const now = Timestamp.now();
+      if (!currentlyOn) {
+        await clearOtherAutoApply(id);
+      }
+      await updateDoc(doc(db, 'discounts', id), {
+        autoApply: !currentlyOn,
+        updatedAt: now
+      });
+      await fetchDiscounts();
+    } catch (error) {
+      console.error('Error updating automatic discount:', error);
+    }
+  };
+
+  const automaticDiscount = discounts.find((discount) => discount.autoApply);
 
   if (loading) {
     return (
@@ -237,6 +281,18 @@ export default function DiscountsPage() {
           </button>
         )}
       </div>
+
+      <p className="mb-5 text-sm text-gray-400">
+        {automaticDiscount ? (
+          <>
+            Challenge checkout automatically applies{' '}
+            <span className="font-mono font-semibold text-[#0FF1CE]">{automaticDiscount.code}</span>
+            {automaticDiscount.active ? '.' : '. It stays off until that code is active.'}
+          </>
+        ) : (
+          <>Turn on Auto-apply for one active code, such as BLACKFRIDAY, and every challenge purchase uses it.</>
+        )}
+      </p>
 
       {isCreating && (
         <div className="bg-black rounded-xl p-6 border border-white/10 mb-6">
@@ -325,7 +381,7 @@ export default function DiscountsPage() {
                 </div>
               </div>
 
-              <div className="flex items-center">
+              <div className="flex flex-col gap-4 md:col-span-2">
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
@@ -336,6 +392,22 @@ export default function DiscountsPage() {
                   <div className="w-11 h-6 bg-black peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0FF1CE]"></div>
                   <span className="ml-3 text-sm font-medium text-gray-400">Active</span>
                 </label>
+                <div>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.autoApply}
+                      onChange={(e) => setFormData({ ...formData, autoApply: e.target.checked })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-black peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#0FF1CE]"></div>
+                    <span className="ml-3 text-sm font-medium text-gray-400">Auto-apply at checkout</span>
+                  </label>
+                  <p className="mt-2 text-xs text-gray-500">
+                    Only one code can auto-apply. Shoppers on the challenge checkout get it filled in for them while the code is active.
+                    {!formData.active && formData.autoApply ? ' This code is inactive, so checkout will skip it until you mark it active.' : ''}
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -381,7 +453,7 @@ export default function DiscountsPage() {
                 </button>
               </div>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-2">
               <div className="text-gray-500 text-xs">
                 Used {discount.usageCount}/{discount.usageLimit || '∞'} · Expires {discount.expiresAt ? discount.expiresAt.toDate().toLocaleDateString() : 'Never'}
               </div>
@@ -390,6 +462,16 @@ export default function DiscountsPage() {
                 <button onClick={() => handleDelete(discount.id)} className="p-1.5 rounded hover:bg-white/5 transition-colors"><Trash2 size={14} className="text-gray-400" /></button>
               </div>
             </div>
+            <button
+              type="button"
+              onClick={() => handleToggleAutoApply(discount.id, Boolean(discount.autoApply))}
+              className={`mt-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${
+                discount.autoApply ? 'bg-[#0FF1CE]/15 text-[#0FF1CE]' : 'bg-white/5 text-gray-400'
+              }`}
+            >
+              <Zap size={12} />
+              {discount.autoApply ? 'Auto-apply on' : 'Auto-apply off'}
+            </button>
           </div>
         ))}
       </div>
@@ -406,6 +488,7 @@ export default function DiscountsPage() {
                 <th className="px-6 py-4 font-medium">Usage</th>
                 <th className="px-6 py-4 font-medium">Expires</th>
                 <th className="px-6 py-4 font-medium">Status</th>
+                <th className="px-6 py-4 font-medium">Auto-apply</th>
                 <th className="px-6 py-4 font-medium">Actions</th>
               </tr>
             </thead>
@@ -449,6 +532,20 @@ export default function DiscountsPage() {
                     </button>
                   </td>
                   <td className="px-6 py-4">
+                    <button
+                      type="button"
+                      onClick={() => handleToggleAutoApply(discount.id, Boolean(discount.autoApply))}
+                      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        discount.autoApply
+                          ? 'bg-[#0FF1CE]/15 text-[#0FF1CE]'
+                          : 'bg-white/5 text-gray-400'
+                      }`}
+                    >
+                      <Zap size={12} />
+                      {discount.autoApply ? 'On' : 'Off'}
+                    </button>
+                  </td>
+                  <td className="px-6 py-4">
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleEdit(discount)}
@@ -471,7 +568,7 @@ export default function DiscountsPage() {
               
               {discounts.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-6 py-10 text-center text-gray-500">
+                  <td colSpan={8} className="px-6 py-10 text-center text-gray-500">
                     <Tag className="mx-auto mb-2" size={24} />
                     <p>No discount codes found</p>
                   </td>

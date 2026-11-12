@@ -12,6 +12,42 @@ import AccountResetButton from '../components/AccountResetModal';
 
 interface AccountWithMetrics extends UserMetaApiAccount {
   cachedMetrics?: any;
+  simulated?: boolean;
+}
+
+const SIMULATED_FAILED_FUNDED_ID = 'sim-failed-500k-funded';
+
+function simulatedFailedFundedAccount(userId: string): AccountWithMetrics | null {
+  if (typeof window === 'undefined') return null;
+  if (new URLSearchParams(window.location.search).get('simulate') !== 'failed-500k-funded') return null;
+
+  const started = new Date(Date.now() - 21 * 24 * 60 * 60 * 1000);
+  const funded = new Date(Date.now() - 4 * 24 * 60 * 60 * 1000);
+  return {
+    accountId: SIMULATED_FAILED_FUNDED_ID,
+    userId,
+    accountType: 'standard',
+    accountSize: 500000,
+    step: 3,
+    status: 'failed',
+    platform: 'mt5',
+    accountToken: 'simulation-only',
+    simulated: true,
+    createdAt: { toMillis: () => started.getTime() } as AccountWithMetrics['createdAt'],
+    updatedAt: { toMillis: () => Date.now() } as AccountWithMetrics['updatedAt'],
+    startDate: { toDate: () => started } as AccountWithMetrics['startDate'],
+    fundedDate: { toDate: () => funded } as AccountWithMetrics['fundedDate'],
+    cachedMetrics: {
+      balance: 424800,
+      equity: 424800,
+      profit: -75200,
+      drawdown: 15.04,
+      dailyDrawdown: 8.1,
+      totalTrades: 36,
+      winRate: 41.7,
+      lastUpdated: new Date().toISOString(),
+    },
+  };
 }
 
 export default function MyAccountsPage() {
@@ -149,8 +185,13 @@ export default function MyAccountsPage() {
             accountsData.push(...placeholderAccounts);
           }
           
-          // Sort accounts: active first, then by creation date
+          const simulated = simulatedFailedFundedAccount(user.uid);
+          if (simulated) accountsData.push(simulated);
+
+          // Sort accounts: preview first, then active, then by creation date
           accountsData.sort((a, b) => {
+            if (a.simulated && !b.simulated) return -1;
+            if (!a.simulated && b.simulated) return 1;
             if (a.status === 'active' && b.status !== 'active') return -1;
             if (a.status !== 'active' && b.status === 'active') return 1;
             return b.createdAt.toMillis() - a.createdAt.toMillis();
@@ -173,6 +214,7 @@ export default function MyAccountsPage() {
 
   const handleViewAccount = (accountId: string) => {
     // Check if it's a placeholder account
+    if (accountId === SIMULATED_FAILED_FUNDED_ID) return;
     if (accountId.startsWith('PLACEHOLDER_')) {
       alert('This is a placeholder account for testing. The full account view is available for real accounts only.');
       return;
@@ -263,6 +305,12 @@ export default function MyAccountsPage() {
               </div>
             </div>
           </div> */}
+
+          {accounts.some((account) => account.simulated) && (
+            <div className="mb-6 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+              Preview only. This $500k funded account is marked failed the same way the admin dashboard does. Nothing is saved, and payment is not started.
+            </div>
+          )}
 
           {resetNotice && (
             <div className="mb-6 rounded-xl border border-[#0FF1CE]/30 bg-[#0FF1CE]/10 px-4 py-3 text-sm text-gray-200">
@@ -368,7 +416,7 @@ export default function MyAccountsPage() {
                   </div>
                   </div>
 
-                  {!isPlaceholder && (
+                  {(!isPlaceholder || account.simulated) && (
                     <AccountResetButton
                       account={account}
                       className="mt-4 w-full rounded-xl border border-[#0FF1CE]/30 py-2.5 text-sm font-semibold text-[#0FF1CE] transition hover:bg-[#0FF1CE]/10"

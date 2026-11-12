@@ -154,9 +154,11 @@ interface DiscountCode {
   type: 'percentage' | 'fixed';
   value: number;
   active: boolean;
+  autoApply?: boolean;
   expiresAt: any;
   usageLimit: number | null;
   usageCount: number;
+  updatedAt?: { toMillis?: () => number };
 }
 
 interface AddOn {
@@ -306,6 +308,8 @@ export default function ChallengePage() {
   const [isValidatingCode, setIsValidatingCode] = useState(false);
   const [addonsContinued, setAddonsContinued] = useState(false);
   const [showDiscountInput, setShowDiscountInput] = useState(false);
+  const [autoAppliedCode, setAutoAppliedCode] = useState<string | null>(null);
+  const discountTouchedRef = useRef(false);
   const step1Ref = useRef<HTMLDivElement>(null);
   const step2Ref = useRef<HTMLDivElement>(null);
   const step3Ref = useRef<HTMLDivElement>(null);
@@ -448,6 +452,46 @@ export default function ChallengePage() {
       setSelectedAmount(formattedBalance);
       sessionStorage.removeItem('preselectedBalance');
     }
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const applyAutomaticDiscount = async () => {
+      try {
+        const snapshot = await getDocs(
+          query(collection(db, 'discounts'), where('autoApply', '==', true))
+        );
+        if (cancelled || discountTouchedRef.current || snapshot.empty) return;
+
+        const candidates = snapshot.docs
+          .map((entry) => ({ id: entry.id, ...entry.data() } as DiscountCode))
+          .filter((discount) => discount.active);
+
+        const discount = candidates.sort((a, b) => {
+          const aTime = a.updatedAt?.toMillis?.() || 0;
+          const bTime = b.updatedAt?.toMillis?.() || 0;
+          return bTime - aTime;
+        })[0];
+
+        if (!discount || discountTouchedRef.current) return;
+        if (discount.expiresAt && new Date() > discount.expiresAt.toDate()) return;
+        if (discount.usageLimit !== null && discount.usageCount >= discount.usageLimit) return;
+
+        setDiscountCode(discount.code);
+        setAppliedDiscount(discount);
+        setAutoAppliedCode(discount.code);
+        setShowDiscountInput(true);
+        setFormErrors((prev) => ({ ...prev, discountCode: undefined }));
+      } catch (error) {
+        console.error('Error loading automatic discount:', error);
+      }
+    };
+
+    applyAutomaticDiscount();
+    return () => {
+      cancelled = true;
+    };
   }, []);
   
   // Calculate table values when selectedType or selectedAmount changes
@@ -1334,6 +1378,8 @@ export default function ChallengePage() {
               <button
                 type="button"
                 onClick={() => {
+                  discountTouchedRef.current = true;
+                  setAutoAppliedCode(null);
                   setShowDiscountInput(false);
                   setDiscountCode('');
                   setFormErrors(prev => ({ ...prev, discountCode: undefined }));
@@ -1351,6 +1397,8 @@ export default function ChallengePage() {
                   type="text"
                   value={discountCode}
                   onChange={(e) => {
+                    discountTouchedRef.current = true;
+                    setAutoAppliedCode(null);
                     setDiscountCode(e.target.value.toUpperCase());
                     setFormErrors(prev => ({ ...prev, discountCode: undefined }));
                   }}
@@ -1382,6 +1430,7 @@ export default function ChallengePage() {
                   Discount applied: {appliedDiscount.type === 'percentage' 
                     ? `${appliedDiscount.value}% off` 
                     : `$${appliedDiscount.value} off`}
+                  {autoAppliedCode && appliedDiscount.code === autoAppliedCode ? ' · applied automatically' : ''}
                 </span>
               </div>
             )}
