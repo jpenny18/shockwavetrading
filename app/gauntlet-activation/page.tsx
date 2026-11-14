@@ -6,6 +6,7 @@ import Particles from '../components/Particles';
 import Header from '../components/Header';
 import { Check, ChevronDown, Bitcoin, CreditCard } from 'lucide-react';
 import CryptoPayment from '../components/CryptoPayment';
+import BlackFridayPayflow from '../components/BlackFridayPayflow';
 
 interface CryptoPrice {
   BTC: number;
@@ -35,11 +36,30 @@ type ActivationMode = 'activate' | 'reset';
 
 // Reset accounts get 12% off the activation fee
 const RESET_DISCOUNT = 0.12;
+// Black Friday takes 50% off the activation fee
+const BLACK_FRIDAY_DISCOUNT = 0.5;
+
+const PAYOUT_RULES: { feature: string; value: string }[] = [
+  { feature: 'First payout', value: '7 calendar days after your first trade' },
+  { feature: 'Subsequent payouts', value: 'On demand' },
+  { feature: 'Minimum between requests', value: '24 hours' },
+  { feature: 'Minimum withdrawal', value: '$100' },
+  { feature: 'Profit split', value: '90%' },
+  { feature: 'Minimum trading days', value: 'None' },
+  { feature: 'Consistency rule', value: 'None' },
+  { feature: 'Minimum profit target', value: 'None' },
+  { feature: 'Payout processing', value: 'Within 1 hour' },
+  { feature: 'Maximum withdrawal cap', value: 'None, subject to available profits' },
+];
+
+function formatUsd(amount: number): string {
+  return amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
 
 const ACTIVATION_OPTIONS: ActivationOption[] = [
   {
     level: '$10k',
-    price: 199,
+    price: 349,
     whopCheckoutUrl: 'https://whop.com/checkout/plan_gYWVAVyu65Zwa',
     features: [
       '$10,000 Simulated Capital',
@@ -52,7 +72,7 @@ const ACTIVATION_OPTIONS: ActivationOption[] = [
   },
   {
     level: '$25k',
-    price: 299,
+    price: 699,
     whopCheckoutUrl: 'https://whop.com/checkout/plan_4JiIRmkyRqjq8',
     features: [
       '$25,000 Simulated Capital',
@@ -65,7 +85,7 @@ const ACTIVATION_OPTIONS: ActivationOption[] = [
   },
   {
     level: '$50k',
-    price: 499,
+    price: 1299,
     whopCheckoutUrl: 'https://whop.com/checkout/plan_9t46Mcti2Gl1G',
     features: [
       '$50,000 Simulated Capital',
@@ -78,7 +98,7 @@ const ACTIVATION_OPTIONS: ActivationOption[] = [
   },
   {
     level: '$100k',
-    price: 799,
+    price: 2499,
     whopCheckoutUrl: 'https://whop.com/checkout/plan_mYd9abFhGM9Mg',
     features: [
       '$100,000 Simulated Capital',
@@ -91,7 +111,7 @@ const ACTIVATION_OPTIONS: ActivationOption[] = [
   },
   {
     level: '$200k',
-    price: 1499,
+    price: 4999,
     whopCheckoutUrl: 'https://whop.com/checkout/plan_ArcXmNChT9aLe',
     features: [
       '$200,000 Simulated Capital',
@@ -104,7 +124,7 @@ const ACTIVATION_OPTIONS: ActivationOption[] = [
   },
   {
     level: '$500k',
-    price: 2999,
+    price: 11999,
     features: [
       '$500,000 Simulated Capital',
       '15% Max Drawdown',
@@ -235,12 +255,10 @@ function GauntletActivationContent() {
     setShowPayment(false);
   };
 
-  // Effective fee for the selected mode (reset = 12% off the activation fee)
+  // Activate: 50% off for Black Friday. Reset: 12% off the list price.
   const getEffectivePrice = (option: ActivationOption): number => {
-    if (activationMode === 'reset') {
-      return Math.round(option.price * (1 - RESET_DISCOUNT) * 100) / 100;
-    }
-    return option.price;
+    const discount = activationMode === 'reset' ? RESET_DISCOUNT : BLACK_FRIDAY_DISCOUNT;
+    return Math.round(option.price * (1 - discount) * 100) / 100;
   };
 
   const isReset = activationMode === 'reset';
@@ -333,6 +351,7 @@ function GauntletActivationContent() {
       platform: formData.platform,
       formData,
       price: getEffectivePrice(selectedOption),
+      originalPrice: selectedOption.price,
       addOns: []
     };
   };
@@ -365,7 +384,8 @@ function GauntletActivationContent() {
                     <p className="mt-1 text-sm text-white/50">{orderLabel} - {selectedOption.level}</p>
                   </div>
                   <div className="shrink-0 text-right">
-                    <div className="text-2xl font-bold text-[#0FF1CE]">${getEffectivePrice(selectedOption).toLocaleString()}</div>
+                    <div className="text-sm text-white/40 line-through">${formatUsd(selectedOption.price)}</div>
+                    <div className="text-2xl font-bold text-[#0FF1CE]">${formatUsd(getEffectivePrice(selectedOption))}</div>
                     <div className="text-sm text-white/45">{feeLabel}</div>
                   </div>
                 </div>
@@ -424,7 +444,7 @@ function GauntletActivationContent() {
                         <div className="text-sm text-white/50">Secure checkout via Whop</div>
                       </div>
                     </div>
-                    <div className="text-2xl font-bold text-[#0FF1CE]">${getEffectivePrice(selectedOption).toLocaleString()}</div>
+                    <div className="text-2xl font-bold text-[#0FF1CE]">${formatUsd(getEffectivePrice(selectedOption))}</div>
                   </div>
                 </button>
               </div>
@@ -444,7 +464,7 @@ function GauntletActivationContent() {
                       <div className="text-sm text-white/50">Pay with BTC, ETH, USDT, or USDC</div>
                     </div>
                   </div>
-                  <div className="shrink-0 text-2xl font-bold text-[#0FF1CE]">${getEffectivePrice(selectedOption).toLocaleString()}</div>
+                  <div className="shrink-0 text-2xl font-bold text-[#0FF1CE]">${formatUsd(getEffectivePrice(selectedOption))}</div>
                 </div>
               </button>
             </div>
@@ -473,15 +493,13 @@ function GauntletActivationContent() {
                   <span className="text-white/50">Option:</span>
                   <span className="text-white">{isReset ? 'Reset Account' : 'Activate Account'}</span>
                 </div>
-                {isReset && (
-                  <div className="flex justify-between gap-4 text-sm">
-                    <span className="text-white/50">Reset Discount (12%):</span>
-                    <span className="text-[#0FF1CE]">-${(selectedOption.price - getEffectivePrice(selectedOption)).toLocaleString()}</span>
-                  </div>
-                )}
+                <div className="flex justify-between gap-4 text-sm">
+                  <span className="text-white/50">{isReset ? 'Reset Discount (12%):' : 'Black Friday (50% off):'}</span>
+                  <span className="text-[#0FF1CE]">-${formatUsd(selectedOption.price - getEffectivePrice(selectedOption))}</span>
+                </div>
                 <div className="flex justify-between border-t border-white/10 pt-3">
                   <span className="font-semibold text-white">Total:</span>
-                  <span className="text-xl font-bold text-[#0FF1CE]">${getEffectivePrice(selectedOption).toLocaleString()}</span>
+                  <span className="text-xl font-bold text-[#0FF1CE]">${formatUsd(getEffectivePrice(selectedOption))}</span>
                 </div>
               </div>
             </div>
@@ -501,8 +519,13 @@ function GauntletActivationContent() {
         <Particles />
         
         <div className="relative z-10 mx-auto max-w-5xl">
-          <div className="mb-4 inline-block rounded-full bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] px-4 py-1.5 text-xs font-bold text-black md:mb-5 md:text-sm">
-            FUNDED ACTIVATION
+          <div className="mb-4 flex flex-wrap items-center justify-center gap-2 md:mb-5">
+            <div className="rounded-full bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] px-4 py-1.5 text-xs font-bold text-black md:text-sm">
+              FUNDED ACTIVATION
+            </div>
+            <div className="rounded-full border border-[#0FF1CE]/40 bg-[#0FF1CE]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-[#0FF1CE] md:text-sm">
+              Black Friday · 50% off
+            </div>
           </div>
           
           <h1 className="mb-4 bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] bg-clip-text text-4xl font-extrabold leading-tight text-transparent md:mb-6 md:text-6xl">
@@ -571,6 +594,40 @@ function GauntletActivationContent() {
         </div>
       </section>
 
+      <section aria-labelledby="payout-structure-heading" className="relative z-10 bg-black px-6 pb-4 md:pb-8">
+        <div className="mx-auto max-w-6xl rounded-[22px] border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl md:p-8">
+          <div className="text-center">
+            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#0FF1CE]">Payouts</p>
+            <h2 id="payout-structure-heading" className="mt-2 text-2xl font-semibold tracking-tight text-white md:text-4xl">
+              Payout structure
+            </h2>
+            <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-white/70 md:text-base">
+              Payouts are sent in crypto, so they are processed within 1 hour.
+            </p>
+          </div>
+
+          <div className="mt-8 grid items-center gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(320px,440px)] lg:gap-10">
+            <div className="order-2 lg:order-1">
+              <dl className="divide-y divide-white/10 overflow-hidden rounded-2xl border border-white/10 bg-black/30">
+                {PAYOUT_RULES.map((rule) => (
+                  <div key={rule.feature} className="grid gap-1 px-4 py-3 sm:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] sm:items-baseline sm:gap-4">
+                    <dt className="text-sm text-white/50">{rule.feature}</dt>
+                    <dd className="text-sm font-medium text-white sm:text-right">{rule.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+            <div className="order-1 lg:order-2">
+              <BlackFridayPayflow placement="band" />
+            </div>
+          </div>
+
+          <p className="mx-auto mt-6 max-w-3xl text-center text-sm leading-relaxed text-white/60">
+            The seven-day period starts with your first executed trade, not when you purchase the account. You do not need to trade on seven separate days.
+          </p>
+        </div>
+      </section>
+
       {/* Activation Options Section */}
       <section id="account-selector" className="relative scroll-mt-20 overflow-hidden bg-black px-6 py-16 md:py-24">
         <div className="pointer-events-none absolute left-1/2 top-0 h-64 w-[70%] -translate-x-1/2 rounded-full bg-[#0FF1CE]/10 blur-[120px]" />
@@ -630,11 +687,12 @@ function GauntletActivationContent() {
                   >
                     <div className="text-center">
                       <div className="mb-2 text-2xl font-bold text-[#0FF1CE]">{option.level}</div>
-                      {isReset && (
-                        <div className="text-sm text-white/40 line-through">${option.price.toLocaleString()}</div>
-                      )}
-                      <div className="text-3xl font-bold text-white">${getEffectivePrice(option).toLocaleString()}</div>
+                      <div className="text-sm text-white/40 line-through">${formatUsd(option.price)}</div>
+                      <div className="text-3xl font-bold text-white">${formatUsd(getEffectivePrice(option))}</div>
                       <div className="mt-1 text-sm text-white/45">{feeLabel}</div>
+                      <div className="mt-2 text-[11px] font-bold uppercase tracking-wide text-[#0FF1CE]">
+                        {isReset ? '12% off' : 'Black Friday · 50% off'}
+                      </div>
                     </div>
 
                     {isSelected && (
@@ -800,10 +858,8 @@ function GauntletActivationContent() {
                         <div className="text-[#0FF1CE]">{selectedOption.level} Funded Account</div>
                       </div>
                       <div className="text-right">
-                        {isReset && (
-                          <div className="text-sm text-white/40 line-through">${selectedOption.price.toLocaleString()}</div>
-                        )}
-                        <div className="text-2xl font-bold text-[#0FF1CE]">${getEffectivePrice(selectedOption).toLocaleString()}</div>
+                        <div className="text-sm text-white/40 line-through">${formatUsd(selectedOption.price)}</div>
+                        <div className="text-2xl font-bold text-[#0FF1CE]">${formatUsd(getEffectivePrice(selectedOption))}</div>
                         <div className="text-sm text-white/45">{feeLabel}</div>
                       </div>
                     </div>

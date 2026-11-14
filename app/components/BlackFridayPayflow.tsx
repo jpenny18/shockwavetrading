@@ -59,53 +59,14 @@ function DesktopConnector({ active, complete }: { active: boolean; complete: boo
   );
 }
 
-export default function BlackFridayPayflow({ placement = 'section' }: { placement?: 'section' | 'hero' }) {
-  const [step, setStep] = useState(1);
-
-  useEffect(() => {
-    const desktopQuery = window.matchMedia('(min-width: 768px)');
-    const reduceQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    let timer = 0;
-    let stopped = false;
-
-    const visible = () => (placement === 'hero' ? desktopQuery.matches : !desktopQuery.matches);
-
-    const tickFrom = (current: number) => {
-      const delay = placement === 'hero' ? (current === 3 ? 2200 : 1100) : current === 3 ? 2600 : 1400;
-      timer = window.setTimeout(() => {
-        if (stopped) return;
-        const next = current >= 3 ? 1 : current + 1;
-        setStep(next);
-        tickFrom(next);
-      }, delay);
-    };
-
-    const sync = () => {
-      window.clearTimeout(timer);
-      if (!visible()) return;
-      if (reduceQuery.matches) {
-        setStep(3);
-        return;
-      }
-      setStep(1);
-      tickFrom(1);
-    };
-
-    sync();
-    desktopQuery.addEventListener('change', sync);
-    return () => {
-      stopped = true;
-      window.clearTimeout(timer);
-      desktopQuery.removeEventListener('change', sync);
-    };
-  }, [placement]);
-
+function FlowCard({ layout, step }: { layout: 'hero' | 'section'; step: number }) {
+  const wide = layout === 'hero';
   const receipt = receiptFor(step);
 
-  const card = (
+  return (
     <div
       className={`rounded-[28px] border border-[#0FF1CE]/35 bg-[#071016] shadow-[0_0_50px_rgba(15,241,206,0.07)] ${
-        placement === 'hero' ? 'p-4 lg:p-5' : 'p-3'
+        wide ? 'p-4 lg:p-5' : 'p-3'
       }`}
       role="img"
       aria-label="Payout flow: trade closes, payout requested, USDC received"
@@ -113,10 +74,10 @@ export default function BlackFridayPayflow({ placement = 'section' }: { placemen
       <div aria-hidden="true">
         <div className="flex items-center justify-between gap-3">
           <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white/45">Funded Account</p>
-          <p className={placement === 'hero' ? 'text-lg font-bold tracking-tight text-white md:text-xl' : 'text-base font-bold tracking-tight text-white'}>$100K</p>
+          <p className={wide ? 'text-lg font-bold tracking-tight text-white md:text-xl' : 'text-base font-bold tracking-tight text-white'}>$100K</p>
         </div>
 
-        {placement === 'hero' ? (
+        {wide ? (
           <div className="mt-5 grid grid-cols-[minmax(0,1fr)_1.75rem_minmax(0,1fr)_1.75rem_minmax(0,1fr)] items-start">
             {NODES.map((node, index) => {
               const on = step >= index + 1;
@@ -180,27 +141,27 @@ export default function BlackFridayPayflow({ placement = 'section' }: { placemen
         )}
 
         <div className={`flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-black/30 ${
-          placement === 'hero' ? 'mt-5 px-4 py-3.5 md:mt-6' : 'mt-3 px-3 py-2.5'
+          wide ? 'mt-5 px-4 py-3.5 md:mt-6' : 'mt-3 px-3 py-2.5'
         }`}>
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <span className="h-2 w-2 shrink-0 rounded-full bg-[#0FF1CE] shadow-[0_0_8px_#0FF1CE]" />
-                <p className={`truncate font-semibold text-white ${placement === 'hero' ? 'text-sm' : 'text-xs'}`}>{receipt.status}</p>
+                <p className={`truncate font-semibold text-white ${wide ? 'text-sm' : 'text-xs'}`}>{receipt.status}</p>
               </div>
-              <p className={`text-white/50 ${placement === 'hero' ? 'mt-1 text-xs' : 'mt-0.5 text-[11px]'}`}>{receipt.when}</p>
+              <p className={`text-white/50 ${wide ? 'mt-1 text-xs' : 'mt-0.5 text-[11px]'}`}>{receipt.when}</p>
             </div>
-            <p className={`shrink-0 font-bold tabular-nums ${placement === 'hero' ? 'text-xl md:text-2xl' : 'text-lg'} ${receipt.paid ? 'text-[#0FF1CE]' : 'text-white/35'}`}>
+            <p className={`shrink-0 font-bold tabular-nums ${wide ? 'text-xl md:text-2xl' : 'text-lg'} ${receipt.paid ? 'text-[#0FF1CE]' : 'text-white/35'}`}>
               {receipt.amount}
             </p>
           </div>
         </div>
       </div>
   );
+}
 
+function PayflowStyles() {
   return (
-    <div className={placement === 'hero' ? 'hidden w-full md:block' : 'px-6 pt-2 md:hidden'}>
-      {placement === 'hero' ? card : <div className="mb-[-8%] origin-top scale-[0.85]">{card}</div>}
-      <style>{`
+    <style>{`
         @keyframes bf-pay-x {
           0% { left: 0; opacity: 0; }
           12% { opacity: 1; }
@@ -258,6 +219,78 @@ export default function BlackFridayPayflow({ placement = 'section' }: { placemen
           .bf-pay-y { opacity: 0; }
         }
       `}</style>
+  );
+}
+
+export default function BlackFridayPayflow({ placement = 'section' }: { placement?: 'section' | 'hero' | 'band' }) {
+  const [step, setStep] = useState(1);
+
+  useEffect(() => {
+    const desktopQuery = window.matchMedia('(min-width: 768px)');
+    const reduceQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let timer = 0;
+    let stopped = false;
+
+    const visible = () => {
+      if (placement === 'band') return true;
+      return placement === 'hero' ? desktopQuery.matches : !desktopQuery.matches;
+    };
+
+    const tickFrom = (current: number) => {
+      const desktopPace = placement === 'hero' || (placement === 'band' && desktopQuery.matches);
+      const delay = desktopPace ? (current === 3 ? 2200 : 1100) : current === 3 ? 2600 : 1400;
+      timer = window.setTimeout(() => {
+        if (stopped) return;
+        const next = current >= 3 ? 1 : current + 1;
+        setStep(next);
+        tickFrom(next);
+      }, delay);
+    };
+
+    const sync = () => {
+      window.clearTimeout(timer);
+      if (!visible()) return;
+      if (reduceQuery.matches) {
+        setStep(3);
+        return;
+      }
+      setStep(1);
+      tickFrom(1);
+    };
+
+    sync();
+    desktopQuery.addEventListener('change', sync);
+    return () => {
+      stopped = true;
+      window.clearTimeout(timer);
+      desktopQuery.removeEventListener('change', sync);
+    };
+  }, [placement]);
+
+  if (placement === 'band') {
+    return (
+      <div className="w-full">
+        <div className="hidden md:block">
+          <FlowCard layout="hero" step={step} />
+        </div>
+        <div className="md:hidden">
+          <FlowCard layout="section" step={step} />
+        </div>
+        <PayflowStyles />
+      </div>
+    );
+  }
+
+  return (
+    <div className={placement === 'hero' ? 'hidden w-full md:block' : 'px-6 pt-2 md:hidden'}>
+      {placement === 'hero' ? (
+        <FlowCard layout="hero" step={step} />
+      ) : (
+        <div className="mb-[-8%] origin-top scale-[0.85]">
+          <FlowCard layout="section" step={step} />
+        </div>
+      )}
+      <PayflowStyles />
     </div>
   );
 }
