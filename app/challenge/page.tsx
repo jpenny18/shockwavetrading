@@ -11,6 +11,7 @@ import { countries, countryName } from '@/lib/countries';
 import { Check, Zap, ChevronRight, AlertCircle, CreditCard, CalendarOff, Percent, Tag, Gift, ChevronDown, Bitcoin, Mail, Lock, User, Phone, Eye, EyeOff, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { trackInitiateCheckout } from '@/lib/meta-pixel';
+import { BlackFridayBanner } from '../components/BlackFridayPromo';
 
 // Define the type for challenge options
 type ChallengeType = 'Standard' | '1-Step' | 'Instant' | 'Gauntlet';
@@ -1720,6 +1721,7 @@ export default function ChallengePage() {
 
         {/* Launch Day Sale Banner - Mobile Optimized */}
         <div className="mb-8 lg:mb-12 relative space-y-5">
+          <BlackFridayBanner />
           {/* Launch Sale Promo removed */}
      
      

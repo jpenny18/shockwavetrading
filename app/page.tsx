@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Particles from './components/Particles';
 import Header from './components/Header';
+import { BlackFridayModal } from './components/BlackFridayPromo';
 import Link from 'next/link';
 import PricingTable from './components/PricingTable';
 import { ChevronRight, ChevronDown, X, Copy, Check } from 'lucide-react';
@@ -547,7 +548,7 @@ export default function ShockwaveLandingPage() {
     return (
       <div className="bg-black text-white min-h-screen font-sans">
         <Header />
-        <PromotionalModal isOpen={false} onClose={() => {}} />
+        <BlackFridayModal />
         
         {/* Hero Section */}
         <section className="relative z-10 px-6 pt-36 md:pt-44 pb-12 md:pb-10 text-center overflow-hidden bg-black">
