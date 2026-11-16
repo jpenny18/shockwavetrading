@@ -1,5 +1,6 @@
 import { Resend } from 'resend';
 import { OrderData } from './firebase';
+import { escapeHtml, renderLoginCredentialsEmail } from './login-credentials-email';
 
 // Initialize Resend with API key (only used in server components/API routes)
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -567,15 +568,29 @@ export async function sendTemplateEmail(
       });
     }
     
-    // Replace variables in subject and body
+    // Replace variables in subject and body.
+    // Login credential templates are escaped and filled here so passwords with
+    // &, <, or $ stay intact in both the HTML and the copy links.
     let processedSubject = template.subject;
     let processedBody = template.body;
-    
-    Object.entries(variableValues).forEach(([key, value]) => {
-      const regex = new RegExp(`{{${key}}}`, 'g');
-      processedSubject = processedSubject.replace(regex, value);
-      processedBody = processedBody.replace(regex, value);
-    });
+    const rawVariableValues = { ...variableValues };
+
+    if (template.name === 'Login Credentials') {
+      const rendered = renderLoginCredentialsEmail(
+        { subject: template.subject, body: template.body },
+        rawVariableValues
+      );
+      processedSubject = rendered.subject;
+      processedBody = rendered.html;
+    } else {
+      Object.entries(variableValues).forEach(([key, value]) => {
+        const regex = new RegExp(`{{${key}}}`, 'g');
+        processedSubject = processedSubject.replace(regex, value);
+        processedBody = processedBody.replace(regex, value);
+      });
+    }
+
+    const standaloneEmail = processedBody.includes('shockwave-standalone-email');
     
     // Enhanced HTML body with better styling and logo
     const styledBody = `
@@ -607,18 +622,45 @@ export async function sendTemplateEmail(
       </div>
     `;
     
-    // Create text version by stripping HTML
-    const textBody = processedBody
-      .replace(/<[^>]*>/g, '')
+    const strippedText = (template.name === 'Login Credentials'
+      ? processedBody
+          .replace(/<style[\s\S]*?<\/style>/gi, '')
+          .replace(/<head[\s\S]*?<\/head>/gi, '')
+          .replace(/<br\s*\/?>/gi, '\n')
+          .replace(/<\/p>/gi, '\n')
+          .replace(/<[^>]*>/g, ' ')
+          .replace(/&nbsp;/g, ' ')
+          .replace(/&quot;/g, '"')
+          .replace(/&#39;/g, "'")
+          .replace(/&lt;/g, '<')
+          .replace(/&gt;/g, '>')
+          .replace(/&amp;/g, '&')
+      : processedBody.replace(/<[^>]*>/g, ''))
+      .replace(/[ \t]+\n/g, '\n')
       .replace(/\n\s*\n/g, '\n\n')
       .trim();
+    const textBody = standaloneEmail
+      ? [
+          `Hello ${rawVariableValues.firstName || 'Trader'},`,
+          '',
+          'Your trading account is ready.',
+          `Platform: ${rawVariableValues.platform || ''}`,
+          `Login ID: ${rawVariableValues.loginId || ''}`,
+          `Password: ${rawVariableValues.password || ''}`,
+          `Server: ${rawVariableValues.server || ''}`,
+          '',
+          'Open your accounts: https://shockwavetrading.com/dashboard/accounts',
+        ].join('\n')
+      : strippedText;
     
+    const customerHtml = standaloneEmail ? processedBody : styledBody;
+
     // Send customer email
     const { data, error } = await resend.emails.send({
       from: 'support@shockwave-capital.com',
       to: user.email,
       subject: processedSubject,
-      html: styledBody,
+      html: customerHtml,
       text: `
         ${processedSubject}
         
@@ -661,18 +703,18 @@ export async function sendTemplateEmail(
               
               <div style="margin-bottom: 30px;">
                 <h2 style="color: #0FF1CE; font-size: 18px; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Customer Details</h2>
-                <p style="margin-bottom: 5px;"><strong>Name:</strong> ${user.displayName || 'N/A'}</p>
-                <p style="margin-bottom: 5px;"><strong>Email:</strong> ${user.email}</p>
-                <p style="margin-bottom: 5px;"><strong>First Name:</strong> ${user.firstName || 'N/A'}</p>
-                <p style="margin-bottom: 5px;"><strong>Last Name:</strong> ${user.lastName || 'N/A'}</p>
+                <p style="margin-bottom: 5px;"><strong>Name:</strong> ${escapeHtml(user.displayName || 'N/A')}</p>
+                <p style="margin-bottom: 5px;"><strong>Email:</strong> ${escapeHtml(user.email)}</p>
+                <p style="margin-bottom: 5px;"><strong>First Name:</strong> ${escapeHtml(user.firstName || 'N/A')}</p>
+                <p style="margin-bottom: 5px;"><strong>Last Name:</strong> ${escapeHtml(user.lastName || 'N/A')}</p>
               </div>
               
               <div style="margin-bottom: 30px;">
                 <h2 style="color: #0FF1CE; font-size: 18px; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 5px;">Credentials Sent</h2>
-                <p style="margin-bottom: 5px;"><strong>Platform:</strong> ${variableValues.platform || 'N/A'}</p>
-                <p style="margin-bottom: 5px;"><strong>Login ID:</strong> ${variableValues.loginId || 'N/A'}</p>
-                <p style="margin-bottom: 5px;"><strong>Password:</strong> ${variableValues.password || 'N/A'}</p>
-                <p style="margin-bottom: 5px;"><strong>Server:</strong> ${variableValues.server || 'N/A'}</p>
+                <p style="margin-bottom: 5px;"><strong>Platform:</strong> ${escapeHtml(rawVariableValues.platform || 'N/A')}</p>
+                <p style="margin-bottom: 5px;"><strong>Login ID:</strong> ${escapeHtml(rawVariableValues.loginId || 'N/A')}</p>
+                <p style="margin-bottom: 5px;"><strong>Password:</strong> ${escapeHtml(rawVariableValues.password || 'N/A')}</p>
+                <p style="margin-bottom: 5px;"><strong>Server:</strong> ${escapeHtml(rawVariableValues.server || 'N/A')}</p>
               </div>
               
               <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; text-align: center; font-size: 12px; color: #666;">
@@ -694,10 +736,10 @@ export async function sendTemplateEmail(
             Last Name: ${user.lastName || 'N/A'}
             
             Credentials Sent:
-            Platform: ${variableValues.platform || 'N/A'}
-            Login ID: ${variableValues.loginId || 'N/A'}
-            Password: ${variableValues.password || 'N/A'}
-            Server: ${variableValues.server || 'N/A'}
+            Platform: ${rawVariableValues.platform || 'N/A'}
+            Login ID: ${rawVariableValues.loginId || 'N/A'}
+            Password: ${rawVariableValues.password || 'N/A'}
+            Server: ${rawVariableValues.server || 'N/A'}
             
             This is an automated notification from Shockwave Capital Admin System.
           `,

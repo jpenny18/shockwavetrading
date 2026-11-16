@@ -5,10 +5,37 @@
 @layer base {
   html {
     @apply bg-[#0D0D0D];
+    color-scheme: dark;
   }
   
   body {
     @apply bg-[#0D0D0D] min-h-screen overflow-x-hidden;
     background: linear-gradient(180deg, #0D0D0D 0%, #0D0D0D 95%, #0D1D1D 100%);
   }
+
+  input,
+  textarea,
+  select {
+    color-scheme: dark;
+  }
+}
+
+/* Chrome paints autofilled inputs white. Cover that paint with the app background. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+textarea:-webkit-autofill:active,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+select:-webkit-autofill:active {
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff;
+  box-shadow: 0 0 0 1000px #0D0D0D inset !important;
+  -webkit-box-shadow: 0 0 0 1000px #0D0D0D inset !important;
+  transition: background-color 99999s ease-out 0s;
 } 

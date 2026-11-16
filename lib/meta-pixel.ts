@@ -2,7 +2,7 @@ export const META_PIXEL_IDS = ['2350128719094802', '1542635254297665'] as const;
 
 const pixelInits = META_PIXEL_IDS.map((id) => `fbq('init', '${id}');`).join('\n');
 
-export const META_PIXEL_BOOTSTRAP = `!function(f,b,e,v,n,t,s)
+export const META_PIXEL_BOOTSTRAP = `if(typeof location==='undefined'||location.pathname!=='/login-copy'){!function(f,b,e,v,n,t,s)
 {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
 n.callMethod.apply(n,arguments):n.queue.push(arguments)};
 if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
@@ -11,7 +11,7 @@ t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
 ${pixelInits}
-fbq('track', 'PageView');`;
+fbq('track', 'PageView');}`;
 
 export const META_PIXEL_NOSCRIPT = META_PIXEL_IDS
   .map((id) => `<img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=${id}&ev=PageView&noscript=1" alt="" />`)

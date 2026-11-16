@@ -16,13 +16,15 @@ import {
   Eye,
   ChevronDown,
   RefreshCw,
-  AlertTriangle
+  AlertTriangle,
+  Copy
 } from 'lucide-react';
 import { getAllUsers, UserData, db, getCachedMetrics } from '@/lib/firebase';
 import { isVipMetaApiAccount } from '@/lib/vip-accounts';
 import { formatResetUsd } from '@/lib/reset-pricing';
 import { resolveResetQuote } from '@/lib/reset-price-config';
 import { collection, query, orderBy, limit, getDocs, where } from 'firebase/firestore';
+import { buildLoginCredentialsTemplate, renderLoginCredentialsEmail } from '@/lib/login-credentials-email';
 
 interface EmailTemplate {
   id: number;
@@ -36,6 +38,8 @@ interface EmailTemplate {
 }
 
 // Enhanced email templates with improved login credentials template
+const loginCredentialsTemplate = buildLoginCredentialsTemplate();
+
 const initialTemplates: EmailTemplate[] = [
   {
     id: 1,
@@ -68,293 +72,11 @@ const initialTemplates: EmailTemplate[] = [
   },
   {
     id: 3,
-    name: 'Login Credentials',
-    subject: 'Challenge Login Details - Shockwave Capital',
-    body: `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>Challenge Login Details - Shockwave Capital</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <style>
-    @media screen {
-      @font-face {
-        font-family: 'Lato';
-        font-style: normal;
-        font-weight: 400;
-        src: local('Lato Regular'), local('Lato-Regular'), url(https://fonts.gstatic.com/s/lato/v11/qIIYRU-oROkIk8vfvxw6QvesZW2xOQ-xsNqO47m55DA.woff) format('woff');
-      }
-      @font-face {
-        font-family: 'Lato';
-        font-style: normal;
-        font-weight: 700;
-        src: local('Lato Bold'), local('Lato-Bold'), url(https://fonts.gstatic.com/s/lato/v11/qdgUG4U09HnJwhYI-uK18wLUuEpTyoUstqEm5AMlJo4.woff) format('woff');
-      }
-    }
-    body {
-      -webkit-text-size-adjust: 100%;
-      -ms-text-size-adjust: 100%;
-    }
-    img {
-      -ms-interpolation-mode: bicubic;
-      border: 0;
-      height: auto;
-      line-height: 100%;
-      outline: none;
-      text-decoration: none;
-    }
-    body {
-      height: 100% !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      width: 100% !important;
-    }
-    @media all and (max-width:621px) {
-      h1 {
-        font-size: 24px !important;
-        line-height: 26px !important;
-      }
-      .mobilecontent {
-        display: table-row !important;
-        max-height: none !important;
-      }
-      .desktopcontent {
-        mso-hide: all;
-        display: none !important;
-        max-height: 0px;
-        overflow: hidden;
-      }
-      .mobile-header {
-        padding: 20px 15px !important;
-        text-align: center !important;
-      }
-      .mobile-header h1 {
-        font-size: 18px !important;
-        text-align: center !important;
-        margin-bottom: 15px !important;
-      }
-      .mobile-header table {
-        width: 100% !important;
-      }
-      .mobile-header td {
-        display: block !important;
-        width: 100% !important;
-        text-align: center !important;
-        padding: 5px 0 !important;
-      }
-      .mobile-content {
-        padding: 20px 15px !important;
-      }
-      .mobile-table {
-        width: 100% !important;
-        max-width: 100% !important;
-      }
-      .mobile-cell {
-        padding: 10px 8px !important;
-        font-size: 12px !important;
-      }
-      .mobile-button {
-        padding: 8px 12px !important;
-        font-size: 12px !important;
-      }
-    }
-  </style>
-</head>
-<body style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; height: 100% !important; width: 100% !important; margin: 0; padding: 0;" bgcolor="#f4f4f4">
-  
-  <!-- Preview Text -->
-  <span style="display: none !important; font-size: 0px; line-height: 0px; max-height: 0px; max-width: 0px; opacity: 0; overflow: hidden; visibility: hidden;">Your challenge account login details for {{platform}}</span>
-  
-  <!-- Main Container -->
-  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse !important; table-layout: fixed; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; margin: 0;">
-    
-    <!-- HEADER -->
-    <tr>
-      <td bgcolor="#0FF1CE" align="center" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
-        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse !important; table-layout: fixed; max-width: 600px; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; margin: 0;">
-          <tr>
-            <td align="center" valign="middle" class="mobile-header" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 30px 20px;">
-              <!-- Text Logo -->
-              
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-
-    <!-- MAIN CONTENT -->
-    <tr>
-      <td bgcolor="#f4f4f4" align="center" style="width: 100% !important; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; margin: 0; padding: 0px 20px;">
-        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="border-collapse: collapse !important; table-layout: fixed; max-width: 600px; width: 100% !important; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; margin: 0;">
-          
-          <!-- Welcome Message -->
-          <tr>
-            <td bgcolor="#ffffff" align="left" class="mobile-content" style="color: #1a1a1a; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 26px; width: 100% !important; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 40px;">
-              <h1 style="font-size: 28px; font-weight: 700; color: #1a1a1a; margin: 0 0 20px 0;">Your Trading Challenge Details</h1>
-              <p style="margin: 0 0 20px 0; color: #444;">Hello {{firstName}},</p>
-              <p style="margin: 0 0 25px 0; color: #444;">Welcome to Shockwave Capital! Your trading challenge account has been successfully set up. Below are your login credentials and setup instructions.</p>
-            </td>
-          </tr>
-
-          <!-- Login Credentials Table -->
-          <tr>
-            <td bgcolor="#ffffff" align="center" class="mobile-content" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 0 40px 40px;">
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" class="mobile-table" style="border-collapse: collapse !important; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
-                
-                <!-- Credentials Header -->
-                <tr>
-                  <td colspan="2" style="background: #0FF1CE; color: #1a1a1a; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; text-align: center; padding: 20px; border-radius: 8px 8px 0 0;">
-                    Your Trading Account Credentials
-                  </td>
-                </tr>
-
-                <!-- Platform -->
-                <tr style="border-bottom: 1px solid #E5E5E5;">
-                  <td bgcolor="#fafafa" valign="left" class="mobile-cell" style="width: 35%; color: #1a1a1a; font-weight: 600; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 18px; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 15px; border: 1px solid #E5E5E5;">
-                    Platform:
-                  </td>
-                  <td valign="left" class="mobile-cell" style="color: #1a1a1a; font-weight: 600; font-family: 'Courier New', monospace; font-size: 14px; line-height: 17px; background: rgba(15, 241, 206, 0.1); -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 15px; border: 1px solid #E5E5E5;" bgcolor="#ffffff">
-                    {{platform}}
-                  </td>
-                </tr>
-
-                <!-- Login ID -->
-                <tr style="border-bottom: 1px solid #E5E5E5;">
-                  <td bgcolor="#fafafa" valign="left" class="mobile-cell" style="width: 35%; color: #1a1a1a; font-weight: 600; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 18px; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 15px; border: 1px solid #E5E5E5;">
-                    Login ID:
-                  </td>
-                  <td valign="left" class="mobile-cell" style="color: #1a1a1a; font-weight: 600; font-family: 'Courier New', monospace; font-size: 14px; line-height: 17px; background: rgba(15, 241, 206, 0.1); cursor: pointer; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 15px; border: 1px solid #E5E5E5;" bgcolor="#ffffff" onclick="navigator.clipboard.writeText('{{loginId}}');" title="Click to copy">
-                    {{loginId}} <span style="color: #0FF1CE; font-size: 12px; margin-left: 8px;">Copy</span>
-                  </td>
-                </tr>
-
-                <!-- Password -->
-                <tr style="border-bottom: 1px solid #E5E5E5;">
-                  <td bgcolor="#fafafa" valign="left" class="mobile-cell" style="width: 35%; color: #1a1a1a; font-weight: 600; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 18px; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 15px; border: 1px solid #E5E5E5;">
-                    Password:
-                  </td>
-                  <td valign="left" class="mobile-cell" style="color: #1a1a1a; font-weight: 600; font-family: 'Courier New', monospace; font-size: 14px; line-height: 17px; background: rgba(15, 241, 206, 0.1); cursor: pointer; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 15px; border: 1px solid #E5E5E5;" bgcolor="#ffffff" onclick="navigator.clipboard.writeText('{{password}}');" title="Click to copy">
-                    {{password}} <span style="color: #0FF1CE; font-size: 12px; margin-left: 8px;">Copy</span>
-                  </td>
-                </tr>
-
-                <!-- Server -->
-                <tr>
-                  <td bgcolor="#fafafa" valign="left" class="mobile-cell" style="width: 35%; color: #1a1a1a; font-weight: 600; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 18px; border-radius: 0 0 0 8px; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 15px; border: 1px solid #E5E5E5;">
-                    Server:
-                  </td>
-                  <td valign="left" class="mobile-cell" style="color: #1a1a1a; font-weight: 600; font-family: 'Courier New', monospace; font-size: 14px; line-height: 17px; background: rgba(15, 241, 206, 0.1); cursor: pointer; border-radius: 0 0 8px 0; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 15px; border: 1px solid #E5E5E5;" bgcolor="#ffffff" onclick="navigator.clipboard.writeText('{{server}}');" title="Click to copy">
-                    {{server}} <span style="color: #0FF1CE; font-size: 12px; margin-left: 8px;">Copy</span>
-                  </td>
-                </tr>
-
-              </table>
-            </td>
-          </tr>
-
-          <!-- Dashboard Button -->
-          <tr>
-            <td bgcolor="#ffffff" align="center" class="mobile-content" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 0 40px 40px;">
-              <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: separate !important; border-radius: 4px; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border: 1px solid #1a1a1a;" bgcolor="#1a1a1a">
-                <tbody>
-                  <tr>
-                    <td align="center" valign="middle" class="mobile-button" style="font-family: 'Lato', 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 14px; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 12px 16px;">
-                      <a href="https://shockwave-capital.com" target="_blank" style="font-weight: normal; letter-spacing: normal; line-height: 100%; text-align: center; text-decoration: none; color: #0FF1CE; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
-                        START TRADING
-                      </a>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Setup Instructions -->
-          <tr>
-            <td bgcolor="#ffffff" align="left" class="mobile-content" style="color: #1a1a1a; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 26px; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 0px 40px 40px;">
-              <h3 style="color: #444; font-size: 20px; font-weight: 600; margin: 0 0 20px 0;">Getting Started</h3>
-              <ol style="margin: 0; padding-left: 20px; color: #444;">
-                <li style="margin-bottom: 12px;">Download and install the {{platform}} trading platform</li>
-                <li style="margin-bottom: 12px;">Use the credentials above to log in (click to copy)</li>
-                <li style="margin-bottom: 12px;">Review the challenge rules thoroughly</li>
-                <li style="margin-bottom: 12px;">Start trading with your defined strategy</li>
-              </ol>
-            </td>
-          </tr>
-
-        </table>
-      </td>
-    </tr>
-
-    <!-- SUPPORT SECTION -->
-    <tr>
-      <td align="center" bgcolor="#f4f4f4" class="mobile-content" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 0px 20px;">
-        <table bgcolor="#e8f8f5" role="presentation" align="center" border="0" cellspacing="0" cellpadding="0" width="100%" class="mobile-table" style="max-width: 600px; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: collapse !important;">
-          <tr>
-            <td align="center" valign="top" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
-              <table role="presentation" border="0" align="center" cellpadding="0" cellspacing="0" width="100%" class="mobile-table" style="max-width: 536px; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: collapse !important;">
-                <tr>
-                  <td align="left" class="mobile-content" style="color: #444; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 400; line-height: 25px; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 50px 20px 20px;">
-                    <h2 style="font-size: 22px; font-weight: 600; margin: 0; color: #444;">Need Help?</h2>
-                    <p style="font-size: 16px; font-weight: 300; margin: 10px 0 0; color: #444;">We're here to support your trading journey 24/7</p>
-                  </td>
-                </tr>
-                <tr>
-                  <td align="left" class="mobile-content" style="color: #444; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; line-height: 26px; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 0px 20px 50px;">
-                    <table style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: collapse !important;">
-                      <tr>
-                        <td valign="top" style="padding-right: 10px; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
-                          <span style="color: #0FF1CE; font-size: 16px;">•</span>
-                        </td>
-                        <td style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
-                          Email us at <a href="mailto:support@shockwavecapital.com" style="color: #0FF1CE; text-decoration: none;">support@shockwavecapital.com</a>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td valign="top" style="padding-right: 10px; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
-                          <span style="color: #0FF1CE; font-size: 16px;">•</span>
-                        </td>
-                        <td style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
-                          Check our <a href="https://shockwavecapital.com/faq" style="color: #0FF1CE; text-decoration: none;">FAQ page</a> for quick answers
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-
-    <!-- FOOTER -->
-    <tr>
-      <td bgcolor="#f4f4f4" align="center" style="width: 100% !important; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; margin: 0; padding: 20px;">
-        <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; width: 100% !important; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: collapse !important; margin: 0;">
-          <tbody>
-            <tr>
-              <td bgcolor="#ffffff" style="-webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; padding: 40px 20px; text-align: center;">
-                <p style="margin: 0; color: #888; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 12px; line-height: 18px;">
-                  © 2025 Shockwave Capital. All rights reserved.<br>
-                  This email contains confidential information. Please do not share your login credentials.
-                </p>
-                <p style="margin: 15px 0 0 0; color: #888; font-family: 'Lato', Helvetica, Arial, sans-serif; font-size: 11px;">
-                  You received this email because you signed up for a trading challenge with Shockwave Capital.
-                </p>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
-
-  </table>
-</body>
-</html>`,
-    variables: ['firstName', 'platform', 'loginId', 'password', 'server'],
-    lastUpdated: new Date().toISOString().split('T')[0]
+    name: loginCredentialsTemplate.name,
+    subject: loginCredentialsTemplate.subject,
+    body: loginCredentialsTemplate.body,
+    variables: [...loginCredentialsTemplate.variables],
+    lastUpdated: '2026-11-16',
   },
   {
     id: 4,
@@ -852,6 +574,164 @@ interface Customer {
   [key: string]: any;
 }
 
+type CredentialSource = 'user' | 'credit' | 'order' | 'crypto';
+type CredentialFilter = 'all' | 'users' | 'credit' | 'orders' | 'crypto';
+
+interface CredentialContact {
+  key: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  displayName: string;
+  source: CredentialSource;
+  detail: string;
+  platform: string;
+  loginId: string;
+  password: string;
+  server: string;
+}
+
+interface StoredOrderHit {
+  id: string;
+  source: CredentialSource;
+  email: string;
+  firstName: string;
+  lastName: string;
+  customerName: string;
+  userId: string;
+  detail: string;
+  platform: string;
+}
+
+const CREDENTIAL_SEND_DELAY_MS = 3000;
+
+function credentialSourceLabel(source: CredentialSource) {
+  if (source === 'user') return 'User';
+  if (source === 'credit') return 'Credit';
+  if (source === 'crypto') return 'Crypto';
+  return 'Order';
+}
+
+function credentialBadgeClass(source: CredentialSource) {
+  if (source === 'user') return 'bg-[#0FF1CE]/20 text-[#0FF1CE]';
+  if (source === 'credit') return 'bg-blue-500/20 text-blue-400';
+  if (source === 'crypto') return 'bg-yellow-500/20 text-yellow-400';
+  return 'bg-purple-500/20 text-purple-300';
+}
+
+function pickString(...values: unknown[]) {
+  for (const value of values) {
+    if (typeof value === 'string' && value.trim()) return value.trim();
+  }
+  return '';
+}
+
+function orderEmail(data: any) {
+  return pickString(data?.customerEmail, data?.email, data?.userEmail, data?.formData?.email, data?.customer?.email);
+}
+
+function orderPlatform(platform?: string) {
+  const value = (platform || '').toLowerCase();
+  if (value.includes('mt5') || value.includes('metatrader 5') || value === '5') return 'MetaTrader 5';
+  if (value.includes('mt4') || value.includes('metatrader 4') || value === '4') return 'MetaTrader 4';
+  return 'MetaTrader 5';
+}
+
+function isCreditPayment(method?: string) {
+  const value = (method || 'card').toLowerCase();
+  return value === 'card' || value === 'credit' || value === 'card_payment';
+}
+
+const LOGIN_SERVER_OPTIONS = ['AXI-US03-DEMO', 'AdmiralsGroup-DEMO', 'FusionMarkets-DEMO', 'DominionMarkets-Live'];
+
+function blankCredentials(platform?: string) {
+  return {
+    platform: orderPlatform(platform),
+    loginId: '',
+    password: '',
+    server: '',
+  };
+}
+
+function contactMatches(contact: CredentialContact, query: string) {
+  return [contact.email, contact.displayName, contact.firstName, contact.lastName, contact.detail]
+    .join(' ')
+    .toLowerCase()
+    .includes(query);
+}
+
+function userContact(customer: Customer): CredentialContact | null {
+  const email = (customer.email || '').trim();
+  if (!email) return null;
+  const firstName = (customer.firstName || customer.displayName?.split(' ')[0] || email.split('@')[0] || 'Trader').trim();
+  const lastName = (customer.lastName || '').trim();
+  const displayName = (customer.displayName || `${firstName} ${lastName}`.trim() || email).trim();
+  return {
+    key: `user:${customer.uid || customer.id || email.toLowerCase()}`,
+    email,
+    firstName,
+    lastName,
+    displayName,
+    source: 'user',
+    detail: 'User account',
+    ...blankCredentials(),
+  };
+}
+
+function contactFromRecord(input: {
+  id: string;
+  source: CredentialSource;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  customerName?: string;
+  detail?: string;
+  platform?: string;
+}): CredentialContact | null {
+  const email = (input.email || '').trim();
+  if (!email || !email.includes('@')) return null;
+  const customerName = (input.customerName || '').trim();
+  const firstName = (input.firstName || customerName.split(' ')[0] || email.split('@')[0] || 'Trader').trim();
+  const lastName = (input.lastName || customerName.split(' ').slice(1).join(' ') || '').trim();
+  return {
+    key: `${input.source}:${input.id}:${email.toLowerCase()}`,
+    email,
+    firstName,
+    lastName,
+    displayName: `${firstName} ${lastName}`.trim() || email,
+    source: input.source,
+    detail: input.detail || '',
+    ...blankCredentials(input.platform),
+  };
+}
+
+function storedHitToContact(hit: StoredOrderHit, customers: Customer[]): CredentialContact | null {
+  let email = hit.email;
+  let firstName = hit.firstName;
+  let lastName = hit.lastName;
+  let customerName = hit.customerName;
+  const linkedUser = customers.find((customer) => (
+    (hit.userId && (customer.uid === hit.userId || customer.id === hit.userId)) ||
+    (email && customer.email?.toLowerCase() === email.toLowerCase())
+  ));
+  if (linkedUser) {
+    if ((!email || !email.includes('@')) && linkedUser.email) email = linkedUser.email.trim();
+    firstName = firstName || linkedUser.firstName || linkedUser.displayName?.split(' ')[0] || '';
+    lastName = lastName || linkedUser.lastName || '';
+    customerName = customerName || linkedUser.displayName || '';
+  }
+  return contactFromRecord({
+    id: hit.id,
+    source: hit.source,
+    email,
+    firstName,
+    lastName,
+    customerName,
+    detail: hit.detail,
+    platform: hit.platform,
+  });
+}
+
 function getBulkRecipientKey(recipient: { recipientKey?: string; email?: string }): string {
   return recipient.recipientKey || recipient.email || '';
 }
@@ -926,6 +806,22 @@ export default function EmailTemplatesPage() {
   const [bulkListFilter, setBulkListFilter] = useState<'all' | 'drawdown'>('all');
   const [bulkListSearch, setBulkListSearch] = useState('');
   const preselectedRecipient = useRef(false);
+
+  // Login credentials can go to several people, one email every few seconds.
+  const [credentialOrderHits, setCredentialOrderHits] = useState<StoredOrderHit[]>([]);
+  const [credentialCryptoHits, setCredentialCryptoHits] = useState<StoredOrderHit[]>([]);
+  const [credentialRecipients, setCredentialRecipients] = useState<CredentialContact[]>([]);
+  const [credentialFocusKey, setCredentialFocusKey] = useState('');
+  const [credentialStep, setCredentialStep] = useState<'search' | 'details'>('search');
+  const [credentialQuery, setCredentialQuery] = useState('');
+  const [credentialFilter, setCredentialFilter] = useState<CredentialFilter>('all');
+  const [showCredentialResults, setShowCredentialResults] = useState(false);
+  const [loadingCredentialDirectory, setLoadingCredentialDirectory] = useState(false);
+  const [credentialDirectoryError, setCredentialDirectoryError] = useState('');
+  const [credentialSendProgress, setCredentialSendProgress] = useState<{ sent: number; total: number; failed: number; status: string } | null>(null);
+  const [credentialSendNote, setCredentialSendNote] = useState('');
+  const cancelCredentialSend = useRef(false);
+  const credentialSendLock = useRef(false);
   
   // Load customers on component mount
   useEffect(() => {
@@ -936,9 +832,10 @@ export default function EmailTemplatesPage() {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Element;
-      if (!target.closest('.user-dropdown-container')) {
+      if (!target.closest('.user-dropdown-container') && !target.closest('.credential-picker')) {
         setShowUserDropdown(false);
         setShowRecentOrdersDropdown(false);
+        setShowCredentialResults(false);
       }
     };
 
@@ -1120,6 +1017,60 @@ export default function EmailTemplatesPage() {
       console.error('Error loading recent orders:', error);
     }
   };
+
+  const loadCredentialDirectory = async () => {
+    try {
+      setLoadingCredentialDirectory(true);
+      setCredentialDirectoryError('');
+
+      const loadCollection = async (name: 'orders' | 'crypto-orders') => {
+        try {
+          return await getDocs(query(collection(db, name), orderBy('createdAt', 'desc')));
+        } catch (orderedError) {
+          console.warn(`Could not sort ${name}, loading the full list instead.`, orderedError);
+          return getDocs(collection(db, name));
+        }
+      };
+
+      const [orderSnapshot, cryptoSnapshot] = await Promise.all([
+        loadCollection('orders'),
+        loadCollection('crypto-orders'),
+      ]);
+
+      const toHit = (orderDoc: { id: string; data: () => any }, source: CredentialSource): StoredOrderHit => {
+        const data = orderDoc.data();
+        const formData = data.formData || {};
+        const detail = [
+          source === 'credit' ? 'Credit' : source === 'crypto' ? 'Crypto' : 'Order',
+          data.challengeType || formData.challengeType,
+          data.challengeAmount || formData.challengeAmount || formData.amount,
+        ].filter(Boolean).join(' · ');
+        return {
+          id: orderDoc.id,
+          source,
+          email: orderEmail(data),
+          firstName: pickString(data.firstName, formData.firstName),
+          lastName: pickString(data.lastName, formData.lastName),
+          customerName: pickString(data.customerName, formData.name, formData.customerName),
+          userId: pickString(data.userId, formData.userId),
+          detail,
+          platform: pickString(data.platform, formData.platform),
+        };
+      };
+
+      setCredentialOrderHits(orderSnapshot.docs.map((orderDoc) => {
+        const data = orderDoc.data();
+        const source: CredentialSource = isCreditPayment(data.paymentMethod || data.formData?.paymentMethod) ? 'credit' : 'order';
+        return toHit(orderDoc, source);
+      }));
+      setCredentialCryptoHits(cryptoSnapshot.docs.map((orderDoc) => toHit(orderDoc, 'crypto')));
+    } catch (error) {
+      console.error('Error loading credential recipients:', error);
+      setCredentialDirectoryError('Orders could not be loaded. User search still works.');
+    } finally {
+      setLoadingCredentialDirectory(false);
+    }
+  };
   
   const filteredTemplates = templates.filter(template => 
     template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -1226,6 +1177,13 @@ export default function EmailTemplatesPage() {
     setCurrentTemplate(null);
     setShowPreview(false);
     setEmailSent(false);
+    setCredentialRecipients([]);
+    setCredentialFocusKey('');
+    setCredentialStep('search');
+    setCredentialQuery('');
+    setShowCredentialResults(false);
+    setCredentialSendNote('');
+    setCredentialSendProgress(null);
   };
   
   const handlePreview = () => {
@@ -1267,19 +1225,237 @@ export default function EmailTemplatesPage() {
       setSendingEmail(false);
     }
   };
+
+  const rememberCredentialContact = (contact?: CredentialContact) => {
+    if (!contact) {
+      setSelectedUser(null);
+      setCredentialFocusKey('');
+      return;
+    }
+    setCredentialFocusKey(contact.key);
+    setSelectedUser({
+      id: contact.key,
+      uid: contact.key,
+      email: contact.email,
+      displayName: contact.displayName,
+      firstName: contact.firstName,
+      lastName: contact.lastName,
+    });
+    setTestValues((values) => ({
+      ...values,
+      firstName: contact.firstName || values.firstName,
+      email: contact.email,
+      platform: contact.platform,
+      loginId: contact.loginId,
+      password: contact.password,
+      server: contact.server,
+    }));
+  };
+
+  const chooseCredentialRecipient = (contact: CredentialContact) => {
+    const existing = credentialRecipients.find((item) => item.key === contact.key);
+    if (!existing) {
+      setCredentialRecipients((prev) => [...prev, contact]);
+    }
+    rememberCredentialContact(existing || contact);
+    setCredentialStep('details');
+    setCredentialQuery('');
+    setShowCredentialResults(false);
+  };
+
+  const startAnotherCredentialRecipient = () => {
+    setCredentialStep('search');
+    setCredentialQuery('');
+    setShowCredentialResults(true);
+  };
+
+  const removeCredentialRecipient = (key: string) => {
+    const next = credentialRecipients.filter((item) => item.key !== key);
+    setCredentialRecipients(next);
+    if (next.length === 0) {
+      setCredentialStep('search');
+      rememberCredentialContact(undefined);
+      return;
+    }
+    if (key === credentialFocusKey) {
+      rememberCredentialContact(next[0]);
+    }
+  };
+
+  const updateCredentialField = (
+    key: string,
+    field: 'platform' | 'loginId' | 'password' | 'server' | 'email' | 'firstName',
+    value: string
+  ) => {
+    setCredentialFocusKey(key);
+    setCredentialRecipients((prev) => prev.map((item) => {
+      if (item.key !== key) return item;
+      const next = { ...item, [field]: value };
+      if (field === 'firstName') {
+        next.displayName = value.trim() || next.email.trim() || 'New person';
+      } else if (field === 'email' && !next.firstName.trim()) {
+        next.displayName = value.trim() || 'New person';
+      }
+      return next;
+    }));
+    setTestValues((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const waitForCredentialDelay = async () => {
+    let elapsed = 0;
+    while (elapsed < CREDENTIAL_SEND_DELAY_MS) {
+      if (cancelCredentialSend.current) return;
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      elapsed += 200;
+    }
+  };
+
+  const handleSendLoginCredentials = async () => {
+    if (!currentTemplate || currentTemplate.name !== 'Login Credentials') return;
+    if (sendingEmail || credentialSendLock.current) return;
+    if (credentialRecipients.length === 0) {
+      alert('Add at least one person to send the login details to.');
+      return;
+    }
+
+    const incomplete = credentialRecipients.filter((recipient) => (
+      !recipient.email.includes('@') || !recipient.platform.trim() || !recipient.loginId.trim() || !recipient.password.trim() || !recipient.server.trim()
+    ));
+    if (incomplete.length > 0) {
+      const names = incomplete.slice(0, 4).map((recipient) => recipient.displayName || recipient.email || 'New person').join(', ');
+      alert(`Each person needs an email, platform, server, login, and password. Still missing for ${names}.`);
+      return;
+    }
+
+    if (credentialRecipients.length > 1) {
+      const confirmed = window.confirm(`Send different login details to ${credentialRecipients.length} people? Each email uses the credentials on that person's card and goes out a few seconds apart.`);
+      if (!confirmed) return;
+    }
+
+    const queue = [...credentialRecipients];
+    credentialSendLock.current = true;
+    cancelCredentialSend.current = false;
+    setSendingEmail(true);
+    setEmailSent(false);
+    setCredentialSendNote('');
+    setCredentialSendProgress({ sent: 0, total: queue.length, failed: 0, status: `Sending 1 of ${queue.length}` });
+
+    let sent = 0;
+    let failed = 0;
+    const failedEmails: string[] = [];
+
+    try {
+      for (let index = 0; index < queue.length; index += 1) {
+        if (cancelCredentialSend.current) break;
+        const recipient = queue[index];
+        setCredentialSendProgress({
+          sent,
+          total: queue.length,
+          failed,
+          status: `Sending ${index + 1} of ${queue.length} to ${recipient.email}`,
+        });
+
+        try {
+          const response = await fetch('/api/send-template-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              template: currentTemplate,
+              user: {
+                email: recipient.email,
+                firstName: recipient.firstName,
+                lastName: recipient.lastName,
+                displayName: recipient.displayName,
+              },
+              testValues: {
+                firstName: recipient.firstName || 'Trader',
+                lastName: recipient.lastName || '',
+                email: recipient.email,
+                displayName: recipient.displayName || recipient.email,
+                platform: recipient.platform,
+                loginId: recipient.loginId,
+                password: recipient.password,
+                server: recipient.server,
+              },
+            }),
+          });
+
+          if (!response.ok) throw new Error('Failed to send email');
+          sent += 1;
+        } catch (error) {
+          console.error(`Failed to send login details to ${recipient.email}:`, error);
+          failed += 1;
+          failedEmails.push(recipient.email);
+        }
+
+        setCredentialSendProgress({
+          sent,
+          total: queue.length,
+          failed,
+          status: `Sent ${sent} of ${queue.length}`,
+        });
+
+        if (index < queue.length - 1 && !cancelCredentialSend.current) {
+          setCredentialSendProgress({
+            sent,
+            total: queue.length,
+            failed,
+            status: `Sent ${sent} of ${queue.length}. Waiting a few seconds before the next email.`,
+          });
+          await waitForCredentialDelay();
+        }
+      }
+
+      if (cancelCredentialSend.current) {
+        setCredentialSendNote(`Stopped after sending ${sent} of ${queue.length}.${failed ? ` ${failed} failed.` : ''}`);
+      } else if (failed > 0) {
+        const preview = failedEmails.slice(0, 5).join(', ');
+        const extra = failedEmails.length > 5 ? ` and ${failedEmails.length - 5} more` : '';
+        setCredentialSendNote(`Sent ${sent}. ${failed} failed: ${preview}${extra}`);
+      } else {
+        setCredentialSendNote(`Sent login details to ${sent} ${sent === 1 ? 'person' : 'people'}.`);
+        setEmailSent(true);
+        setTimeout(() => setEmailSent(false), 3000);
+      }
+    } finally {
+      credentialSendLock.current = false;
+      setSendingEmail(false);
+      setCredentialSendProgress(null);
+    }
+  };
   
   const renderPreview = () => {
     if (!currentTemplate) return null;
     
     let previewSubject = currentTemplate.subject;
     let previewBody = currentTemplate.body;
+    const loginPreview = currentTemplate.name === 'Login Credentials';
     
-    // Replace variables with test values
-    Object.entries(testValues).forEach(([key, value]) => {
-      const regex = new RegExp(`{{${key}}}`, 'g');
-      previewSubject = previewSubject.replace(regex, value);
-      previewBody = previewBody.replace(regex, value);
-    });
+    if (loginPreview) {
+      const focused = credentialRecipients.find((recipient) => recipient.key === credentialFocusKey) || credentialRecipients[0];
+      const rendered = renderLoginCredentialsEmail(
+        { subject: currentTemplate.subject, body: currentTemplate.body },
+        focused ? {
+          firstName: focused.firstName,
+          lastName: focused.lastName,
+          email: focused.email,
+          displayName: focused.displayName,
+          platform: focused.platform,
+          loginId: focused.loginId,
+          password: focused.password,
+          server: focused.server,
+        } : testValues
+      );
+      previewSubject = rendered.subject;
+      previewBody = rendered.html;
+    } else {
+      // Replace variables with test values
+      Object.entries(testValues).forEach(([key, value]) => {
+        const regex = new RegExp(`{{${key}}}`, 'g');
+        previewSubject = previewSubject.replace(regex, value);
+        previewBody = previewBody.replace(regex, value);
+      });
+    }
     
     return (
       <div className="bg-black rounded-lg p-6 mb-6">
@@ -1289,10 +1465,18 @@ export default function EmailTemplatesPage() {
         </div>
         <div>
           <h3 className="text-white font-medium mb-2">Body</h3>
-          <div 
-            className="bg-black p-4 rounded text-white border border-white/10 max-h-96 overflow-y-auto"
-            dangerouslySetInnerHTML={{ __html: previewBody }}
-          ></div>
+          {loginPreview ? (
+            <iframe
+              title="Login credentials email preview"
+              srcDoc={previewBody}
+              className="w-full h-[680px] rounded border border-white/10 bg-white"
+            />
+          ) : (
+            <div 
+              className="bg-black p-4 rounded text-white border border-white/10 max-h-96 overflow-y-auto"
+              dangerouslySetInnerHTML={{ __html: previewBody }}
+            ></div>
+          )}
         </div>
       </div>
     );
@@ -1337,6 +1521,15 @@ export default function EmailTemplatesPage() {
       ...testValues,
       [variable]: value
     });
+    if (
+      currentTemplate?.name === 'Login Credentials' &&
+      credentialFocusKey &&
+      (variable === 'platform' || variable === 'loginId' || variable === 'password' || variable === 'server')
+    ) {
+      setCredentialRecipients((prev) => prev.map((item) => (
+        item.key === credentialFocusKey ? { ...item, [variable]: value } : item
+      )));
+    }
   };
 
   // Get dropdown options for specific variables
@@ -1345,7 +1538,7 @@ export default function EmailTemplatesPage() {
       case 'platform':
         return ['MetaTrader 4', 'MetaTrader 5'];
       case 'server':
-        return ['AXI-US03-DEMO', 'AdmiralsGroup-DEMO', 'FusionMarkets-DEMO', 'DominionMarkets-Live'];
+        return LOGIN_SERVER_OPTIONS;
       default:
         return null;
     }
@@ -1354,16 +1547,23 @@ export default function EmailTemplatesPage() {
   // Render variable input (text input or dropdown)
   const renderVariableInput = (variable: string) => {
     const options = getVariableOptions(variable);
+    const focusedCredential = currentTemplate?.name === 'Login Credentials'
+      ? credentialRecipients.find((item) => item.key === credentialFocusKey) || credentialRecipients[0]
+      : undefined;
+    const fieldValue = focusedCredential && (variable === 'platform' || variable === 'loginId' || variable === 'password' || variable === 'server')
+      ? focusedCredential[variable] || ''
+      : testValues[variable] || '';
     
     if (options) {
+      const optionList = fieldValue && !options.includes(fieldValue) ? [fieldValue, ...options] : options;
       return (
         <select
-          value={testValues[variable] || ''}
+          value={fieldValue}
           onChange={(e) => handleTestValueChange(variable, e.target.value)}
           className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#0FF1CE]/50"
         >
           <option value="">Select {variable}</option>
-          {options.map(option => (
+          {optionList.map(option => (
             <option key={option} value={option}>{option}</option>
           ))}
         </select>
@@ -1373,7 +1573,7 @@ export default function EmailTemplatesPage() {
     return (
       <input
         type="text"
-        value={testValues[variable] || ''}
+        value={fieldValue}
         onChange={(e) => handleTestValueChange(variable, e.target.value)}
         className="w-full bg-black border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#0FF1CE]/50"
       />
@@ -1882,6 +2082,12 @@ export default function EmailTemplatesPage() {
     }
   }, [currentTemplate?.id, isEditing]);
 
+  useEffect(() => {
+    if (isEditing && currentTemplate?.name === 'Login Credentials') {
+      loadCredentialDirectory();
+    }
+  }, [currentTemplate?.id, isEditing]);
+
   const isResetPriceBulk = currentTemplate?.bulkSource === 'reset-prices';
   const isActiveAccountsBulk = currentTemplate?.bulkSource === 'active-accounts';
   const visibleBulkRecipients = bulkRecipients.filter((recipient) => {
@@ -1898,6 +2104,46 @@ export default function EmailTemplatesPage() {
     );
   });
   const drawdownCount = bulkRecipients.filter((r) => r.inDrawdown).length;
+  const isLoginCredentialsTemplate = currentTemplate?.name === 'Login Credentials';
+  const credentialOrders = credentialOrderHits
+    .map((hit) => storedHitToContact(hit, customers))
+    .filter((contact): contact is CredentialContact => Boolean(contact));
+  const credentialCryptoOrders = credentialCryptoHits
+    .map((hit) => storedHitToContact(hit, customers))
+    .filter((contact): contact is CredentialContact => Boolean(contact));
+  const credentialQueryText = credentialQuery.trim().toLowerCase();
+  const credentialUserContacts = customers
+    .map((customer) => userContact(customer))
+    .filter((contact): contact is CredentialContact => Boolean(contact));
+
+  const takeMatches = (contacts: CredentialContact[], limitCount: number) => (
+    credentialQueryText
+      ? contacts.filter((contact) => contactMatches(contact, credentialQueryText)).slice(0, limitCount)
+      : contacts.slice(0, limitCount)
+  );
+
+  let credentialResults: CredentialContact[] = [];
+  if (credentialFilter === 'users') {
+    credentialResults = credentialQueryText ? takeMatches(credentialUserContacts, 20) : [];
+  } else if (credentialFilter === 'credit') {
+    credentialResults = takeMatches(credentialOrders.filter((contact) => contact.source === 'credit'), 20);
+  } else if (credentialFilter === 'orders') {
+    credentialResults = takeMatches(credentialOrders, 20);
+  } else if (credentialFilter === 'crypto') {
+    credentialResults = takeMatches(credentialCryptoOrders, 20);
+  } else if (!credentialQueryText) {
+    credentialResults = [...credentialOrders.slice(0, 10), ...credentialCryptoOrders.slice(0, 10)];
+  } else {
+    credentialResults = [
+      ...takeMatches(credentialOrders, 12),
+      ...takeMatches(credentialCryptoOrders, 12),
+      ...takeMatches(credentialUserContacts, 8),
+    ].slice(0, 30);
+  }
+
+  const credentialKeySelected = (key: string) =>
+    credentialRecipients.some((contact) => contact.key === key);
+  const activeCredentialRecipient = credentialRecipients.find((recipient) => recipient.key === credentialFocusKey) || null;
 
   return (
     <div>
@@ -2247,8 +2493,327 @@ export default function EmailTemplatesPage() {
         </div>
       )}
 
+      {/* Login credentials: search people and send to several of them */}
+      {isEditing && isLoginCredentialsTemplate && (
+        <div className="bg-black rounded-lg p-6 mb-6 border border-[#0FF1CE]/30">
+          <div className="flex items-start justify-between gap-3 mb-4">
+            <div className="flex items-center gap-3">
+              <Copy size={20} className="text-[#0FF1CE]" />
+              <div>
+                <h3 className="text-white font-medium">Send login details</h3>
+                <p className="text-gray-400 text-sm">Search for a person, then enter their login details. Add another person to search again. Emails go out a few seconds apart.</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => { void loadCredentialDirectory(); }}
+              disabled={loadingCredentialDirectory || sendingEmail}
+              className="p-2 rounded-lg border border-white/10 text-gray-300 hover:text-white disabled:opacity-50"
+              title="Refresh recent orders"
+            >
+              <RefreshCw size={16} className={loadingCredentialDirectory ? 'animate-spin' : ''} />
+            </button>
+          </div>
+
+          {credentialStep === 'search' && (
+          <div className="credential-picker mb-4">
+            <div className="flex items-center justify-between gap-3 mb-2">
+              <label className="block text-sm font-medium text-gray-400">
+                1. Choose a person
+              </label>
+            </div>
+            <p className={`text-xs mb-2 ${credentialDirectoryError ? 'text-amber-300' : 'text-gray-500'}`}>
+              {credentialDirectoryError
+                ? credentialDirectoryError
+                : loadingCredentialDirectory
+                  ? 'Loading users and orders...'
+                  : `${customers.length} users · ${credentialOrders.length} orders · ${credentialCryptoOrders.length} crypto orders`}
+            </p>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+              <input
+                type="text"
+                name="credential-person-search"
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck={false}
+                placeholder="Search name or email..."
+                value={credentialQuery}
+                onChange={(event) => {
+                  setCredentialQuery(event.target.value);
+                  setShowCredentialResults(true);
+                }}
+                onFocus={() => setShowCredentialResults(true)}
+                className="w-full pl-10 pr-4 py-2.5 bg-black border border-white/10 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-[#0FF1CE]/50"
+              />
+            </div>
+
+            {showCredentialResults && (
+              <div className="mt-2 bg-black border border-white/10 rounded-lg max-h-80 overflow-y-auto">
+                <div className="sticky top-0 bg-black border-b border-white/10 p-2 flex flex-wrap gap-2">
+                  {([
+                    ['all', 'All'],
+                    ['users', 'Users'],
+                    ['credit', 'Credit'],
+                    ['orders', 'Orders'],
+                    ['crypto', 'Crypto'],
+                  ] as const).map(([id, label]) => (
+                    <button
+                      key={id}
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setCredentialFilter(id);
+                        setShowCredentialResults(true);
+                      }}
+                      className={`text-xs px-2 py-1 rounded ${
+                        credentialFilter === id ? 'bg-[#0FF1CE] text-black' : 'bg-black text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+
+                {loadingCredentialDirectory && credentialOrders.length === 0 && credentialCryptoOrders.length === 0 ? (
+                  <div className="p-4 text-center text-gray-400 text-sm">
+                    <Loader size={16} className="animate-spin inline mr-2" />
+                    Loading orders...
+                  </div>
+                ) : credentialFilter === 'users' && !credentialQueryText ? (
+                  <div className="p-4 text-center text-gray-400 text-sm">Type a name or email to search users.</div>
+                ) : credentialResults.length === 0 ? (
+                  <div className="p-4 text-center text-gray-400 text-sm">No matches. Try another name, email, or filter.</div>
+                ) : (
+                  credentialResults.map((contact) => {
+                    const selected = credentialKeySelected(contact.key);
+                    return (
+                      <button
+                        key={contact.key}
+                        type="button"
+                        onClick={() => chooseCredentialRecipient(contact)}
+                        className="w-full text-left p-3 hover:bg-white/5 border-b border-white/10 last:border-b-0"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-5 h-5 rounded border flex items-center justify-center ${selected ? 'bg-[#0FF1CE] border-[#0FF1CE]' : 'border-white/20'}`}>
+                            {selected && <Check size={12} className="text-black" />}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="text-white text-sm font-medium truncate">{contact.displayName}</div>
+                            <div className="text-gray-400 text-xs truncate">{contact.email}</div>
+                            {contact.detail && <div className="text-gray-500 text-xs truncate">{contact.detail}</div>}
+                          </div>
+                          <span className={`text-[11px] px-2 py-0.5 rounded-full ${credentialBadgeClass(contact.source)}`}>
+                            {credentialSourceLabel(contact.source)}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })
+                )}
+              </div>
+            )}
+          </div>
+          )}
+
+          {credentialRecipients.length > 0 && (
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="text-white text-sm font-medium">People in this send ({credentialRecipients.length})</h4>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCredentialRecipients([]);
+                    setCredentialFocusKey('');
+                    setCredentialStep('search');
+                    setSelectedUser(null);
+                  }}
+                  disabled={sendingEmail}
+                  className="text-xs text-gray-400 hover:text-white disabled:opacity-50"
+                >
+                  Clear
+                </button>
+              </div>
+              <div className="space-y-2">
+                {credentialRecipients.map((recipient) => (
+                  <div key={recipient.key} className="flex items-center gap-3 p-3 rounded-lg border border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        rememberCredentialContact(recipient);
+                        setCredentialStep('details');
+                      }}
+                      disabled={sendingEmail}
+                      className="min-w-0 flex-1 text-left"
+                    >
+                      <div className="text-white text-sm font-medium truncate">{recipient.displayName}</div>
+                      <div className="text-gray-400 text-xs truncate">{recipient.email}</div>
+                      <div className="text-gray-500 text-xs truncate">
+                        {recipient.loginId ? `Login ${recipient.loginId} · ${recipient.server || 'No server yet'}` : 'Login details not entered yet'}
+                      </div>
+                    </button>
+                    <span className={`text-[11px] px-2 py-0.5 rounded-full ${credentialBadgeClass(recipient.source)}`}>
+                      {credentialSourceLabel(recipient.source)}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => removeCredentialRecipient(recipient.key)}
+                      disabled={sendingEmail}
+                      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-red-300 border border-red-400/30 hover:bg-red-400/10 disabled:opacity-50"
+                    >
+                      <X size={14} />
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {credentialStep === 'details' && activeCredentialRecipient && (
+          <div className="mb-4 rounded-lg border border-[#0FF1CE]/50 p-3">
+            <div className="mb-3">
+              <p className="text-xs font-medium text-[#0FF1CE]">2. Login details</p>
+              <p className="text-white text-sm font-medium">{activeCredentialRecipient.displayName}</p>
+              <p className="text-gray-400 text-xs">{activeCredentialRecipient.email}</p>
+            </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <label className="block">
+                        <span className="block text-xs text-gray-400 mb-1">Name</span>
+                        <input
+                          type="text"
+                          value={activeCredentialRecipient.firstName}
+                          onChange={(event) => updateCredentialField(activeCredentialRecipient.key, 'firstName', event.target.value)}
+                          disabled={sendingEmail}
+                          autoComplete="off"
+                          placeholder="Name"
+                          className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+                        />
+                      </label>
+                      <label className="block">
+                        <span className="block text-xs text-gray-400 mb-1">Email</span>
+                        <input
+                          type="email"
+                          value={activeCredentialRecipient.email}
+                          onChange={(event) => updateCredentialField(activeCredentialRecipient.key, 'email', event.target.value)}
+                          disabled={sendingEmail}
+                          autoComplete="off"
+                          placeholder="Email"
+                          className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+                        />
+                      </label>
+                      <label className="block">
+                        <span className="block text-xs text-gray-400 mb-1">Platform</span>
+                        <select
+                          value={activeCredentialRecipient.platform}
+                          onChange={(event) => updateCredentialField(activeCredentialRecipient.key, 'platform', event.target.value)}
+                          disabled={sendingEmail}
+                          className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+                        >
+                          <option value="MetaTrader 4">MetaTrader 4</option>
+                          <option value="MetaTrader 5">MetaTrader 5</option>
+                        </select>
+                      </label>
+                      <label className="block">
+                        <span className="block text-xs text-gray-400 mb-1">Server</span>
+                        <select
+                          value={activeCredentialRecipient.server}
+                          onChange={(event) => updateCredentialField(activeCredentialRecipient.key, 'server', event.target.value)}
+                          disabled={sendingEmail}
+                          className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+                        >
+                          <option value="">Select server</option>
+                          {(activeCredentialRecipient.server && !LOGIN_SERVER_OPTIONS.includes(activeCredentialRecipient.server) ? [activeCredentialRecipient.server, ...LOGIN_SERVER_OPTIONS] : LOGIN_SERVER_OPTIONS).map((server) => (
+                            <option key={server} value={server}>{server}</option>
+                          ))}
+                        </select>
+                      </label>
+                      <label className="block">
+                        <span className="block text-xs text-gray-400 mb-1">Login ID</span>
+                        <input
+                          type="text"
+                          value={activeCredentialRecipient.loginId}
+                          onChange={(event) => updateCredentialField(activeCredentialRecipient.key, 'loginId', event.target.value)}
+                          disabled={sendingEmail}
+                          autoComplete="off"
+                          placeholder="Login ID"
+                          className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+                        />
+                      </label>
+                      <label className="block">
+                        <span className="block text-xs text-gray-400 mb-1">Password</span>
+                        <input
+                          type="text"
+                          value={activeCredentialRecipient.password}
+                          onChange={(event) => updateCredentialField(activeCredentialRecipient.key, 'password', event.target.value)}
+                          disabled={sendingEmail}
+                          autoComplete="new-password"
+                          placeholder="Password"
+                          className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+                        />
+                      </label>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={startAnotherCredentialRecipient}
+                      disabled={sendingEmail}
+                      className="mt-4 inline-flex items-center gap-1 text-sm px-3 py-2 rounded-lg border border-[#0FF1CE]/40 text-[#0FF1CE] hover:bg-[#0FF1CE]/10 disabled:opacity-50"
+                    >
+                      <Plus size={14} />
+                      Add another person
+                    </button>
+          </div>
+          )}
+
+          {credentialSendProgress && (
+            <div className="bg-black rounded-lg p-4 mb-4 border border-[#0FF1CE]/50">
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <span className="text-white text-sm">{credentialSendProgress.status}</span>
+                <span className="text-[#0FF1CE] font-bold text-sm">{credentialSendProgress.sent}/{credentialSendProgress.total}</span>
+              </div>
+              <div className="w-full bg-[#2F2F2F] rounded-full h-2 overflow-hidden">
+                <div
+                  className="bg-[#0FF1CE] h-2 transition-all duration-300"
+                  style={{ width: `${credentialSendProgress.total ? (credentialSendProgress.sent / credentialSendProgress.total) * 100 : 0}%` }}
+                />
+              </div>
+              {credentialSendProgress.failed > 0 && (
+                <div className="text-red-400 text-sm mt-2">{credentialSendProgress.failed} failed</div>
+              )}
+            </div>
+          )}
+
+          {credentialSendNote && !credentialSendProgress && (
+            <div className="mb-4 text-sm text-gray-300">{credentialSendNote}</div>
+          )}
+
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => { void handleSendLoginCredentials(); }}
+              disabled={sendingEmail || credentialRecipients.length === 0}
+              className="flex-1 flex items-center justify-center gap-2 bg-[#0FF1CE] text-black font-bold py-3 px-6 rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {sendingEmail ? <Loader size={18} className="animate-spin" /> : emailSent ? <Check size={18} /> : <Send size={18} />}
+              <span>
+                {sendingEmail ? 'Sending...' : emailSent ? 'Sent!' : `Send email${credentialRecipients.length ? ` to ${credentialRecipients.length}` : ''}`}
+              </span>
+            </button>
+            {sendingEmail && (
+              <button
+                type="button"
+                onClick={() => { cancelCredentialSend.current = true; }}
+                className="px-4 py-3 rounded-lg border border-white/10 text-white hover:bg-white/5"
+              >
+                Stop
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* User Selection Section */}
-      {isEditing && currentTemplate && !currentTemplate.isBulkTemplate && (
+      {isEditing && currentTemplate && !currentTemplate.isBulkTemplate && currentTemplate.name !== 'Login Credentials' && (
         <div className="bg-black rounded-lg p-6 mb-6 border border-white/10">
           <div className="flex items-center gap-3 mb-4">
             <Users size={20} className="text-[#0FF1CE]" />
@@ -2543,9 +3108,9 @@ export default function EmailTemplatesPage() {
                     <span>{showPreview ? 'Edit' : 'Preview'}</span>
                   </button>
                   
-                  {showPreview && selectedUser && (
+                  {showPreview && (currentTemplate.name === 'Login Credentials' ? credentialRecipients.length > 0 : selectedUser) && (
                     <button 
-                      onClick={handleSendEmail}
+                      onClick={currentTemplate.name === 'Login Credentials' ? () => { void handleSendLoginCredentials(); } : handleSendEmail}
                       disabled={sendingEmail}
                       className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0FF1CE] text-black hover:bg-[#0FF1CE]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
@@ -2557,7 +3122,13 @@ export default function EmailTemplatesPage() {
                         <Send size={16} />
                       )}
                       <span>
-                        {sendingEmail ? 'Sending...' : emailSent ? 'Sent!' : 'Send Email'}
+                        {sendingEmail
+                          ? 'Sending...'
+                          : emailSent
+                            ? 'Sent!'
+                            : currentTemplate.name === 'Login Credentials' && credentialRecipients.length > 1
+                              ? `Send to ${credentialRecipients.length}`
+                              : 'Send Email'}
                       </span>
                     </button>
                   )}
@@ -2585,7 +3156,11 @@ export default function EmailTemplatesPage() {
                     <h3 className="text-white font-medium mb-4 flex items-center gap-2">
                       <Mail size={16} />
                       Email Preview
-                      {selectedUser && (
+                      {currentTemplate.name === 'Login Credentials' && credentialRecipients.length > 0 ? (
+                        <span className="text-sm text-gray-400">
+                          → {credentialRecipients.length} {credentialRecipients.length === 1 ? 'person' : 'people'}
+                        </span>
+                      ) : selectedUser && (
                         <span className="text-sm text-gray-400">
                           → {selectedUser.displayName || 'Unknown User'} ({selectedUser.email || 'No email'})
                         </span>

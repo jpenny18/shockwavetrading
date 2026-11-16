@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth as adminAuth, db } from '@/lib/firebase-admin';
 import { requireAdmin } from '@/lib/require-admin';
 import { sendTemplateEmail } from '@/lib/email';
-import { buildLoginCredentialsTemplate, escapeHtml, platformLabel } from '@/lib/login-credentials-email';
+import { buildLoginCredentialsTemplate, platformLabel } from '@/lib/login-credentials-email';
 
 export const dynamic = 'force-dynamic';
 
@@ -156,11 +156,11 @@ export async function POST(request: NextRequest) {
         displayName: userRecord.displayName || `${firstName} ${lastName}`.trim(),
       },
       {
-        firstName: escapeHtml(firstName),
+        firstName,
         platform: platformLabel(selected.platform),
-        loginId: escapeHtml(credentials.login!.trim()),
-        password: escapeHtml(credentials.password!),
-        server: escapeHtml(credentials.server!.trim()),
+        loginId: credentials.login!.trim(),
+        password: credentials.password!,
+        server: credentials.server!.trim(),
       }
     );
 

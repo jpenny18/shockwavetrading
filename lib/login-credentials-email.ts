@@ -14,66 +14,100 @@ export function platformLabel(platform?: string) {
   return platform || 'MetaTrader 5';
 }
 
+function fillTokens(input: string, tokens: Record<string, string>) {
+  const keys = Object.keys(tokens).sort((left, right) => right.length - left.length);
+  return keys.reduce((output, key) => output.split(`{{${key}}}`).join(tokens[key] ?? ''), input);
+}
+
+export function renderLoginCredentialsEmail(
+  template: { subject: string; body: string },
+  values: Record<string, string>
+) {
+  const raw: Record<string, string> = {};
+  Object.entries(values).forEach(([key, value]) => {
+    raw[key] = value == null ? '' : String(value);
+  });
+
+  const htmlValues: Record<string, string> = {};
+  Object.entries(raw).forEach(([key, value]) => {
+    htmlValues[key] = escapeHtml(value);
+  });
+
+  return {
+    subject: fillTokens(template.subject, raw),
+    html: fillTokens(template.body, htmlValues),
+    raw,
+  };
+}
+
+function credentialRow(label: string, token: string) {
+  return `<p style="margin: 0 0 14px 0; color: #333;">
+      <strong>${label}:</strong>
+      <span style="font-family: Consolas, Menlo, Courier, monospace; font-weight: bold; background-color: #eee; padding: 2px 6px; border-radius: 3px; word-break: break-all; -webkit-user-select: all; user-select: all;">{{${token}}}</span>
+    </p>`;
+}
+
 export function buildLoginCredentialsTemplate() {
+  const year = new Date().getFullYear();
+  const rows = [
+    credentialRow('PLATFORM', 'platform'),
+    credentialRow('LOGIN ID', 'loginId'),
+    credentialRow('PASSWORD', 'password'),
+    credentialRow('SERVER', 'server'),
+  ].join('');
+
   return {
     name: 'Login Credentials',
     subject: 'Challenge Login Details - Shockwave Capital',
     variables: ['firstName', 'platform', 'loginId', 'password', 'server'],
-    body: `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>Challenge Login Details - Shockwave Capital</title>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;">
-  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 0;">
-    <tr>
-      <td bgcolor="#0FF1CE" align="center" style="padding: 30px 20px;">
-        <h1 style="color: #0D0D0D; margin: 0; font-size: 28px;">Shockwave Capital</h1>
-      </td>
-    </tr>
-    <tr>
-      <td bgcolor="#f4f4f4" align="center" style="padding: 20px;">
-        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px;">
-          <tr>
-            <td bgcolor="#ffffff" style="padding: 40px; border-radius: 8px;">
-              <h1 style="font-size: 28px; font-weight: 700; color: #1a1a1a; margin: 0 0 20px 0;">Your Trading Challenge Details</h1>
-              <p style="margin: 0 0 20px 0; color: #444;">Hello {{firstName}},</p>
-              <p style="margin: 0 0 25px 0; color: #444;">Welcome to Shockwave Capital! Your trading account has been set up. Below are your login credentials.</p>
-              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-bottom: 30px;">
-                <tr>
-                  <td colspan="2" style="background: #0FF1CE; color: #1a1a1a; font-size: 18px; font-weight: 700; text-align: center; padding: 20px;">Your Trading Account Credentials</td>
-                </tr>
-                <tr>
-                  <td style="width: 35%; font-weight: 600; padding: 15px; border: 1px solid #E5E5E5;">Platform:</td>
-                  <td style="font-family: monospace; padding: 15px; border: 1px solid #E5E5E5;">{{platform}}</td>
-                </tr>
-                <tr>
-                  <td style="font-weight: 600; padding: 15px; border: 1px solid #E5E5E5;">Login ID:</td>
-                  <td style="font-family: monospace; padding: 15px; border: 1px solid #E5E5E5;">{{loginId}}</td>
-                </tr>
-                <tr>
-                  <td style="font-weight: 600; padding: 15px; border: 1px solid #E5E5E5;">Password:</td>
-                  <td style="font-family: monospace; padding: 15px; border: 1px solid #E5E5E5;">{{password}}</td>
-                </tr>
-                <tr>
-                  <td style="font-weight: 600; padding: 15px; border: 1px solid #E5E5E5;">Server:</td>
-                  <td style="font-family: monospace; padding: 15px; border: 1px solid #E5E5E5;">{{server}}</td>
-                </tr>
-              </table>
-              <div style="text-align: center; margin: 40px 0;">
-                <a href="https://shockwave-capital.com/dashboard/accounts" style="display: inline-block; background-color: #1a1a1a; color: #0FF1CE; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">OPEN MY ACCOUNTS</a>
-              </div>
-              <p style="margin-top: 40px; margin-bottom: 0;">Best regards,</p>
-              <p style="margin-top: 5px;"><strong>The Shockwave Capital Team</strong></p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>`,
+    body: `<!-- shockwave-standalone-email -->
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
+  <div style="background-color: #0D0D0D; padding: 20px; margin-bottom: 20px; border-radius: 5px; text-align: center;">
+    <h1 style="color: #0FF1CE; margin: 0; font-size: 24px;">Your login details</h1>
+  </div>
+
+  <div style="margin-bottom: 30px;">
+    <p>Hello {{firstName}},</p>
+    <p>Your trading account is ready. Use the details below to sign in to {{platform}}.</p>
+    <p>Press and hold a value, then choose Copy to put it on your clipboard.</p>
+  </div>
+
+  <div style="margin-bottom: 30px; background-color: #f9f9f9; padding: 15px; border-radius: 5px;">
+    <h2 style="color: #333; font-size: 18px; margin: 0 0 15px 0; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Trading Account Credentials</h2>
+    ${rows}
+  </div>
+
+  <div style="margin-bottom: 30px; background-color: #f9f9f9; padding: 15px; border-radius: 5px;">
+    <h2 style="color: #333; font-size: 18px; margin: 0 0 15px 0; border-bottom: 1px solid #ddd; padding-bottom: 5px;">Hold to copy everything</h2>
+    <p style="margin: 0; font-family: Consolas, Menlo, Courier, monospace; background-color: #eee; padding: 10px; border-radius: 3px; color: #333; word-break: break-all; -webkit-user-select: all; user-select: all;">Platform: {{platform}}<br>Login ID: {{loginId}}<br>Password: {{password}}<br>Server: {{server}}</p>
+  </div>
+
+  <div style="margin-bottom: 30px;">
+    <h2 style="color: #0FF1CE; font-size: 18px; margin-bottom: 15px;">Next Steps</h2>
+    <div style="margin-bottom: 15px;">
+      <h3 style="margin: 0 0 5px 0; color: #333;">1. Install {{platform}}</h3>
+      <p style="margin: 0; color: #666;">Download the platform on your phone or computer.</p>
+    </div>
+    <div style="margin-bottom: 15px;">
+      <h3 style="margin: 0 0 5px 0; color: #333;">2. Copy your login details</h3>
+      <p style="margin: 0; color: #666;">Press and hold the login, password, or server above, then choose Copy.</p>
+    </div>
+    <div style="margin-bottom: 15px;">
+      <h3 style="margin: 0 0 5px 0; color: #333;">3. Start trading</h3>
+      <p style="margin: 0; color: #666;">Sign in, review your challenge rules, then place your first trade. You can also open your accounts at <a href="https://shockwavetrading.com/dashboard/accounts" style="color: #0FF1CE;">shockwavetrading.com</a>.</p>
+    </div>
+  </div>
+
+  <div style="margin-bottom: 30px;">
+    <p>If you have any questions or need assistance, please contact our support team at <a href="mailto:support@shockwave-capital.com" style="color: #0FF1CE;">support@shockwave-capital.com</a>.</p>
+    <p style="margin-bottom: 0;">Best regards,</p>
+    <p style="margin-top: 5px;"><strong>The Shockwave Capital Team</strong></p>
+  </div>
+
+  <div style="background-color: #0D0D0D; padding: 15px; border-radius: 5px; text-align: center; font-size: 12px; color: #999;">
+    <p style="margin-bottom: 5px;">© ${year} Shockwave Capital. All rights reserved.</p>
+    <p style="margin: 0;">These details are private. Don't forward this email.</p>
+  </div>
+</div>`,
   };
 }
