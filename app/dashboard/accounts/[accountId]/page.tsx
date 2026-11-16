@@ -101,17 +101,21 @@ const MetricCard = ({ title, value, icon: Icon, format = 'number', prefix = '', 
 };
 
 // Trading Objectives Table Component
-const TradingObjectivesTable = ({ objectives, accountStatus, riskEvents = [] }: {
+const TradingObjectivesTable = ({ objectives, accountStatus, accountType, riskEvents = [] }: {
   objectives: TradingObjectives;
   accountStatus?: string;
+  accountType?: string;
   riskEvents?: RiskEvent[];
 }) => {
   const isFunded = accountStatus === 'funded';
+  const gauntletFunded = isFunded && accountType === 'gauntlet';
   const [riskOpen, setRiskOpen] = useState(false);
   
   const rows = [
     { 
-      label: isFunded ? 'Min Trading Days (0.5% gain required)' : 'Min Trading Days', 
+      label: isFunded
+        ? (gauntletFunded ? 'Min Trading Days' : 'Min Trading Days (0.5% gain required)')
+        : 'Min Trading Days', 
       target: objectives.minTradingDays.target,
       current: objectives.minTradingDays.current,
       passed: objectives.minTradingDays.passed,
@@ -691,8 +695,18 @@ export default function AccountDetailsPage() {
               <ul className="text-gray-300 text-sm mt-2 list-disc list-inside">
                 <li>Maximum drawdown: 15%</li>
                 <li>Daily drawdown: 8%</li>
-                <li>Risk limit: Maximum 2% risk on open positions</li>
-                <li>Payout eligibility: Minimum 5 trading days with 0.5% gain from starting balance</li>
+                <li>{userAccount?.accountType === 'gauntlet'
+                  ? 'Maximum aggregate open risk: 2% of account equity'
+                  : 'Risk limit: Maximum 2% risk on open positions'}</li>
+                {userAccount?.accountType === 'gauntlet' ? (
+                  <>
+                    <li>Minimum trading days: none</li>
+                    <li>Profit split: 95%</li>
+                    <li>Payouts: on demand, up to $5,000 on the first payout, then no limit</li>
+                  </>
+                ) : (
+                  <li>Payout eligibility: Minimum 5 trading days with 0.5% gain from starting balance</li>
+                )}
               </ul>
             </div>
           </div>
@@ -705,7 +719,7 @@ export default function AccountDetailsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           {/* Trading Objectives - 60% width */}
           <div className="lg:col-span-3">
-            {objectives && <TradingObjectivesTable objectives={objectives} accountStatus={accountStatus} riskEvents={riskEvents} />}
+            {objectives && <TradingObjectivesTable objectives={objectives} accountStatus={accountStatus} accountType={userAccount?.accountType} riskEvents={riskEvents} />}
           </div>
 
           {/* Account Information - 40% width */}

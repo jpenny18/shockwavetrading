@@ -40,7 +40,7 @@ const tooltipData: TooltipData = {
   "profit-split": "Your share of profits on the funded account, up to 95%.",
   "profit-split-instant": "Your share of profits on an Instant account is 70%.",
   "refundable-fee": "The full challenge fee is refunded with your first payout, unless the challenge was bought at a discount.",
-  "pay-when-pass": "Start for $19.99. The activation fee shown here is charged only after you pass.",
+  "pay-when-pass": "Start for $1. The activation fee shown here is charged only after you pass.",
 };
 
 const challengeData: ChallengeData = {
@@ -497,25 +497,27 @@ const challengeData: ChallengeData = {
   },
   gauntlet: {
     name: "Shockwave Gauntlet",
-    accounts: [10000, 25000, 50000, 100000, 200000],
+    accounts: [10000, 25000, 50000, 100000, 200000, 500000],
     prices: {
-      10000: 19.99,
-      25000: 19.99,
-      50000: 19.99,
-      100000: 19.99,
-      200000: 19.99
+      10000: 1,
+      25000: 1,
+      50000: 1,
+      100000: 1,
+      200000: 1,
+      500000: 1
     },
     features: [
       {
         name: "Pay When You Pass",
-        subtitle: "Only $19.99 to try",
+        subtitle: "Only $1 to try",
         tooltip: "pay-when-pass",
         values: {
           10000: "$199 activation",
-          25000: "$299 activation",
-          50000: "$499 activation",
-          100000: "$799 activation",
-          200000: "$1,499 activation"
+          25000: "$349 activation",
+          50000: "$599 activation",
+          100000: "$999 activation",
+          200000: "$1,899 activation",
+          500000: "$4,499 activation"
         }
       },
       {
@@ -523,11 +525,12 @@ const challengeData: ChallengeData = {
         subtitle: "Single Phase",
         tooltip: "challenge-target",
         values: {
-          10000: "10% ($1,000)",
-          25000: "10% ($2,500)",
-          50000: "10% ($5,000)",
-          100000: "10% ($10,000)",
-          200000: "10% ($20,000)"
+          10000: "4% ($400)",
+          25000: "4% ($1,000)",
+          50000: "4% ($2,000)",
+          100000: "4% ($4,000)",
+          200000: "4% ($8,000)",
+          500000: "4% ($20,000)"
         }
       },
       {
@@ -539,7 +542,8 @@ const challengeData: ChallengeData = {
           25000: "8% ($2,000)",
           50000: "8% ($4,000)",
           100000: "8% ($8,000)",
-          200000: "8% ($16,000)"
+          200000: "8% ($16,000)",
+          500000: "8% ($40,000)"
         }
       },
       {
@@ -551,7 +555,8 @@ const challengeData: ChallengeData = {
           25000: "15% ($3,750)",
           50000: "15% ($7,500)",
           100000: "15% ($15,000)",
-          200000: "15% ($30,000)"
+          200000: "15% ($30,000)",
+          500000: "15% ($75,000)"
         }
       },
       {
@@ -563,7 +568,8 @@ const challengeData: ChallengeData = {
           25000: "1:200",
           50000: "1:200",
           100000: "1:200",
-          200000: "1:200"
+          200000: "1:200",
+          500000: "1:200"
         }
       },
       {
@@ -575,7 +581,8 @@ const challengeData: ChallengeData = {
           25000: "✓",
           50000: "✓",
           100000: "✓",
-          200000: "✓"
+          200000: "✓",
+          500000: "✓"
         }
       },
       {
@@ -587,19 +594,21 @@ const challengeData: ChallengeData = {
           25000: "✓",
           50000: "✓",
           100000: "✓",
-          200000: "✓"
+          200000: "✓",
+          500000: "✓"
         }
       },
       {
         name: "Profit Split",
-        subtitle: "Up to 95%",
+        subtitle: "95%",
         tooltip: "profit-split",
         values: {
           10000: "95%",
           25000: "95%",
           50000: "95%",
           100000: "95%",
-          200000: "95%"
+          200000: "95%",
+          500000: "95%"
         }
       },
       {
@@ -607,11 +616,12 @@ const challengeData: ChallengeData = {
         subtitle: "",
         tooltip: "trading-days",
         values: {
-          10000: "0 Days",
-          25000: "0 Days",
-          50000: "0 Days",
-          100000: "0 Days",
-          200000: "0 Days"
+          10000: "None",
+          25000: "None",
+          50000: "None",
+          100000: "None",
+          200000: "None",
+          500000: "None"
         }
       },
       {
@@ -619,11 +629,12 @@ const challengeData: ChallengeData = {
         subtitle: "",
         tooltip: "payout-eligibility",
         values: {
-          10000: "On-demand",
-          25000: "On-demand",
-          50000: "On-demand",
-          100000: "On-demand",
-          200000: "On-demand"
+          10000: "On demand, up to $5,000",
+          25000: "On demand, up to $5,000",
+          50000: "On demand, up to $5,000",
+          100000: "On demand, up to $5,000",
+          200000: "On demand, up to $5,000",
+          500000: "On demand, up to $5,000"
         }
       }
     ]
@@ -913,7 +924,7 @@ export default function PricingTable() {
     standard: ['15% max drawdown', 'On-demand payouts', 'No min days'],
     onestep: ['Single phase', 'On-demand payouts', 'No min days'],
     instant: ['No daily loss limit', 'On-demand payouts', 'No min days'],
-    gauntlet: ['$19.99 to start', 'On-demand payouts', 'No min days'],
+    gauntlet: ['$1 to start', 'On-demand payouts', 'No min days'],
   };
 
   return (

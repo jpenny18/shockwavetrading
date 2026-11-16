@@ -78,23 +78,23 @@ const PLANS: Record<
     checkoutType: 'Gauntlet',
     name: 'Gauntlet Challenge',
     description: 'Start for a small entry fee. The activation fee is charged only after you pass.',
-    perks: ['$19.99 to start', 'On-demand payouts', 'No min days'],
+    perks: ['$1 to start', 'On-demand payouts', 'No min days'],
     accounts: [10000, 25000, 50000, 100000, 200000, 500000],
     prices: {
-      10000: 19.99,
-      25000: 19.99,
-      50000: 19.99,
-      100000: 19.99,
-      200000: 19.99,
-      500000: 19.99,
+      10000: 1,
+      25000: 1,
+      50000: 1,
+      100000: 1,
+      200000: 1,
+      500000: 1,
     },
     activationFees: {
       10000: 199,
-      25000: 299,
-      50000: 499,
-      100000: 799,
-      200000: 1499,
-      500000: 2999,
+      25000: 349,
+      50000: 599,
+      100000: 999,
+      200000: 1899,
+      500000: 4499,
     },
   },
 };
@@ -217,7 +217,7 @@ export default function BlackFridayPricing() {
 
   const dailyRate = plan === 'standard' || plan === 'gauntlet' ? 0.08 : plan === 'onestep' ? 0.04 : 0;
   const maxRate = plan === 'standard' || plan === 'gauntlet' ? 0.15 : plan === 'onestep' ? 0.08 : 0.04;
-  const targetRate = plan === 'instant' ? 0.12 : 0.1;
+  const targetRate = plan === 'instant' ? 0.12 : plan === 'gauntlet' ? 0.04 : 0.1;
   const price = data.prices[activeAccount];
   const activation = data.activationFees?.[activeAccount];
 
@@ -371,7 +371,8 @@ export default function BlackFridayPricing() {
                 <div data-account-track="" className="flex w-max origin-top-left scale-[0.85] gap-3 md:contents">
                 {data.accounts.map((account) => {
                   const original = data.prices[account];
-                  const sale = salePrice(original);
+                  const onSale = plan !== 'gauntlet';
+                  const sale = onSale ? salePrice(original) : original;
                   const popular = account === DEFAULT_ACCOUNT;
                   const selected = account === selectedAccount;
                   return (
@@ -397,13 +398,15 @@ export default function BlackFridayPricing() {
                         <p className={`text-[11px] font-semibold tracking-[0.16em] text-white/45 ${popular ? 'mt-2' : ''}`}>
                           {sizeLabel(account)} ACCOUNT
                         </p>
-                        <p className="mt-3 text-sm text-white/35 line-through tabular-nums">{formatPrice(original)}</p>
-                        <p className="mt-0.5 text-[1.65rem] font-bold leading-none tracking-tight text-[#0FF1CE] tabular-nums">
+                        {onSale && <p className="mt-3 text-sm text-white/35 line-through tabular-nums">{formatPrice(original)}</p>}
+                        <p className={`${onSale ? 'mt-0.5' : 'mt-3'} text-[1.65rem] font-bold leading-none tracking-tight text-[#0FF1CE] tabular-nums`}>
                           {formatPrice(sale)}
                         </p>
-                        <span className="mt-3 inline-flex whitespace-nowrap rounded-full border border-[#0FF1CE]/40 px-1.5 py-1 text-[9px] font-bold leading-none tracking-tight text-[#0FF1CE]">
-                          {SALE_PERCENT}% OFF + 1 FREE RETRY
-                        </span>
+                        {onSale && (
+                          <span className="mt-3 inline-flex whitespace-nowrap rounded-full border border-[#0FF1CE]/40 px-1.5 py-1 text-[9px] font-bold leading-none tracking-tight text-[#0FF1CE]">
+                            {SALE_PERCENT}% OFF + 1 FREE RETRY
+                          </span>
+                        )}
                       </button>
                       <button
                         type="button"

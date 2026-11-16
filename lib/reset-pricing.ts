@@ -2,6 +2,7 @@
  * Reset fees for an existing trading account.
  *
  * Challenge (not yet funded): 20% off the one-time fee from PricingTable / the challenge checkout.
+ * Gauntlet challenges are the $1 entry fee with no reset discount.
  * Funded: the gauntlet activation price itself, with no extra discount.
  * VIP: 20% off the VIP allocation fee. A $1.5M allocation is half of the $3M fee, then 20% off.
  *
@@ -13,6 +14,7 @@
  * - app/components/PricingTable.tsx
  * - app/challenge/page.tsx calculatePrice
  * - app/gauntlet-activation/page.tsx ACTIVATION_OPTIONS
+ * - app/funded-activation/page.tsx keeps the direct-to-funded list and is not a reset price
  * - app/vip/config.ts VIP_OPTIONS + VIP_RESET_DISCOUNT_PERCENT
  */
 
@@ -59,22 +61,22 @@ const CHALLENGE_PRICES: Record<Exclude<ResetAccountType, 'vip'>, Record<number, 
     500000: 10498.5,
   },
   gauntlet: {
-    10000: 19.99,
-    25000: 19.99,
-    50000: 19.99,
-    100000: 19.99,
-    200000: 19.99,
-    500000: 19.99,
+    10000: 1,
+    25000: 1,
+    50000: 1,
+    100000: 1,
+    200000: 1,
+    500000: 1,
   },
 };
 
 const FUNDED_ACTIVATION_PRICES: Record<number, number> = {
   10000: 199,
-  25000: 299,
-  50000: 499,
-  100000: 799,
-  200000: 1499,
-  500000: 2999,
+  25000: 349,
+  50000: 599,
+  100000: 999,
+  200000: 1899,
+  500000: 4499,
 };
 
 const CATALOG_LABEL: Record<Exclude<ResetAccountType, 'vip'>, ResetCatalogType> = {
@@ -234,6 +236,8 @@ export function getResetQuote(account: ResetAccountInput): ResetQuote | null {
   const originalPrice = CHALLENGE_PRICES[accountType][accountSize];
   if (!originalPrice) return null;
   const catalogType = CATALOG_LABEL[accountType];
+  const gauntletChallenge = accountType === 'gauntlet';
+  const discountPercent = gauntletChallenge ? 0 : CHALLENGE_RESET_DISCOUNT_PERCENT;
   return {
     category: 'challenge',
     categoryLabel: 'Challenge',
@@ -246,9 +250,9 @@ export function getResetQuote(account: ResetAccountInput): ResetQuote | null {
     platform,
     tierName: null,
     originalPrice,
-    price: priceAfterPercentOff(originalPrice, CHALLENGE_RESET_DISCOUNT_PERCENT),
-    discountPercent: CHALLENGE_RESET_DISCOUNT_PERCENT,
-    feeNote: `${CHALLENGE_RESET_DISCOUNT_PERCENT}% off the challenge fee`,
+    price: gauntletChallenge ? originalPrice : priceAfterPercentOff(originalPrice, discountPercent),
+    discountPercent,
+    feeNote: gauntletChallenge ? 'Gauntlet entry fee' : `${discountPercent}% off the challenge fee`,
   };
 }
 

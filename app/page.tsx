@@ -369,7 +369,7 @@ const ShockwaveSundayModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: (
                         <div className="w-2 h-2 bg-[#0FF1CE] rounded-full"></div>
                         <div>
                           <div className="text-xs text-gray-400">Profit Target</div>
-                          <div className="text-white font-bold">10%</div>
+                          <div className="text-white font-bold">4%</div>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -596,11 +596,11 @@ export default function ShockwaveLandingPage() {
 
               {/* CTA Buttons */}
               <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-6 max-w-sm md:max-w-[600px] mx-auto w-full mb-8 md:mb-10">
-                <Link href="/challenge">
+                <a href="#pricing">
                   <button className="px-10 py-3 md:py-4 bg-[#0FF1CE] text-black text-sm md:text-lg font-bold rounded-lg hover:scale-105 transition-transform w-full md:w-[300px]">
                     START CHALLENGE
-                  </button>             
-                </Link>
+                  </button>
+                </a>
               </div>
             </div>
        

@@ -31,7 +31,7 @@ const ACCOUNTS = [
   { id: 'std-50', name: '50K SHOCKWAVE CHALLENGE', start: 50000, dailyPct: 0.08, maxDdPct: 0.15, targetPct: 0.1 },
   { id: 'onestep-100', name: '100K SHOCKWAVE 1-STEP', start: 100000, dailyPct: 0.04, maxDdPct: 0.08, targetPct: 0.1 },
   { id: 'instant-25', name: '25K SHOCKWAVE INSTANT', start: 25000, dailyPct: 0.04, maxDdPct: 0.04, targetPct: 0.12 },
-  { id: 'gauntlet-100', name: '100K SHOCKWAVE GAUNTLET', start: 100000, dailyPct: 0.08, maxDdPct: 0.15, targetPct: 0.1 },
+  { id: 'gauntlet-100', name: '100K SHOCKWAVE GAUNTLET', start: 100000, dailyPct: 0.08, maxDdPct: 0.15, targetPct: 0.04 },
 ] as const;
 
 const ORDER_TYPES = ['Market', 'Limit', 'Stop'] as const;

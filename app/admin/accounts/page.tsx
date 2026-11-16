@@ -679,7 +679,7 @@ export default function AdminAccountsPage() {
       } else {
         // Regular challenge account checks
         const targetProfit = config.accountType === '1-step' ? 10 :  // 1-step: 10%
-                           config.accountType === 'gauntlet' ? 10 :  // Gauntlet: 10%
+                           config.accountType === 'gauntlet' ? 4 :  // Gauntlet: 4%
                            config.accountType === 'standard' 
           ? (config.step === 1 ? 10 : 5)  // Standard: Step 1 = 10%, Step 2 = 5%
           : 12;  // Instant: 12%
@@ -2486,7 +2486,7 @@ export default function AdminAccountsPage() {
               );
               const profitPercent = config && metrics ? ((metrics.balance - config.accountSize) / config.accountSize * 100) : 0;
               const targetProfit = config?.accountType === '1-step' ? 10 :
-                                   config?.accountType === 'gauntlet' ? 10 :
+                                   config?.accountType === 'gauntlet' ? 4 :
                                    config?.accountType === 'standard'
                                      ? (config.step === 1 ? 10 : 5)
                                      : 12;
@@ -2884,7 +2884,7 @@ export default function AdminAccountsPage() {
                   // Check if account has passed objectives
                   const profitPercent = config && metrics ? ((metrics.balance - config.accountSize) / config.accountSize * 100) : 0;
                   const targetProfit = config?.accountType === '1-step' ? 10 :
-                                     config?.accountType === 'gauntlet' ? 10 : // Gauntlet: 10%
+                                     config?.accountType === 'gauntlet' ? 4 : // Gauntlet: 4%
                                      config?.accountType === 'standard' 
                                        ? (config.step === 1 ? 10 : 5)
                                        : 12; // Instant: 12%
@@ -3506,9 +3506,9 @@ export default function AdminAccountsPage() {
                                   // Auto-populate account form with order details
                                   setAccountForm(prev => ({
                                     ...prev,
-                                    accountType: order.challengeType?.toLowerCase().includes('instant') ? 'instant' : 
-                                                order.challengeType?.toLowerCase().includes('1-step') ? '1-step' : 
-                                                order.challengeType?.toLowerCase().includes('gauntlet') ? 'gauntlet' : 'standard',
+                                    accountType: order.challengeType?.toLowerCase().includes('instant') ? 'instant' :
+                                                order.challengeType?.toLowerCase().includes('1-step') ? '1-step' :
+                                                (order.challengeType?.toLowerCase().includes('gauntlet') || order.challengeType?.toLowerCase().includes('activate-funded')) ? 'gauntlet' : 'standard',
                                     accountSize: parseInt(order.challengeAmount?.replace(/[^0-9]/g, '') || '10000'),
                                     platform: (order.platform?.toLowerCase() || 'mt5') as 'mt4' | 'mt5'
                                   }));
@@ -3957,7 +3957,7 @@ export default function AdminAccountsPage() {
                                           ...prev,
                                           accountType: order.challengeType.toLowerCase().includes('instant') ? 'instant' : 
                                                       order.challengeType.toLowerCase().includes('1-step') ? '1-step' : 
-                                                      order.challengeType.toLowerCase().includes('gauntlet') ? 'gauntlet' : 'standard',
+                                                      (order.challengeType.toLowerCase().includes('gauntlet') || order.challengeType.toLowerCase().includes('activate-funded')) ? 'gauntlet' : 'standard',
                                           accountSize: parseInt(order.challengeAmount.replace(/[^0-9]/g, '')),
                                           platform: order.platform.toLowerCase() as 'mt4' | 'mt5'
                                         }));

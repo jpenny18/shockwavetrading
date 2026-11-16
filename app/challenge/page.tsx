@@ -59,7 +59,7 @@ const challengeTypes = [
     image: '/shockwavegauntlet.png',
     description: 'Pay when you pass - ultimate freedom',
     badge: 'PAY WHEN YOU PASS',
-    features: ['$19.99 Entry Fee', 'No Restrictions', 'Activation Fee on Pass']
+    features: ['$1 Entry Fee', 'No Restrictions', 'Activation Fee on Pass']
   }
 ];
 
@@ -197,6 +197,21 @@ const addOns: AddOn[] = [
   // }
 ];
 
+const GAUNTLET_ACTIVATION_FEES: Record<number, number> = {
+  10000: 199,
+  25000: 349,
+  50000: 599,
+  100000: 999,
+  200000: 1899,
+  500000: 4499,
+};
+
+const formatGauntletActivation = (amount: string | null): string => {
+  const size = parseInt((amount || '').replace(/\$|,/g, ''), 10);
+  const fee = GAUNTLET_ACTIVATION_FEES[size];
+  return fee ? `$${fee.toLocaleString('en-US')} after you pass` : 'After you pass';
+};
+
 // Function to calculate price based on challenge type and amount
 const calculatePrice = (type: ChallengeType, amount: string): number => {
   const baseAmount = parseInt(amount.replace(/\$|,/g, ''));
@@ -236,14 +251,15 @@ const calculatePrice = (type: ChallengeType, amount: string): number => {
         default: return 0;
       }
     case 'Gauntlet':
-      // All Gauntlet challenges cost $19.99 regardless of size
+      // Every Gauntlet size has a $1 entry fee. The activation fee is charged after a pass.
       switch(baseAmount) {
-        case 10000: return 19.99;
-        case 25000: return 19.99;
-        case 50000: return 19.99;
-        case 100000: return 19.99;
-        case 200000: return 19.99;
-        case 500000: return 19.99;
+        case 10000:
+        case 25000:
+        case 50000:
+        case 100000:
+        case 200000:
+        case 500000:
+          return 1;
         default: return 0;
       }
     default:
@@ -260,7 +276,7 @@ const calculateTableValues = (selectedType: ChallengeType | null, selectedAmount
   return {
     maxDailyLoss: baseAmount * (selectedType === 'Standard' ? 0.08 : selectedType === '1-Step' ? 0.04 : selectedType === 'Gauntlet' ? 0.08 : 0.04),
     maxLoss: baseAmount * (selectedType === 'Standard' ? 0.15 : selectedType === '1-Step' ? 0.08 : selectedType === 'Gauntlet' ? 0.15 : 0.04),
-    profitTargetStep1: baseAmount * (selectedType === 'Standard' ? 0.10 : selectedType === '1-Step' ? 0.10 : selectedType === 'Gauntlet' ? 0.10 : 0.12),
+    profitTargetStep1: baseAmount * (selectedType === 'Standard' ? 0.10 : selectedType === '1-Step' ? 0.10 : selectedType === 'Gauntlet' ? 0.04 : 0.12),
     profitTargetStep2: baseAmount * (selectedType === 'Standard' ? 0.05 : 0)
   };
 };
@@ -311,6 +327,7 @@ export default function ChallengePage() {
   const [showDiscountInput, setShowDiscountInput] = useState(false);
   const [autoAppliedCode, setAutoAppliedCode] = useState<string | null>(null);
   const discountTouchedRef = useRef(false);
+  const gauntletLockRef = useRef(false);
   const step1Ref = useRef<HTMLDivElement>(null);
   const step2Ref = useRef<HTMLDivElement>(null);
   const step3Ref = useRef<HTMLDivElement>(null);
@@ -443,6 +460,7 @@ export default function ChallengePage() {
         mappedType = '1-Step';
       } else if (preselectedType === 'Gauntlet') {
         mappedType = 'Gauntlet';
+        gauntletLockRef.current = true;
       }
       setSelectedType(mappedType);
       sessionStorage.removeItem('preselectedChallengeType');
@@ -475,7 +493,7 @@ export default function ChallengePage() {
           return bTime - aTime;
         })[0];
 
-        if (!discount || discountTouchedRef.current) return;
+        if (!discount || discountTouchedRef.current || gauntletLockRef.current) return;
         if (discount.expiresAt && new Date() > discount.expiresAt.toDate()) return;
         if (discount.usageLimit !== null && discount.usageCount >= discount.usageLimit) return;
 
@@ -498,9 +516,21 @@ export default function ChallengePage() {
   // Calculate table values when selectedType or selectedAmount changes
   const tableValues = calculateTableValues(selectedType, selectedAmount);
 
+  const clearGauntletDiscount = () => {
+    gauntletLockRef.current = true;
+    discountTouchedRef.current = true;
+    setAppliedDiscount(null);
+    setDiscountCode('');
+    setAutoAppliedCode(null);
+    setShowDiscountInput(false);
+    setFormErrors((prev) => ({ ...prev, discountCode: undefined }));
+  };
+
   const handleTypeSelect = (type: ChallengeType) => {
     setSelectedType(type);
     setSelectedAmount(null);
+    if (type === 'Gauntlet') clearGauntletDiscount();
+    else gauntletLockRef.current = false;
     setTimeout(() => scrollToStep(2, true), 150);
   };
 
@@ -540,6 +570,10 @@ export default function ChallengePage() {
   };
 
   const validateDiscountCode = async (code: string) => {
+    if (selectedType === 'Gauntlet' || gauntletLockRef.current) {
+      clearGauntletDiscount();
+      return;
+    }
     if (!code) {
       setAppliedDiscount(null);
       return;
@@ -607,6 +641,7 @@ export default function ChallengePage() {
     const basePrice = calculatePrice(selectedType, selectedAmount);
     const addOnsPrice = calculateAddOnsPrice(basePrice);
     const priceWithAddOns = basePrice + addOnsPrice;
+    if (selectedType === 'Gauntlet') return priceWithAddOns;
     return calculateDiscountedPrice(priceWithAddOns, appliedDiscount);
   };
 
@@ -967,7 +1002,7 @@ export default function ChallengePage() {
             challengeAmount: selectedAmount,
             platform: selectedPlatform,
             addOns: selectedAddOns,
-            discountCode: appliedDiscount?.code || '',
+            discountCode: selectedType === 'Gauntlet' ? '' : (appliedDiscount?.code || ''),
             expectedAmount,
           }),
         });
@@ -1320,7 +1355,7 @@ export default function ChallengePage() {
 
           {showCheckoutExtras && (
             <div className="mt-8 space-y-4 flex-1 flex flex-col">
-              {renderDiscountSection()}
+              {selectedType !== 'Gauntlet' && renderDiscountSection()}
 
               <div className="hidden rounded-[18px] border border-white/10 bg-black/30 p-4 lg:block">
                 {renderPriceSection()}
@@ -1447,7 +1482,8 @@ export default function ChallengePage() {
     const basePrice = calculatePrice(selectedType, selectedAmount);
     const addOnsPrice = calculateAddOnsPrice(basePrice);
     const subtotal = basePrice + addOnsPrice;
-    const finalPrice = calculateDiscountedPrice(subtotal, appliedDiscount);
+    const discountForPrice = selectedType === 'Gauntlet' ? null : appliedDiscount;
+    const finalPrice = calculateDiscountedPrice(subtotal, discountForPrice);
     
     return (
       <div className="space-y-2">
@@ -1478,13 +1514,13 @@ export default function ChallengePage() {
           </>
         )}
         
-        {appliedDiscount && (
+        {discountForPrice && (
           <div className="flex justify-between items-center text-[#0FF1CE]">
             <span>Discount:</span>
             <span>
-              -{appliedDiscount.type === 'percentage' 
-                ? `${appliedDiscount.value}%` 
-                : `$${appliedDiscount.value}`}
+              -{discountForPrice.type === 'percentage' 
+                ? `${discountForPrice.value}%` 
+                : `$${discountForPrice.value}`}
             </span>
           </div>
         )}
@@ -1499,8 +1535,70 @@ export default function ChallengePage() {
     );
   };
 
+  const renderGauntletRules = () => {
+    const money = (value?: number) => (typeof value === 'number' ? `$${value.toLocaleString()}` : '');
+    const withAmount = (label: string, value?: number) => (value ? `${label} · ${money(value)}` : label);
+    const challengeRows = [
+      ['Profit target', withAmount('4%', tableValues?.profitTargetStep1)],
+      ['Maximum daily drawdown', withAmount('8%', tableValues?.maxDailyLoss)],
+      ['Maximum overall drawdown', withAmount('15%', tableValues?.maxLoss)],
+      ['Drawdown type', 'Static'],
+      ['Minimum trading days', 'None'],
+      ['Trading period', 'Unlimited'],
+      ['Consistency rule', 'None'],
+      ['Leverage', '1:200'],
+      ['News trading', 'Allowed'],
+      ['Weekend holding', 'Allowed'],
+      ['Expert advisors', 'Allowed'],
+      ['Entry fee', '$1'],
+      ['Activation fee', formatGauntletActivation(selectedAmount)],
+    ];
+    const fundedRows = [
+      ['Profit target', 'None'],
+      ['Maximum daily drawdown', withAmount('8%', tableValues?.maxDailyLoss)],
+      ['Maximum overall drawdown', withAmount('15%', tableValues?.maxLoss)],
+      ['Drawdown type', 'Static'],
+      ['Minimum trading days', 'None'],
+      ['Trading period', 'Unlimited'],
+      ['Consistency rule', 'None'],
+      ['Profit split', '95%'],
+      ['Payouts', 'On demand. First payout up to $5,000, then no limit'],
+      ['Maximum open risk', '2% of account equity'],
+      ['Leverage', '1:200'],
+      ['News trading', 'Allowed'],
+      ['Weekend holding', 'Allowed'],
+      ['Expert advisors', 'Allowed'],
+    ];
+
+    const RuleColumn = ({ title, rows }: { title: string; rows: string[][] }) => (
+      <section className="overflow-hidden rounded-2xl border border-white/10 bg-black/30">
+        <h4 className="bg-[#0FF1CE] px-4 py-3 text-center text-xs font-bold uppercase tracking-[0.16em] text-black">{title}</h4>
+        <dl>
+          {rows.map(([label, value]) => (
+            <div key={label} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-3 border-t border-white/10 px-4 py-3 text-sm first:border-t-0">
+              <dt className="text-white/50">{label}</dt>
+              <dd className="text-right font-medium text-white">{value}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+    );
+
+    return (
+      <div className="rounded-[22px] border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl md:p-6">
+        <p className="text-center text-[11px] font-bold uppercase tracking-[0.22em] text-[#0FF1CE]">Gauntlet</p>
+        <h3 className="mb-5 mt-2 text-center text-xl font-semibold tracking-tight text-white">Rules</h3>
+        <div className="grid gap-4">
+          <RuleColumn title="Challenge" rows={challengeRows} />
+          <RuleColumn title="Funded" rows={fundedRows} />
+        </div>
+      </div>
+    );
+  };
+
   const renderChallengeTable = () => {
     if (!selectedType) return null;
+    if (selectedType === 'Gauntlet') return renderGauntletRules();
 
     return (
       <div className="rounded-[22px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl">
@@ -1523,11 +1621,6 @@ export default function ChallengePage() {
                 <div className="col-span-2 grid grid-cols-2 bg-[#0FF1CE]">
                   <div className="p-3 md:p-4 border-r border-black/20 text-black font-bold"></div>
                   <div className="p-3 md:p-4 text-center text-black font-bold">FUNDED</div>
-                </div>
-              ) : selectedType === 'Gauntlet' ? (
-                <div className="col-span-2 grid grid-cols-2 bg-gradient-to-r from-[#FF6B6B] to-[#EE5A24]">
-                  <div className="p-3 md:p-4 border-r border-black/20 text-white font-bold"></div>
-                  <div className="p-3 md:p-4 text-center text-white font-bold">GAUNTLET</div>
                 </div>
               ) : (
                 <div className="col-span-2 grid grid-cols-2 bg-[#0FF1CE]">
@@ -1656,42 +1749,6 @@ export default function ChallengePage() {
                     </div>
                   ))}
                 </>
-              ) : selectedType === 'Gauntlet' ? (
-                <>
-                  {[
-                    ['Trading Period', 'Unlimited'],
-                    ['Minimum Trading Days', '0 Days'],
-                    ['Maximum Daily Loss', 
-                      <div key="daily" className="flex flex-col items-center">
-                        <span className="text-[#FF6B6B] font-bold text-base md:text-lg">8%</span>
-                        <span className="text-white text-[10px] md:text-xs mt-1 bg-[#FF6B6B]/20 px-2 py-0.5 rounded-full">${tableValues?.maxDailyLoss.toLocaleString()}</span>
-                      </div>
-                    ],
-                    ['Maximum Loss', 
-                      <div key="max" className="flex flex-col items-center">
-                        <span className="text-[#FF6B6B] font-bold text-base md:text-lg">15%</span>
-                        <span className="text-white text-[10px] md:text-xs mt-1 bg-[#FF6B6B]/20 px-2 py-0.5 rounded-full">${tableValues?.maxLoss.toLocaleString()}</span>
-                      </div>
-                    ],
-                    ['Profit Target', 
-                      <div key="profit" className="flex flex-col items-center">
-                        <span className="text-[#FF6B6B] font-bold text-base md:text-lg">10%</span>
-                        <span className="text-white text-[10px] md:text-xs mt-1 bg-[#FF6B6B]/20 px-2 py-0.5 rounded-full">${tableValues?.profitTargetStep1.toLocaleString()}</span>
-                      </div>
-                    ],
-                    ['Leverage', '1:200'],
-                    ['Trading Rules', 'No Restrictions'],
-                    ['News Trading', 'Allowed'],
-                    ['Entry Fee', '$19.99'],
-                    ['Activation Fee', 'Pay When You Pass'],
-                    ['Profit Split', 'Up to 95%']
-                  ].map((row, index) => (
-                    <div key={index} className={`contents text-white ${index % 2 === 0 ? 'bg-[#ffffff08]' : 'bg-[#FF6B6B]/[0.08]'}`}>
-                      <div className="p-3 md:p-4 border-t border-white/10 font-medium text-sm md:text-xs">{row[0]}</div>
-                      <div className="p-3 md:p-4 border-t border-l border-white/10 text-center text-sm md:text-xs">{row[1]}</div>
-                    </div>
-                  ))}
-                </>
               ) : null}
             </div>
           </div>
@@ -1752,7 +1809,7 @@ export default function ChallengePage() {
         {/* Challenge Selection Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* First Card - Challenge Selection */}
-          <div className="rounded-[22px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl lg:col-span-7">
+          <div className="order-1 rounded-[22px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl lg:col-span-7">
             <div ref={step1Ref} className="flex gap-3 sm:gap-4 mb-2">
               {renderStepRail(1)}
               <div className="flex-1 min-w-0 pb-8">
@@ -1872,7 +1929,7 @@ export default function ChallengePage() {
           </div>
 
           {/* Second Card - Challenge Details */}
-          <div className="lg:col-span-5 relative">
+          <div className="relative order-3 lg:order-2 lg:col-span-5">
             {/* Sticky container for desktop */}
             <div className="lg:sticky lg:top-8">
               {/* Sticky Price Display - Desktop Only */}
@@ -1892,7 +1949,7 @@ export default function ChallengePage() {
                   </div>
                   
                   {/* Show price breakdown if there are add-ons or discount */}
-                  {(selectedAddOns.length > 0 || appliedDiscount) && (
+                  {(selectedAddOns.length > 0 || (appliedDiscount && selectedType !== 'Gauntlet')) && (
                     <div className="mt-4 border-t border-white/10 pt-4">
                       {renderPriceSection()}
                     </div>
@@ -1904,12 +1961,11 @@ export default function ChallengePage() {
               {renderChallengeTable()}
             </div>
           </div>
-        </div>
 
-        {/* Personal Information Section - Full Width Mobile First */}
+        {/* Sign-in sits above the rules table on mobile, and below the two-column layout on desktop. */}
         <div
           ref={step5Ref}
-          className="mt-8 rounded-[22px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl lg:mt-12 lg:p-8"
+          className="order-2 mt-2 rounded-[22px] border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl lg:order-3 lg:col-span-12 lg:mt-4 lg:p-8"
         >
           <div className="mb-6 text-center">
             <div className="mb-3 flex items-center justify-center gap-3">
@@ -2423,6 +2479,7 @@ export default function ChallengePage() {
               </p>
             )}
 
+            {selectedType !== 'Gauntlet' && (
             <button
               type="button"
               onClick={handleProceedToPayment}
@@ -2438,19 +2495,21 @@ export default function ChallengePage() {
                 <span>{isLinkingAccount ? 'Preparing payment...' : 'Pay with crypto'}</span>
               </div>
             </button>
+            )}
           </div>
           )}
           {selectedType === 'Gauntlet' && (
-            <div className="mx-auto mt-4 max-w-4xl rounded-2xl border border-[#FF6B6B]/30 bg-[#FF6B6B]/10 p-4 text-center">
-              <p className="mb-1 text-sm font-bold text-[#FF6B6B]">🔥 Gauntlet Challenge</p>
+            <div className="mx-auto mt-4 max-w-4xl rounded-2xl border border-[#0FF1CE]/30 bg-[#0FF1CE]/10 p-4 text-center">
+              <p className="mb-1 text-sm font-bold text-[#0FF1CE]">Gauntlet Challenge</p>
               <p className="text-xs text-white">
-                Pay only $19.99 now. If you pass, you&apos;ll pay the activation fee to get your funded account.
+                Pay $1 now. Discounts do not apply. If you pass, the activation fee unlocks your funded account.
               </p>
               <p className="mt-1 text-xs text-gray-400">
-                Activation fees: $10k→$199, $25k→$299, $50k→$499, $100k→$799, $200k→$1,499, $500k→$2,999
+                Activation fees: $10k→$199, $25k→$349, $50k→$599, $100k→$999, $200k→$1,899, $500k→$4,499
               </p>
             </div>
           )}
+        </div>
         </div>
       </div>
       {isRedirecting && (

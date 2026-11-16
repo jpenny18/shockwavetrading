@@ -340,14 +340,14 @@ const calculatePrice = (type: ChallengeType, amount: string): number => {
         default: return 0;
       }
     case 'Gauntlet':
-      // All Gauntlet challenges cost $19.99 regardless of size
+      // All Gauntlet challenges cost $1 regardless of size
       switch(baseAmount) {
-        case 10000: return 19.99;
-        case 25000: return 19.99;
-        case 50000: return 19.99;
-        case 100000: return 19.99;
-        case 200000: return 19.99;
-        case 500000: return 19.99;
+        case 10000: return 1;
+        case 25000: return 1;
+        case 50000: return 1;
+        case 100000: return 1;
+        case 200000: return 1;
+        case 500000: return 1;
         default: return 0;
       }
     default:
@@ -1333,7 +1333,7 @@ export default function ChallengePage() {
                     ['Leverage', '1:200'],
                     ['Trading Rules', 'No Restrictions'],
                     ['News Trading', 'Allowed'],
-                    ['Entry Fee', '$19.99'],
+                    ['Entry Fee', '$1'],
                     ['Activation Fee', 'Pay When You Pass'],
                     ['Profit Split', 'Up to 95%']
                   ].map((row, index) => (
@@ -1742,10 +1742,10 @@ export default function ChallengePage() {
                 <div className="text-center mt-3 p-3 bg-[#FF6B6B]/10 border border-[#FF6B6B]/30 rounded-lg">
                   <p className="text-[#FF6B6B] font-bold text-sm mb-1">🔥 Gauntlet Challenge</p>
                   <p className="text-white text-xs">
-                    Pay only $19.99 now. If you pass, you'll pay the activation fee to get your funded account.
+                    Pay only $1 now. If you pass, you'll pay the activation fee to get your funded account.
                   </p>
                   <p className="text-gray-400 text-xs mt-1">
-                    Activation fees: $10k→$199, $25k→$299, $50k→$499, $100k→$799, $200k→$1,499, $500k→$2,999
+                    Activation fees: $10k→$199, $25k→$349, $50k→$599, $100k→$999, $200k→$1,899, $500k→$4,499
                   </p>
                 </div>
               ) : (

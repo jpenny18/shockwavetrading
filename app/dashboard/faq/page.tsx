@@ -99,7 +99,16 @@ Payouts come from live profits and our reserve pool - rarely from new challenge 
     // Challenge Questions
     {
       question: "What challenge types do you offer?",
-      answer: `We offer three challenge types:
+      answer: `We offer four challenge types:
+
+**Shockwave Gauntlet**:
+• $1 entry fee. The activation fee is charged only after you pass
+• 4% profit target
+• 15% maximum drawdown and 8% daily drawdown, both static
+• No minimum trading days, no consistency rule, unlimited trading period
+• 1:200 leverage
+• News trading, weekend holding, and expert advisors are allowed
+• Funded stage: no profit target, 95% profit split, payouts on demand up to $5,000 on the first payout and no limit after, with maximum aggregate open risk of 2% of account equity
 
 **Shockwave Challenge (2-Step)**:
 • Unlimited trading period

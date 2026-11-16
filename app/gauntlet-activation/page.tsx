@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Particles from '../components/Particles';
 import Header from '../components/Header';
 import { Check, ChevronDown, Bitcoin, CreditCard } from 'lucide-react';
@@ -36,20 +36,20 @@ type ActivationMode = 'activate' | 'reset';
 
 // Reset accounts get 12% off the activation fee
 const RESET_DISCOUNT = 0.12;
-// Black Friday takes 50% off the activation fee
-const BLACK_FRIDAY_DISCOUNT = 0.5;
 
 const PAYOUT_RULES: { feature: string; value: string }[] = [
-  { feature: 'First payout', value: '7 calendar days after your first trade' },
-  { feature: 'Subsequent payouts', value: 'On demand' },
-  { feature: 'Minimum between requests', value: '24 hours' },
-  { feature: 'Minimum withdrawal', value: '$100' },
-  { feature: 'Profit split', value: '90%' },
+  { feature: 'Profit split', value: '95%' },
+  { feature: 'Payouts', value: 'On demand. First payout up to $5,000, then no limit' },
   { feature: 'Minimum trading days', value: 'None' },
   { feature: 'Consistency rule', value: 'None' },
-  { feature: 'Minimum profit target', value: 'None' },
-  { feature: 'Payout processing', value: 'Within 1 hour' },
-  { feature: 'Maximum withdrawal cap', value: 'None, subject to available profits' },
+  { feature: 'Profit target', value: 'None' },
+  { feature: 'Maximum daily drawdown', value: '8% static' },
+  { feature: 'Maximum overall drawdown', value: '15% static' },
+  { feature: 'Maximum open risk', value: '2% of account equity' },
+  { feature: 'Leverage', value: '1:200' },
+  { feature: 'News trading', value: 'Allowed' },
+  { feature: 'Weekend holding', value: 'Allowed' },
+  { feature: 'Expert advisors', value: 'Allowed' },
 ];
 
 function formatUsd(amount: number): string {
@@ -59,7 +59,7 @@ function formatUsd(amount: number): string {
 const ACTIVATION_OPTIONS: ActivationOption[] = [
   {
     level: '$10k',
-    price: 349,
+    price: 199,
     whopCheckoutUrl: 'https://whop.com/checkout/plan_gYWVAVyu65Zwa',
     features: [
       '$10,000 Simulated Capital',
@@ -72,7 +72,7 @@ const ACTIVATION_OPTIONS: ActivationOption[] = [
   },
   {
     level: '$25k',
-    price: 699,
+    price: 349,
     whopCheckoutUrl: 'https://whop.com/checkout/plan_4JiIRmkyRqjq8',
     features: [
       '$25,000 Simulated Capital',
@@ -85,7 +85,7 @@ const ACTIVATION_OPTIONS: ActivationOption[] = [
   },
   {
     level: '$50k',
-    price: 1299,
+    price: 599,
     whopCheckoutUrl: 'https://whop.com/checkout/plan_9t46Mcti2Gl1G',
     features: [
       '$50,000 Simulated Capital',
@@ -98,7 +98,7 @@ const ACTIVATION_OPTIONS: ActivationOption[] = [
   },
   {
     level: '$100k',
-    price: 2499,
+    price: 999,
     whopCheckoutUrl: 'https://whop.com/checkout/plan_mYd9abFhGM9Mg',
     features: [
       '$100,000 Simulated Capital',
@@ -111,7 +111,7 @@ const ACTIVATION_OPTIONS: ActivationOption[] = [
   },
   {
     level: '$200k',
-    price: 4999,
+    price: 1899,
     whopCheckoutUrl: 'https://whop.com/checkout/plan_ArcXmNChT9aLe',
     features: [
       '$200,000 Simulated Capital',
@@ -124,7 +124,7 @@ const ACTIVATION_OPTIONS: ActivationOption[] = [
   },
   {
     level: '$500k',
-    price: 11999,
+    price: 4499,
     features: [
       '$500,000 Simulated Capital',
       '15% Max Drawdown',
@@ -137,6 +137,7 @@ const ACTIVATION_OPTIONS: ActivationOption[] = [
 ];
 
 function GauntletActivationContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [selectedOption, setSelectedOption] = useState<ActivationOption | null>(null);
   const [activationMode, setActivationMode] = useState<ActivationMode>('activate');
@@ -167,13 +168,6 @@ function GauntletActivationContent() {
         return normalizedLevel === normalizedParam;
       })
     : ACTIVATION_OPTIONS;
-
-  // Auto-select if only one option available
-  useEffect(() => {
-    if (filteredOptions.length === 1 && !selectedOption) {
-      setSelectedOption(filteredOptions[0]);
-    }
-  }, [filteredOptions, selectedOption]);
 
   // Fetch crypto prices
   useEffect(() => {
@@ -240,14 +234,8 @@ function GauntletActivationContent() {
   };
 
   const handleSelectOption = (option: ActivationOption) => {
-    setSelectedOption(option);
-    setShowPayment(false);
-    // On mobile, auto-scroll to the information section once it has rendered
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
-      setTimeout(() => {
-        document.getElementById('information-section')?.scrollIntoView({ behavior: 'smooth' });
-      }, 150);
-    }
+    const params = new URLSearchParams({ level: option.level, mode: activationMode });
+    router.push(`/gauntlet-activation/information?${params.toString()}`);
   };
 
   const handleModeSelect = (mode: ActivationMode) => {
@@ -255,10 +243,10 @@ function GauntletActivationContent() {
     setShowPayment(false);
   };
 
-  // Activate: 50% off for Black Friday. Reset: 12% off the list price.
+  // Activation charges the list price. Reset is 12% off that price.
   const getEffectivePrice = (option: ActivationOption): number => {
-    const discount = activationMode === 'reset' ? RESET_DISCOUNT : BLACK_FRIDAY_DISCOUNT;
-    return Math.round(option.price * (1 - discount) * 100) / 100;
+    if (activationMode !== 'reset') return option.price;
+    return Math.round(option.price * (1 - RESET_DISCOUNT) * 100) / 100;
   };
 
   const isReset = activationMode === 'reset';
@@ -384,7 +372,7 @@ function GauntletActivationContent() {
                     <p className="mt-1 text-sm text-white/50">{orderLabel} - {selectedOption.level}</p>
                   </div>
                   <div className="shrink-0 text-right">
-                    <div className="text-sm text-white/40 line-through">${formatUsd(selectedOption.price)}</div>
+                    {isReset && <div className="text-sm text-white/40 line-through">${formatUsd(selectedOption.price)}</div>}
                     <div className="text-2xl font-bold text-[#0FF1CE]">${formatUsd(getEffectivePrice(selectedOption))}</div>
                     <div className="text-sm text-white/45">{feeLabel}</div>
                   </div>
@@ -493,10 +481,12 @@ function GauntletActivationContent() {
                   <span className="text-white/50">Option:</span>
                   <span className="text-white">{isReset ? 'Reset Account' : 'Activate Account'}</span>
                 </div>
-                <div className="flex justify-between gap-4 text-sm">
-                  <span className="text-white/50">{isReset ? 'Reset Discount (12%):' : 'Black Friday (50% off):'}</span>
-                  <span className="text-[#0FF1CE]">-${formatUsd(selectedOption.price - getEffectivePrice(selectedOption))}</span>
-                </div>
+                {isReset && (
+                  <div className="flex justify-between gap-4 text-sm">
+                    <span className="text-white/50">Reset Discount (12%):</span>
+                    <span className="text-[#0FF1CE]">-${formatUsd(selectedOption.price - getEffectivePrice(selectedOption))}</span>
+                  </div>
+                )}
                 <div className="flex justify-between border-t border-white/10 pt-3">
                   <span className="font-semibold text-white">Total:</span>
                   <span className="text-xl font-bold text-[#0FF1CE]">${formatUsd(getEffectivePrice(selectedOption))}</span>
@@ -521,10 +511,7 @@ function GauntletActivationContent() {
         <div className="relative z-10 mx-auto max-w-5xl">
           <div className="mb-4 flex flex-wrap items-center justify-center gap-2 md:mb-5">
             <div className="rounded-full bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] px-4 py-1.5 text-xs font-bold text-black md:text-sm">
-              FUNDED ACTIVATION
-            </div>
-            <div className="rounded-full border border-[#0FF1CE]/40 bg-[#0FF1CE]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-wide text-[#0FF1CE] md:text-sm">
-              Black Friday · 50% off
+              GAUNTLET ACTIVATION
             </div>
           </div>
           
@@ -532,7 +519,7 @@ function GauntletActivationContent() {
             Activate Your Funded Account
           </h1>
           <p className="mx-auto mb-8 max-w-2xl text-sm text-white/60 md:text-base">
-            Skip the challenge, Pay your activation fee to unlock your funded account with zero restrictions.
+            Pay this activation fee after you pass the Gauntlet. Your funded account keeps a 15% maximum drawdown, an 8% daily drawdown, and a 95% profit split.
           </p>
 
           {/* Price Increase Notice */}
@@ -568,9 +555,9 @@ function GauntletActivationContent() {
                   "No consistency rules",
                   "News trading allowed",
                   "Hold over weekends",
-                  "EAs & Bots allowed",
-                  "No Profit Caps",
-                  "No Position size caps"
+                  "EAs and bots allowed",
+                  "95% profit split",
+                  "2% maximum open risk"
                 ].map((rule) => (
                   <div key={rule} className="group flex items-center gap-3">
                     <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#0FF1CE]/10 transition-transform group-hover:scale-110">
@@ -623,7 +610,7 @@ function GauntletActivationContent() {
           </div>
 
           <p className="mx-auto mt-6 max-w-3xl text-center text-sm leading-relaxed text-white/60">
-            The seven-day period starts with your first executed trade, not when you purchase the account. You do not need to trade on seven separate days.
+            The first payout is on demand and capped at $5,000. After that payout, there is no withdrawal limit.
           </p>
         </div>
       </section>
@@ -687,12 +674,14 @@ function GauntletActivationContent() {
                   >
                     <div className="text-center">
                       <div className="mb-2 text-2xl font-bold text-[#0FF1CE]">{option.level}</div>
-                      <div className="text-sm text-white/40 line-through">${formatUsd(option.price)}</div>
+                      {isReset && <div className="text-sm text-white/40 line-through">${formatUsd(option.price)}</div>}
                       <div className="text-3xl font-bold text-white">${formatUsd(getEffectivePrice(option))}</div>
                       <div className="mt-1 text-sm text-white/45">{feeLabel}</div>
-                      <div className="mt-2 text-[11px] font-bold uppercase tracking-wide text-[#0FF1CE]">
-                        {isReset ? '12% off' : 'Black Friday · 50% off'}
-                      </div>
+                      {isReset && (
+                        <div className="mt-2 text-[11px] font-bold uppercase tracking-wide text-[#0FF1CE]">
+                          12% off
+                        </div>
+                      )}
                     </div>
 
                     {isSelected && (
@@ -858,7 +847,7 @@ function GauntletActivationContent() {
                         <div className="text-[#0FF1CE]">{selectedOption.level} Funded Account</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm text-white/40 line-through">${formatUsd(selectedOption.price)}</div>
+                        {isReset && <div className="text-sm text-white/40 line-through">${formatUsd(selectedOption.price)}</div>}
                         <div className="text-2xl font-bold text-[#0FF1CE]">${formatUsd(getEffectivePrice(selectedOption))}</div>
                         <div className="text-sm text-white/45">{feeLabel}</div>
                       </div>

@@ -124,7 +124,9 @@ const TradingObjectivesTable = ({ objectives, accountInfo }: { objectives: Tradi
   
   const rows = [
     { 
-      label: isFunded ? 'Min Trading Days (0.5% gain required)' : 'Min Trading Days', 
+      label: isFunded
+        ? (accountInfo?.accountType === 'gauntlet' ? 'Min Trading Days' : 'Min Trading Days (0.5% gain required)')
+        : 'Min Trading Days', 
       target: objectives.minTradingDays.target,
       current: objectives.minTradingDays.current,
       passed: objectives.minTradingDays.passed,
@@ -756,11 +758,12 @@ export default function AdminAccountDetailsPage() {
             // Funded account objectives
             const profitPercent = ((cachedData.balance - accountData.accountSize) / accountData.accountSize) * 100;
             
+            const gauntletFunded = accountData.accountType === 'gauntlet';
             setObjectives({
               minTradingDays: {
-                target: 5, // 5 days with 0.5% gain required for payout eligibility
+                target: gauntletFunded ? 0 : 5,
                 current: cachedData.tradingDays || 0,
-                passed: (cachedData.tradingDays || 0) >= 5
+                passed: gauntletFunded || (cachedData.tradingDays || 0) >= 5
               },
               maxDrawdown: {
                 target: 15, // 15% for funded accounts
@@ -787,12 +790,12 @@ export default function AdminAccountDetailsPage() {
             // Instant challenges have no daily drawdown limit
             const targetDailyDrawdown: number | null = accountData.accountType === 'standard' || accountData.accountType === 'gauntlet' ? 8 : 
                                        accountData.accountType === '1-step' ? 4 : null;
-            const targetProfit = accountData.accountType === 'gauntlet' ? 10 :  // Gauntlet: 10% (single phase)
+            const targetProfit = accountData.accountType === 'gauntlet' ? 4 :  // Gauntlet: 4% (single phase)
                                accountData.accountType === '1-step' ? 10 :  // 1-Step: 10%
                                accountData.accountType === 'standard' 
               ? (accountData.step === 1 ? 10 : 5)  // Standard: Step 1 = 10%, Step 2 = 5%
               : 12;  // Instant: 12%
-            const targetTradingDays = 5;
+            const targetTradingDays = accountData.accountType === 'gauntlet' ? 0 : 5;
             
             const profitPercent = ((cachedData.balance - accountData.accountSize) / accountData.accountSize) * 100;
             
@@ -1089,7 +1092,15 @@ export default function AdminAccountDetailsPage() {
                 <li>Maximum drawdown: 15% (from initial balance)</li>
                 <li>Daily drawdown: 8% maximum per day</li>
                 <li>Risk limit: Maximum 2% risk on open positions at any time</li>
-                <li>Payout eligibility: Minimum 5 trading days with 0.5% gain from starting balance</li>
+                {accountInfo?.accountType === 'gauntlet' ? (
+                  <>
+                    <li>Minimum trading days: none</li>
+                    <li>Profit split: 95%</li>
+                    <li>Payouts: on demand, up to $5,000 on the first payout, then no limit</li>
+                  </>
+                ) : (
+                  <li>Payout eligibility: Minimum 5 trading days with 0.5% gain from starting balance</li>
+                )}
                 <li>No profit target requirement</li>
               </ul>
             </div>

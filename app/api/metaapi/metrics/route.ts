@@ -1249,9 +1249,9 @@ function calculateTradingObjectives(
     },
     gauntlet: {
       minTradingDays: 0,
-      maxDrawdown: 15, // Gauntlet: 15% max drawdown
-      maxDailyDrawdown: 8, // Gauntlet: 8% daily drawdown
-      profitTargetStep1: 10, // Gauntlet: 10% profit target (single phase)
+      maxDrawdown: 15, // Gauntlet: 15% static max drawdown
+      maxDailyDrawdown: 8, // Gauntlet: 8% static daily drawdown
+      profitTargetStep1: 4, // Gauntlet: 4% profit target (single phase)
       profitTargetStep2: 0 // No step 2 for gauntlet challenge
     },
     vip: {
@@ -1340,13 +1340,16 @@ function calculateTradingObjectives(
     }
   }
   
-  // Special handling for funded accounts
+  // Special handling for funded accounts.
+  // Gauntlet funded accounts have no minimum trading days. Other funded products still require 5 days with a 0.5% gain.
   if (isFunded) {
+    const gauntletFunded = challengeType === 'gauntlet';
+    const fundedMinDays = gauntletFunded ? 0 : target.minTradingDays;
     return {
       minTradingDays: {
-        target: target.minTradingDays,
+        target: fundedMinDays,
         current: tradingDays,
-        passed: tradingDays >= target.minTradingDays // Must have 5 days with 0.5% gain for payout eligibility
+        passed: gauntletFunded ? true : tradingDays >= fundedMinDays
       },
       maxDrawdown: {
         target: target.maxDrawdown,
@@ -1368,7 +1371,7 @@ function calculateTradingObjectives(
       },
       fundedStatus: true,
       tradingDaysWithGain: tradingDays, // For funded accounts, this represents days with 0.5% gain
-      fundedPayoutEligible: tradingDays >= target.minTradingDays // True when 5+ days with 0.5% gain
+      fundedPayoutEligible: gauntletFunded ? true : tradingDays >= target.minTradingDays
     };
   }
   
@@ -1621,14 +1624,15 @@ function calculateMockObjectives(accountType: string, accountSize: number, curre
   const isFunded = step === 3;
   
   if (isFunded) {
+    const gauntletFunded = accountType === 'gauntlet';
     return {
-      minTradingDays: { target: 5, current: tradingDays, passed: tradingDays >= 5 },
+      minTradingDays: { target: gauntletFunded ? 0 : 5, current: tradingDays, passed: gauntletFunded || tradingDays >= 5 },
       maxDrawdown: { target: 15, current: maxDrawdown, passed: maxDrawdown <= 15 },
       maxDailyDrawdown: { target: 8, current: dailyDrawdown, passed: dailyDrawdown <= 8 },
       profitTarget: { target: 0, current: profitPercent, passed: true },
       fundedStatus: true,
       tradingDaysWithGain: tradingDays,
-      fundedPayoutEligible: tradingDays >= 5
+      fundedPayoutEligible: gauntletFunded || tradingDays >= 5
     };
   }
   
@@ -1646,7 +1650,7 @@ function calculateMockObjectives(accountType: string, accountSize: number, curre
       minTradingDays: 0,
       maxDrawdown: 15,
       maxDailyDrawdown: 8,
-      profitTarget: 10
+      profitTarget: 4
     };
   } else if (accountType === 'vip') {
     targets = {
