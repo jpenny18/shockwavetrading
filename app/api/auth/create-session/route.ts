@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth, createSessionCookie } from '@/lib/firebase-admin';
-import { cookies } from 'next/headers';
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,20 +22,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create session cookie
+    // Firebase wants milliseconds. The browser cookie maxAge is seconds.
     const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
     const sessionCookie = await createSessionCookie(idToken, expiresIn);
 
-    // Set the cookie
-    cookies().set('session', sessionCookie, {
-      maxAge: expiresIn,
+    const response = NextResponse.json({ success: true });
+    response.cookies.set('session', sessionCookie, {
+      maxAge: Math.floor(expiresIn / 1000),
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
     });
 
-    return NextResponse.json({ success: true });
+    return response;
   } catch (error: any) {
     console.error('Error creating session:', error);
     return NextResponse.json(

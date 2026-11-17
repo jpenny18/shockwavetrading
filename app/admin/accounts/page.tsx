@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { collection, query, where, getDocs, orderBy, limit, onSnapshot, doc, updateDoc, deleteDoc, setDoc, getDoc } from 'firebase/firestore';
 import { db, getAllUsers, setUserMetaApiAccount, getUserMetaApiAccount, UserData, UserMetaApiAccount, Timestamp, getCachedMetrics } from '../../../lib/firebase';
+import { ensureAdminClientAuth, isAdminAuthError, signInAdminFromSession } from '../../../lib/ensure-admin-client-auth';
 import { isVipMetaApiAccount } from '../../../lib/vip-accounts';
 import { 
   Search, 
@@ -181,9 +182,13 @@ export default function AdminAccountsPage() {
   };
 
   // Load all accounts function
-  const loadAllAccounts = async () => {
+  const loadAllAccounts = async (allowRetry = true) => {
     setLoading(true);
     try {
+      const user = await ensureAdminClientAuth();
+      if (!user) {
+        throw Object.assign(new Error('Admin access expired'), { code: 'admin-auth-expired' });
+      }
       // Query userMetaApiAccounts directly instead of loading all users
       const accountsRef = collection(db, 'userMetaApiAccounts');
       const accountsSnapshot = await getDocs(accountsRef);
@@ -221,7 +226,17 @@ export default function AdminAccountsPage() {
       // Check for alerts
       checkForAlerts(users);
     } catch (error) {
+      if (allowRetry && isAdminAuthError(error)) {
+        const restored = await signInAdminFromSession();
+        if (restored) {
+          await loadAllAccounts(false);
+          return;
+        }
+      }
       console.error('Error loading accounts:', error);
+      if (isAdminAuthError(error)) {
+        setMessage({ type: 'error', text: 'Admin access expired. Sign out and sign in again.' });
+      }
     } finally {
       setLoading(false);
     }
@@ -361,6 +376,8 @@ export default function AdminAccountsPage() {
           loadAllAccounts();
         }
       }, 1000); // Wait 1 second before reloading
+    }, (error) => {
+      console.error('Account listener failed:', error);
     });
 
     return () => {
@@ -794,8 +811,19 @@ export default function AdminAccountsPage() {
       }
       
       // Update just this account's row from the fresh cache instead of reloading
-      // every account (the old full reload caused O(N^2) reads during bulk refresh)
-      const updatedMetrics = await getCachedMetrics(accountId);
+      // every account (the old full reload caused O(N^2) reads during bulk refresh).
+      // Re-check the browser login first: a long metrics refresh can outlive the
+      // Firebase ID token, and the next read would fail closed.
+      let updatedMetrics;
+      try {
+        await ensureAdminClientAuth();
+        updatedMetrics = await getCachedMetrics(accountId);
+      } catch (metricsError) {
+        if (!isAdminAuthError(metricsError)) throw metricsError;
+        const restored = await signInAdminFromSession();
+        if (!restored) throw metricsError;
+        updatedMetrics = await getCachedMetrics(accountId);
+      }
       setAllAccounts(prev => prev.map(a =>
         a.metaApiAccount?.accountId === accountId
           ? { ...a, cachedMetrics: updatedMetrics }

@@ -8,9 +8,9 @@ import {
   Lock,
   AlertCircle
 } from 'lucide-react';
-import { signInWithEmailAndPassword, onAuthStateChanged, getIdToken } from 'firebase/auth';
-import { auth, db } from '@/lib/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { signInWithEmailAndPassword, onAuthStateChanged, getIdToken, signOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+import { resumeAdminClientRestore } from '@/lib/ensure-admin-client-auth';
 
 interface AdminAuthData {
   email: string;
@@ -102,25 +102,60 @@ export default function AdminAuthPage() {
   const [errors, setErrors] = useState<AuthErrors>({});
   const [loading, setLoading] = useState(false);
 
-  // Check if user is already authenticated and is an admin
+  // A saved browser login can renew the 5-day cookie. Redirect only after that
+  // cookie exists, otherwise /admin bounces straight back here.
   useEffect(() => {
+    let cancelled = false;
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // Check if user has admin role
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists() && userDoc.data().role === 'admin') {
-          router.push('/admin');
+      if (cancelled) return;
+      if (window.sessionStorage.getItem('admin-just-logged-out') === '1') {
+        if (user) {
+          window.sessionStorage.removeItem('admin-just-logged-out');
+          await signOut(auth).catch(() => undefined);
         }
+        return;
+      }
+      if (!user) return;
+
+      try {
+        let token = await user.getIdTokenResult();
+        if (token.claims.admin !== true) {
+          token = await user.getIdTokenResult(true);
+        }
+        if (cancelled || token.claims.admin !== true) return;
+
+        const issuedRecently = Date.parse(token.expirationTime) - Date.now() > 55 * 60 * 1000;
+        if (!issuedRecently) {
+          token = await user.getIdTokenResult(true);
+        }
+
+        const response = await fetch('/api/auth/create-session', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ idToken: token.token }),
+        });
+
+        if (!response.ok || cancelled) return;
+        router.push('/admin');
+      } catch (error) {
+        console.error('Admin session restore failed:', error);
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
   }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrors({});
     setLoading(true);
+    resumeAdminClientRestore();
+    window.sessionStorage.removeItem('admin-just-logged-out');
 
     try {
       // Validation

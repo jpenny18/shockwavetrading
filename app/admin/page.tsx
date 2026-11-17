@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { collection, query, orderBy, limit, getDocs, Timestamp } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
+import { ensureAdminClientAuth, isAdminAuthError, signInAdminFromSession } from '../../lib/ensure-admin-client-auth';
 import { formatDistanceToNow } from 'date-fns';
 
 // Status styles
@@ -163,10 +164,14 @@ export default function AdminDashboard() {
     fetchDashboardData();
   }, [timeRange]);
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = async (allowRetry = true) => {
     try {
       setIsLoading(true);
       setLoadError(null);
+      const user = await ensureAdminClientAuth();
+      if (!user) {
+        throw Object.assign(new Error('Admin access expired'), { code: 'admin-auth-expired' });
+      }
       
       // Get the date ranges for comparison
       const now = new Date();
@@ -347,8 +352,19 @@ export default function AdminDashboard() {
       });
       
     } catch (error) {
+      if (allowRetry && isAdminAuthError(error)) {
+        const restored = await signInAdminFromSession();
+        if (restored) {
+          await fetchDashboardData(false);
+          return;
+        }
+      }
       console.error('Error fetching dashboard data:', error);
-      setLoadError('Failed to load dashboard data. Please try again.');
+      setLoadError(
+        isAdminAuthError(error)
+          ? 'Admin access expired. Sign out and sign in again.'
+          : 'Failed to load dashboard data. Please try again.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -395,7 +411,7 @@ export default function AdminDashboard() {
         <div className="mb-4 p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <span className="text-red-400 text-sm">{loadError}</span>
           <button
-            onClick={fetchDashboardData}
+            onClick={() => fetchDashboardData()}
             className="text-sm text-[#0FF1CE] hover:underline"
           >
             Try again

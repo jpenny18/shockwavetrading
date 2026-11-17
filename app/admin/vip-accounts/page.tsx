@@ -20,6 +20,7 @@ import {
   UserData,
   UserMetaApiAccount
 } from '../../../lib/firebase';
+import { ensureAdminClientAuth, isAdminAuthError, signInAdminFromSession } from '../../../lib/ensure-admin-client-auth';
 import {
   formatVipAllocation,
   formatVipDollars,
@@ -114,9 +115,13 @@ export default function AdminVipAccountsPage() {
   const [sizeForm, setSizeForm] = useState('');
   const [splitForm, setSplitForm] = useState('80');
 
-  const loadAccounts = async () => {
+  const loadAccounts = async (allowRetry = true) => {
     setLoading(true);
     try {
+      const user = await ensureAdminClientAuth();
+      if (!user) {
+        throw Object.assign(new Error('Admin access expired'), { code: 'admin-auth-expired' });
+      }
       const accountsRef = collection(db, 'userMetaApiAccounts');
       const snapshot = await getDocs(accountsRef);
       const loaded = await Promise.all(snapshot.docs.map(async (accountDoc) => {
@@ -153,8 +158,20 @@ export default function AdminVipAccountsPage() {
 
       setAccounts(loaded.filter(Boolean) as UserWithVipAccount[]);
     } catch (error) {
+      if (allowRetry && isAdminAuthError(error)) {
+        const restored = await signInAdminFromSession();
+        if (restored) {
+          await loadAccounts(false);
+          return;
+        }
+      }
       console.error('Error loading VIP accounts:', error);
-      setMessage({ type: 'error', text: 'Failed to load VIP accounts' });
+      setMessage({
+        type: 'error',
+        text: isAdminAuthError(error)
+          ? 'Admin access expired, so VIP accounts could not be loaded. Sign out and sign in again.'
+          : 'Failed to load VIP accounts'
+      });
     } finally {
       setLoading(false);
     }
@@ -759,7 +776,16 @@ export default function AdminVipAccountsPage() {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.error || 'Failed to refresh metrics');
       }
-      const updatedMetrics = await getCachedMetrics(accountId);
+      let updatedMetrics;
+      try {
+        await ensureAdminClientAuth();
+        updatedMetrics = await getCachedMetrics(accountId);
+      } catch (metricsError) {
+        if (!isAdminAuthError(metricsError)) throw metricsError;
+        const restored = await signInAdminFromSession();
+        if (!restored) throw metricsError;
+        updatedMetrics = await getCachedMetrics(accountId);
+      }
       setAccounts((prev) => prev.map((item) =>
         item.metaApiAccount.accountId === accountId
           ? { ...item, cachedMetrics: updatedMetrics }
@@ -911,7 +937,7 @@ export default function AdminVipAccountsPage() {
           <option value="funded">Funded</option>
         </select>
         <button
-          onClick={loadAccounts}
+          onClick={() => loadAccounts()}
           className="px-4 py-2 bg-black border border-white/10 text-white rounded-lg hover:border-[#0FF1CE]/40 inline-flex items-center gap-2 text-sm"
         >
           <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
@@ -924,6 +950,7 @@ export default function AdminVipAccountsPage() {
           <Loader2 className="w-8 h-8 text-[#0FF1CE] animate-spin" />
         </div>
       ) : filteredAccounts.length === 0 ? (
+        message.type === 'error' ? null : (
         <div className="bg-black border border-white/10 rounded-xl p-10 text-center">
           <Crown className="w-10 h-10 text-[#0FF1CE] mx-auto mb-3" />
           <h2 className="text-white font-semibold mb-2">No VIP trading accounts yet</h2>
@@ -931,6 +958,7 @@ export default function AdminVipAccountsPage() {
             Connect a MetaAPI account after a VIP customer completes onboarding to start tracking live profit, profit split, and drawdown.
           </p>
         </div>
+        )
       ) : (
         <div className="space-y-4">
           {filteredAccounts.map((account) => {

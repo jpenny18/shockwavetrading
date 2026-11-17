@@ -38,7 +38,9 @@ export async function createSessionCookie(idToken: string, expiresIn = 60 * 60 *
  * @returns Decoded token claims
  */
 export async function verifySessionCookie(sessionCookie: string) {
-  return auth.verifySessionCookie(sessionCookie, true);
+  // The cookie's own expiration is the 5-day limit. A revocation lookup on every
+  // request was treating still-valid sessions as logged out.
+  return auth.verifySessionCookie(sessionCookie, false);
 }
 
 /**
@@ -48,7 +50,7 @@ export async function verifySessionCookie(sessionCookie: string) {
  */
 export async function getSessionClaims(sessionCookie: string) {
   try {
-    const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
+    const decodedClaims = await verifySessionCookie(sessionCookie);
     return decodedClaims;
   } catch (error: any) {
     console.error('Error verifying session cookie:', error.message);

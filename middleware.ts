@@ -2,9 +2,50 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export const config = {
-  matcher: ['/admin/:path*', '/admin-auth/:path*', '/dashboard/challenge/:path*'],
+  matcher: ['/admin', '/admin/:path*', '/admin-auth/:path*', '/dashboard/challenge/:path*'],
   runtime: 'experimental-edge',
 };
+
+async function verifyAdminSession(request: NextRequest, sessionValue: string) {
+  const verify = () => fetch(new URL('/api/auth/verify-session', request.url), {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ session: sessionValue }),
+  });
+
+  let verifyResponse: Response;
+  try {
+    verifyResponse = await verify();
+    if (verifyResponse.status >= 500) {
+      verifyResponse = await verify();
+    }
+  } catch {
+    try {
+      verifyResponse = await verify();
+    } catch {
+      // The auth service could not be reached. Keep the existing cookie
+      // instead of sending a signed-in admin back to the login page.
+      return NextResponse.next();
+    }
+  }
+
+  if (verifyResponse.status >= 500) {
+    return NextResponse.next();
+  }
+
+  if (!verifyResponse.ok) {
+    return NextResponse.redirect(new URL('/admin-auth', request.url));
+  }
+
+  const { isAdmin } = await verifyResponse.json();
+  if (!isAdmin) {
+    return NextResponse.redirect(new URL('/admin-auth', request.url));
+  }
+
+  return NextResponse.next();
+}
 
 export async function middleware(request: NextRequest) {
   // Skip middleware for static files and API routes
@@ -29,34 +70,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/admin-auth', request.url));
     }
 
-    try {
-      // Make a request to your API endpoint to verify the session
-      const verifyResponse = await fetch(new URL('/api/auth/verify-session', request.url), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ session: session.value }),
-      });
-
-      if (!verifyResponse.ok) {
-        throw new Error('Session verification failed');
-      }
-
-      const { isAdmin } = await verifyResponse.json();
-      
-      if (!isAdmin) {
-        // If not admin, redirect to admin login
-        return NextResponse.redirect(new URL('/admin-auth', request.url));
-      }
-
-      // Allow access to admin routes for admin users
-      return NextResponse.next();
-    } catch (error) {
-      console.error('Session verification failed:', error);
-      // If session is invalid, redirect to admin login
-      return NextResponse.redirect(new URL('/admin-auth', request.url));
-    }
+    return verifyAdminSession(request, session.value);
   }
 
   // Check if the URL starts with /dashboard/challenge

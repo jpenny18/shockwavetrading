@@ -12,6 +12,7 @@ import {
   VIPActivation,
   Timestamp
 } from '@/lib/firebase';
+import { ensureAdminClientAuth, isAdminAuthError, signInAdminFromSession } from '@/lib/ensure-admin-client-auth';
 import {
   Search,
   CheckCircle,
@@ -128,6 +129,7 @@ export default function AdminVIPPage() {
   const [activations, setActivations] = useState<VIPActivationWithId[]>([]);
   const [filteredActivations, setFilteredActivations] = useState<VIPActivationWithId[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [kybFilter, setKybFilter] = useState<VIPActivation['kybStatus'] | 'all'>('all');
   const [selectedActivation, setSelectedActivation] = useState<VIPActivationWithId | null>(null);
@@ -170,13 +172,30 @@ export default function AdminVIPPage() {
     }
   }, [allocationChoice]);
 
-  const loadActivations = async () => {
+  const loadActivations = async (allowRetry = true) => {
     try {
       setIsLoading(true);
+      setLoadError(null);
+      const user = await ensureAdminClientAuth();
+      if (!user) {
+        throw Object.assign(new Error('Admin access expired'), { code: 'admin-auth-expired' });
+      }
       const all = await getAllVIPActivations();
       setActivations(all);
     } catch (error) {
+      if (allowRetry && isAdminAuthError(error)) {
+        const restored = await signInAdminFromSession();
+        if (restored) {
+          await loadActivations(false);
+          return;
+        }
+      }
       console.error('Error loading VIP activations:', error);
+      setLoadError(
+        isAdminAuthError(error)
+          ? 'Admin access expired, so VIP activations could not be loaded. Sign out and sign in again.'
+          : 'Could not load VIP activations. Try again.'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -767,11 +786,24 @@ export default function AdminVIPPage() {
         </div>
       </div>
 
+      {loadError && (
+        <div className="mb-4 p-4 bg-red-500/10 border border-red-500/30 rounded-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <span className="text-red-400 text-sm">{loadError}</span>
+          <button
+            type="button"
+            onClick={() => loadActivations()}
+            className="text-sm text-[#0FF1CE] hover:underline"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
       {/* Activations - Mobile cards */}
       <div className="md:hidden space-y-2">
         {filteredActivations.length === 0 ? (
           <div className="bg-black rounded-xl border border-white/10 px-4 py-8 text-center text-gray-400">
-            No VIP activations found
+            {loadError ? 'VIP activations could not be loaded' : 'No VIP activations found'}
           </div>
         ) : filteredActivations.map((activation) => (
           <div key={activation.id} className="bg-black rounded-xl border border-white/10 p-3">
@@ -820,7 +852,7 @@ export default function AdminVIPPage() {
               {filteredActivations.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="px-6 py-8 text-center text-gray-400">
-                    No VIP activations found
+                    {loadError ? 'VIP activations could not be loaded' : 'No VIP activations found'}
                   </td>
                 </tr>
               ) : (

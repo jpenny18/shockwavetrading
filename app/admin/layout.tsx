@@ -4,7 +4,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { collection, getCountFromServer, query, Timestamp, where } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth, db, signOut } from '@/lib/firebase';
+import { ensureAdminClientAuth, pauseAdminClientRestore, resumeAdminClientRestore } from '@/lib/ensure-admin-client-auth';
 import { 
   BarChart2, 
   Users, 
@@ -64,14 +66,6 @@ function isNavActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function initials(name: string, email: string) {
-  const source = name && name !== 'Admin' ? name : email;
-  const parts = source.split(/[\s@._-]+/).filter(Boolean);
-  const first = parts[0]?.[0] || 'A';
-  const second = parts[1]?.[0] || '';
-  return `${first}${second}`.toUpperCase();
-}
-
 async function countDocs(countQuery: ReturnType<typeof query>) {
   try {
     const snapshot = await getCountFromServer(countQuery);
@@ -91,6 +85,7 @@ export default function AdminLayout({
   const pathname = usePathname();
   const searchRef = useRef<HTMLDivElement>(null);
   const alertsRef = useRef<HTMLDivElement>(null);
+  const loggingOutRef = useRef(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [desktopCollapsed, setDesktopCollapsed] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -99,7 +94,17 @@ export default function AdminLayout({
   const [searchOpen, setSearchOpen] = useState(false);
   const [alertsOpen, setAlertsOpen] = useState(false);
   const [siteName, setSiteName] = useState('Shockwave Capital');
-  const [adminProfile, setAdminProfile] = useState({ name: 'Admin', email: '' });
+  const [clientReady, setClientReady] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [sessionKey, setSessionKey] = useState(0);
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
+  const [notificationSettings, setNotificationSettings] = useState<{
+    emailNotifications?: boolean;
+    orderNotifications?: boolean;
+    customerSignups?: boolean;
+    paymentFailures?: boolean;
+    dailySummary?: boolean;
+  } | null>(null);
   const [alerts, setAlerts] = useState<{ label: string; href: string; count: number }[]>([]);
 
   const searchableItems = [...navItems, ...devNavItems];
@@ -134,26 +139,101 @@ export default function AdminLayout({
 
   useEffect(() => {
     let cancelled = false;
+    let unsubscribe = () => {};
+    let attempts = 0;
+    resumeAdminClientRestore();
 
-    const loadShell = async () => {
-      const [profileResult, settingsResult] = await Promise.allSettled([
-        fetch('/api/auth/admin-profile').then((response) => (response.ok ? response.json() : null)),
-        fetch('/api/admin/settings').then((response) => (response.ok ? response.json() : null)),
-      ]);
-
-      if (cancelled) return;
-
-      const profile = profileResult.status === 'fulfilled' ? profileResult.value : null;
-      const settings = settingsResult.status === 'fulfilled' ? settingsResult.value : null;
-      if (profile?.email || profile?.name) {
-        setAdminProfile({
-          name: profile.name || 'Admin',
-          email: profile.email || '',
-        });
+    const restore = async () => {
+      const user = await ensureAdminClientAuth();
+      if (cancelled || loggingOutRef.current) return user;
+      if (!user) {
+        setAuthError('Your admin session expired. Sign in again to continue.');
+      } else {
+        setAuthError(null);
       }
-      if (settings?.general?.siteName) setSiteName(settings.general.siteName);
+      setClientReady(true);
+      return user;
+    };
 
-      const notifications = settings?.notifications || {
+    restore().then(() => {
+      if (cancelled) return;
+      unsubscribe = onAuthStateChanged(auth, async (user) => {
+        if (cancelled || loggingOutRef.current || user) return;
+        if (attempts >= 1) {
+          setAuthError('Your admin session expired. Sign in again to continue.');
+          return;
+        }
+        attempts += 1;
+        const restored = await ensureAdminClientAuth();
+        if (cancelled || loggingOutRef.current) return;
+        if (!restored) {
+          setAuthError('Your admin session expired. Sign in again to continue.');
+          return;
+        }
+        setAuthError(null);
+        setSessionKey((key) => key + 1);
+      });
+    });
+
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!clientReady || authError) return;
+
+    const keepAlive = () => {
+      const user = auth.currentUser;
+      if (!user || loggingOutRef.current) return;
+      user.getIdTokenResult()
+        .then((result) => {
+          const expiresAt = Date.parse(result.expirationTime);
+          if (!Number.isFinite(expiresAt) || expiresAt - Date.now() < 10 * 60 * 1000) {
+            return user.getIdToken(true);
+          }
+          return undefined;
+        })
+        .catch((error) => {
+          console.error('Admin token keepalive failed:', error);
+        });
+    };
+
+    const intervalId = window.setInterval(keepAlive, 5 * 60 * 1000);
+    return () => window.clearInterval(intervalId);
+  }, [clientReady, authError]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadSettings = async () => {
+      try {
+        const response = await fetch('/api/admin/settings');
+        if (cancelled) return;
+        const settings = response.ok ? await response.json() : null;
+        if (cancelled) return;
+        if (settings?.general?.siteName) setSiteName(settings.general.siteName);
+        setNotificationSettings(settings?.notifications || null);
+      } catch (error) {
+        console.error('Error loading admin settings:', error);
+      } finally {
+        if (!cancelled) setSettingsLoaded(true);
+      }
+    };
+
+    loadSettings();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!clientReady || authError || !settingsLoaded) return;
+    let cancelled = false;
+
+    const loadAlerts = async () => {
+      const notifications = notificationSettings || {
         emailNotifications: true,
         orderNotifications: true,
         customerSignups: true,
@@ -197,17 +277,20 @@ export default function AdminLayout({
       setAlerts(nextAlerts);
     };
 
-    loadShell();
+    loadAlerts();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [clientReady, authError, settingsLoaded, notificationSettings]);
 
   const handleLogout = async () => {
     try {
+      loggingOutRef.current = true;
+      pauseAdminClientRestore();
       setIsLoggingOut(true);
       setLogoutError(null);
-      
+      window.sessionStorage.setItem('admin-just-logged-out', '1');
+
       const response = await fetch('/api/auth/logout', {
         method: 'POST',
         headers: {
@@ -219,9 +302,13 @@ export default function AdminLayout({
         throw new Error('Logout failed');
       }
 
+      await signOut();
       router.push('/admin-auth');
     } catch (error) {
       console.error('Logout error:', error);
+      loggingOutRef.current = false;
+      resumeAdminClientRestore();
+      window.sessionStorage.removeItem('admin-just-logged-out');
       setLogoutError('Logout failed. Please try again.');
     } finally {
       setIsLoggingOut(false);
@@ -229,7 +316,32 @@ export default function AdminLayout({
   };
 
   const alertCount = alerts.reduce((sum, item) => sum + item.count, 0);
-  const adminInitials = initials(adminProfile.name, adminProfile.email);
+
+  if (!clientReady || authError) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center px-4">
+        {authError ? (
+          <div className="max-w-md text-center">
+            <p className="text-red-400 text-sm">{authError}</p>
+            {logoutError && <p className="text-red-400 text-sm mt-2">{logoutError}</p>}
+            <button
+              type="button"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="mt-4 bg-[#0FF1CE] text-black font-semibold px-4 py-2 rounded-lg disabled:opacity-60"
+            >
+              {isLoggingOut ? 'Signing out...' : 'Sign in'}
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 text-gray-300">
+            <div className="w-5 h-5 border-2 border-[#0FF1CE] border-t-transparent rounded-full animate-spin" />
+            <span>Loading admin...</span>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   const goToSearchResult = (href: string) => {
     setSearchOpen(false);
@@ -353,11 +465,11 @@ export default function AdminLayout({
           <div className="border-t border-white/10 pt-4 mt-4">
             <div className="flex items-center gap-3 px-3 py-2">
               <div className="w-8 h-8 rounded-full bg-black border border-[#0FF1CE]/50 flex items-center justify-center">
-                <span className="text-[#0FF1CE] font-medium text-sm">{adminInitials}</span>
+                <span className="text-[#0FF1CE] font-medium text-sm">A</span>
               </div>
               <div className="flex-1 min-w-0">
-                <div className="text-white text-sm font-medium truncate">{adminProfile.name}</div>
-                <div className="text-gray-400 text-xs truncate">{adminProfile.email || 'Signed in'}</div>
+                <div className="text-white text-sm font-medium truncate">Admin</div>
+                <div className="text-gray-400 text-xs truncate">Signed in</div>
               </div>
               <button 
                 onClick={handleLogout}
@@ -477,9 +589,9 @@ export default function AdminLayout({
             <div className="w-px h-6 bg-white/10"></div>
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-black border border-[#0FF1CE]/50 flex items-center justify-center">
-                <span className="text-[#0FF1CE] font-medium text-sm">{adminInitials}</span>
+                <span className="text-[#0FF1CE] font-medium text-sm">A</span>
               </div>
-              <span className="text-white text-sm">{adminProfile.name}</span>
+              <span className="text-white text-sm">Admin</span>
             </div>
             <button 
               onClick={handleLogout}
@@ -498,7 +610,7 @@ export default function AdminLayout({
           </div>
         )}
         <main className="flex-1 p-4 md:p-6">
-          <div className="md:rounded-3xl md:border md:border-white/10 md:p-6">
+          <div key={sessionKey} className="md:rounded-3xl md:border md:border-white/10 md:p-6">
             {children}
           </div>
         </main>
