@@ -25,6 +25,15 @@ import { registerUser, signInUser, resetPassword } from '@/lib/firebase';
 import { auth } from '@/lib/firebase';
 import { countries } from '@/lib/countries';
 
+function destinationAfterAuth(): string {
+  if (typeof window === 'undefined') return '/dashboard';
+  const next = new URLSearchParams(window.location.search).get('next');
+  if (!next || !next.startsWith('/') || next.startsWith('//') || next.includes('://') || next.includes('\\')) {
+    return '/dashboard';
+  }
+  return next;
+}
+
 interface AuthData {
   email: string;
   password: string;
@@ -215,7 +224,7 @@ export default function EarlyAccessPage() {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user && !loading) {
-        router.push('/dashboard');
+        router.push(destinationAfterAuth());
       }
       setLoading(false);
     });
@@ -273,7 +282,7 @@ export default function EarlyAccessPage() {
         // Sign in with Firebase
         await signInUser(formData.email, formData.password);
         // If successful, redirect to main page
-        router.push('/dashboard');
+        router.push(destinationAfterAuth());
       } else {
         // For registration form
         // Validation
@@ -330,7 +339,7 @@ export default function EarlyAccessPage() {
         });
 
         // If successful, redirect to main page
-        router.push('/dashboard');
+        router.push(destinationAfterAuth());
       }
     } catch (error: any) {
       console.error('Authentication error:', error);

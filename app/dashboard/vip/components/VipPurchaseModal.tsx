@@ -452,15 +452,21 @@ export default function VipPurchaseModal({ onClose }: { onClose: () => void }) {
                   </div>
                 </div>
               )}
-              <button type="button" onClick={handleCard} disabled={isRedirecting} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0FF1CE] px-4 py-3.5 text-sm font-bold text-black disabled:opacity-50">
-                <CreditCard size={18} />
-                {isRedirecting ? 'Redirecting to payment portal...' : 'Pay with card'}
-              </button>
+              <div>
+                <button type="button" onClick={handleCard} disabled={isRedirecting} className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0FF1CE] px-4 py-3.5 text-sm font-bold text-black disabled:opacity-50">
+                  <CreditCard size={18} />
+                  {isRedirecting ? 'Redirecting to payment portal...' : 'Pay with card'}
+                </button>
+                <p className="mt-2 text-center text-xs text-gray-500">Accounts get activated within 7-14 days</p>
+              </div>
               <p className="text-center text-xs text-gray-500">Card payment continues on our payment portal. The price above is the amount charged.</p>
-              <button type="button" onClick={handleCrypto} disabled={isRedirecting} className="flex w-full items-center justify-center gap-2 rounded-2xl border border-[#0FF1CE] px-4 py-3.5 text-sm font-bold text-[#0FF1CE] disabled:opacity-50">
-                <Bitcoin size={18} />
-                Pay with crypto
-              </button>
+              <div>
+                <button type="button" onClick={handleCrypto} disabled={isRedirecting} className="flex w-full items-center justify-center gap-2 rounded-2xl border border-[#0FF1CE] px-4 py-3.5 text-sm font-bold text-[#0FF1CE] disabled:opacity-50">
+                  <Bitcoin size={18} />
+                  Pay with crypto
+                </button>
+                <p className="mt-2 text-center text-xs text-gray-500">Account gets activated within 1-2 hours</p>
+              </div>
               {cardError && (
                 <p className="flex items-center justify-center gap-1 text-sm text-red-400">
                   <AlertCircle size={14} />

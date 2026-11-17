@@ -1,12 +1,15 @@
 'use client';
 
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthState } from 'react-firebase-hooks/auth';
 import Particles from '../components/Particles';
 import Header from '../components/Header';
 import { ChevronDown, Crown, Headphones, TrendingUp, Copy } from 'lucide-react';
-import { VIP_PAYMENT_PORTAL_URL } from '@/lib/vip-portal';
+import VipPurchaseModal from '@/app/dashboard/vip/components/VipPurchaseModal';
+import { auth } from '@/lib/firebase';
 
-const VIP_CHECKOUT_URL = VIP_PAYMENT_PORTAL_URL;
+const VIP_PURCHASE_RETURN = '/vip?buy=1';
 
 const VIP_RULES = [
   '15% Max Drawdown',
@@ -22,6 +25,39 @@ const VIP_RULES = [
 ];
 
 function VipContent() {
+  const router = useRouter();
+  const [user, authLoading] = useAuthState(auth);
+  const [purchaseOpen, setPurchaseOpen] = useState(false);
+  const [queuedOpen, setQueuedOpen] = useState(false);
+
+  useEffect(() => {
+    if (authLoading) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('buy') === '1' && user) setPurchaseOpen(true);
+  }, [authLoading, user]);
+
+  useEffect(() => {
+    if (!queuedOpen || authLoading) return;
+    setQueuedOpen(false);
+    if (!user) {
+      router.push(`/access?next=${encodeURIComponent(VIP_PURCHASE_RETURN)}`);
+      return;
+    }
+    setPurchaseOpen(true);
+  }, [queuedOpen, authLoading, user, router]);
+
+  const openPurchase = () => {
+    if (authLoading) {
+      setQueuedOpen(true);
+      return;
+    }
+    if (!user) {
+      router.push(`/access?next=${encodeURIComponent(VIP_PURCHASE_RETURN)}`);
+      return;
+    }
+    setPurchaseOpen(true);
+  };
+
   return (
     <div className="bg-black text-white min-h-screen font-sans">
       <Header />
@@ -89,14 +125,14 @@ function VipContent() {
             </div>
           </div>
 
-          {/* Mobile CTA - opens the external checkout */}
-          <a
-            href={VIP_CHECKOUT_URL}
+          <button
+            type="button"
+            onClick={openPurchase}
             className="md:hidden w-full max-w-xs mx-auto flex items-center justify-center gap-2 px-8 py-3.5 bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-black text-sm font-bold rounded-xl active:scale-[0.98] transition-transform shadow-[0_0_20px_rgba(15,241,206,0.3)]"
           >
             <span>Choose Your Allocation</span>
             <ChevronDown size={18} />
-          </a>
+          </button>
         </div>
       </section>
 
@@ -178,15 +214,18 @@ function VipContent() {
             <p className="text-gray-400 text-sm md:text-base mb-6">
               A structure built for experienced traders. Ready to trade serious capital?
             </p>
-            <a
-              href={VIP_CHECKOUT_URL}
+            <button
+              type="button"
+              onClick={openPurchase}
               className="inline-block px-8 py-4 bg-gradient-to-r from-[#0FF1CE] to-[#00D9FF] text-black text-base md:text-lg font-bold rounded-xl hover:scale-105 transition-transform shadow-[0_0_20px_rgba(15,241,206,0.3)]"
             >
               Choose Your Allocation & Get Started
-            </a>
+            </button>
           </div>
         </div>
       </section>
+
+      {purchaseOpen && <VipPurchaseModal onClose={() => setPurchaseOpen(false)} />}
 
       <style jsx global>{`
         .background-noise {

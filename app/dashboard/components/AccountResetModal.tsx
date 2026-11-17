@@ -540,25 +540,35 @@ function AccountResetDialog({
 
               {quote && (
                 <div className="space-y-3">
-                  <button
-                    type="button"
-                    onClick={handleCard}
-                    disabled={profileLoading || isRedirecting || !priceReady}
-                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0FF1CE] px-4 py-3.5 text-sm font-bold text-black shadow-[0_8px_30px_rgba(15,241,206,0.22)] transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
-                  >
-                    <CreditCard size={18} />
-                    {isRedirecting ? 'Redirecting to payment portal...' : 'Pay with card'}
-                  </button>
+                  <div>
+                    <button
+                      type="button"
+                      onClick={handleCard}
+                      disabled={profileLoading || isRedirecting || !priceReady}
+                      className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0FF1CE] px-4 py-3.5 text-sm font-bold text-black shadow-[0_8px_30px_rgba(15,241,206,0.22)] transition hover:scale-[1.01] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+                    >
+                      <CreditCard size={18} />
+                      {isRedirecting ? 'Redirecting to payment portal...' : 'Pay with card'}
+                    </button>
+                    {quote.category === 'vip' && (
+                      <p className="mt-2 text-center text-xs text-gray-500">Accounts get activated within 7-14 days</p>
+                    )}
+                  </div>
                   <p className="text-center text-xs text-gray-500">You will be redirected to our payment portal to finish the card payment.</p>
-                  <button
-                    type="button"
-                    onClick={handleCrypto}
-                    disabled={profileLoading || isRedirecting || !priceReady}
-                    className="flex w-full items-center justify-center gap-2 rounded-2xl border border-[#0FF1CE] px-4 py-3.5 text-sm font-bold text-[#0FF1CE] transition hover:bg-[#0FF1CE]/10 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <Bitcoin size={18} />
-                    Pay with crypto
-                  </button>
+                  <div>
+                    <button
+                      type="button"
+                      onClick={handleCrypto}
+                      disabled={profileLoading || isRedirecting || !priceReady}
+                      className="flex w-full items-center justify-center gap-2 rounded-2xl border border-[#0FF1CE] px-4 py-3.5 text-sm font-bold text-[#0FF1CE] transition hover:bg-[#0FF1CE]/10 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <Bitcoin size={18} />
+                      Pay with crypto
+                    </button>
+                    {quote.category === 'vip' && (
+                      <p className="mt-2 text-center text-xs text-gray-500">Account gets activated within 1-2 hours</p>
+                    )}
+                  </div>
                   {cardError && (
                     <p className="flex items-center justify-center gap-1 text-sm text-red-400">
                       <AlertCircle size={14} />
