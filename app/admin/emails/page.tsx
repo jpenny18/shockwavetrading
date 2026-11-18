@@ -128,17 +128,10 @@ const initialTemplates: EmailTemplate[] = [
               </p>
               
               <div style="background: #f8f8f8; padding: 25px; border-radius: 8px; margin: 25px 0;">
-                <h2 style="color: #1a1a1a; font-size: 22px; margin: 0 0 20px 0;">Here are your next steps:</h2>
-                
-                <div style="margin-bottom: 25px;">
-                  <h3 style="color: #0FF1CE; font-size: 18px; margin: 0 0 10px 0;">1. Complete KYC</h3>
-                  <p style="margin: 0; color: #555; line-height: 1.6;">
-                    We have unlocked your KYC on your dashboard. Please upload the required documents for approval and e-sign the Funded Trader Agreement.
-                  </p>
-                </div>
+                <h2 style="color: #1a1a1a; font-size: 22px; margin: 0 0 20px 0;">Here is your next step:</h2>
                 
                 <div>
-                  <h3 style="color: #0FF1CE; font-size: 18px; margin: 0 0 10px 0;">2. Funded Account Activation</h3>
+                  <h3 style="color: #0FF1CE; font-size: 18px; margin: 0 0 10px 0;">Funded Account Activation</h3>
                   <p style="margin: 0 0 15px 0; color: #555; line-height: 1.6;">
                     To gain access to your {{accountSize}} funded account, you'll need to pay the activation fee within 48 hours. 
                     <strong>Please note that if the activation is not completed within this timeframe, your Gauntlet Challenge will expire and you would need to repurchase and pass a new challenge.</strong>
@@ -148,7 +141,7 @@ const initialTemplates: EmailTemplate[] = [
               </div>
               
               <div style="text-align: center; margin: 30px 0;">
-                <a href="https://shockwave-capital.com/gauntlet-activation" style="display: inline-block; background-color: #1a1a1a; color: #0FF1CE; padding: 16px 32px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">
+                <a href="https://shockwavetrading.com/gauntlet-activation" style="display: inline-block; background-color: #1a1a1a; color: #0FF1CE; padding: 16px 32px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 16px;">
                   👉 Activate Your Funded Account
                 </a>
               </div>
@@ -224,7 +217,7 @@ const initialTemplates: EmailTemplate[] = [
               </div>
               
               <p style="margin: 0 0 20px 0; color: #444;">
-                You have successfully passed the challenge, and your KYC has been approved. We are still waiting for the activation fee for your accounts.
+                You have successfully passed the challenge. We are still waiting for the activation fee for your accounts.
               </p>
               
               <div style="background: #f8d7da; border: 2px solid #f5c6cb; padding: 20px; border-radius: 8px; margin: 25px 0;">
@@ -235,7 +228,7 @@ const initialTemplates: EmailTemplate[] = [
               </div>
               
               <div style="text-align: center; margin: 30px 0;">
-                <a href="https://shockwave-capital.com/gauntlet-activation" style="display: inline-block; background-color: #FF4444; color: #FFFFFF; padding: 16px 32px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 18px;">
+                <a href="https://shockwavetrading.com/gauntlet-activation" style="display: inline-block; background-color: #FF4444; color: #FFFFFF; padding: 16px 32px; text-decoration: none; border-radius: 4px; font-weight: bold; font-size: 18px;">
                   👉 Complete Your Activation Here
                 </a>
               </div>
@@ -574,8 +567,8 @@ interface Customer {
   [key: string]: any;
 }
 
-type CredentialSource = 'user' | 'credit' | 'order' | 'crypto';
-type CredentialFilter = 'all' | 'users' | 'credit' | 'orders' | 'crypto';
+type CredentialSource = 'user' | 'credit' | 'order' | 'crypto' | 'account';
+type CredentialFilter = 'all' | 'users' | 'credit' | 'orders' | 'crypto' | 'accounts';
 
 interface CredentialContact {
   key: string;
@@ -589,6 +582,7 @@ interface CredentialContact {
   loginId: string;
   password: string;
   server: string;
+  accountSize: string;
 }
 
 interface StoredOrderHit {
@@ -601,14 +595,20 @@ interface StoredOrderHit {
   userId: string;
   detail: string;
   platform: string;
+  accountSize: string;
 }
 
 const CREDENTIAL_SEND_DELAY_MS = 3000;
+
+function isGauntletPassEmail(name?: string) {
+  return name === 'Passed Gauntlet Challenge' || name === 'Gauntlet Final Reminder';
+}
 
 function credentialSourceLabel(source: CredentialSource) {
   if (source === 'user') return 'User';
   if (source === 'credit') return 'Credit';
   if (source === 'crypto') return 'Crypto';
+  if (source === 'account') return 'Account';
   return 'Order';
 }
 
@@ -616,6 +616,7 @@ function credentialBadgeClass(source: CredentialSource) {
   if (source === 'user') return 'bg-[#0FF1CE]/20 text-[#0FF1CE]';
   if (source === 'credit') return 'bg-blue-500/20 text-blue-400';
   if (source === 'crypto') return 'bg-yellow-500/20 text-yellow-400';
+  if (source === 'account') return 'bg-green-500/20 text-green-400';
   return 'bg-purple-500/20 text-purple-300';
 }
 
@@ -654,7 +655,7 @@ function blankCredentials(platform?: string) {
 }
 
 function contactMatches(contact: CredentialContact, query: string) {
-  return [contact.email, contact.displayName, contact.firstName, contact.lastName, contact.detail]
+  return [contact.email, contact.displayName, contact.firstName, contact.lastName, contact.detail, contact.accountSize]
     .join(' ')
     .toLowerCase()
     .includes(query);
@@ -674,6 +675,7 @@ function userContact(customer: Customer): CredentialContact | null {
     displayName,
     source: 'user',
     detail: 'User account',
+    accountSize: '',
     ...blankCredentials(),
   };
 }
@@ -687,6 +689,7 @@ function contactFromRecord(input: {
   customerName?: string;
   detail?: string;
   platform?: string;
+  accountSize?: string;
 }): CredentialContact | null {
   const email = (input.email || '').trim();
   if (!email || !email.includes('@')) return null;
@@ -701,8 +704,29 @@ function contactFromRecord(input: {
     displayName: `${firstName} ${lastName}`.trim() || email,
     source: input.source,
     detail: input.detail || '',
+    accountSize: input.accountSize || '',
     ...blankCredentials(input.platform),
   };
+}
+
+function activeAccountContact(account: {
+  id?: string;
+  email?: string;
+  firstName?: string;
+  challengeType?: string;
+  accountSize?: string;
+  challengeAmount?: string;
+  step?: number;
+}): CredentialContact | null {
+  const size = account.accountSize || account.challengeAmount || '';
+  return contactFromRecord({
+    id: account.id || `${account.email || 'account'}-${size}`,
+    source: 'account',
+    email: account.email,
+    firstName: account.firstName,
+    detail: [account.challengeType, size, account.step ? `Step ${account.step}` : ''].filter(Boolean).join(' · '),
+    accountSize: size,
+  });
 }
 
 function storedHitToContact(hit: StoredOrderHit, customers: Customer[]): CredentialContact | null {
@@ -729,6 +753,7 @@ function storedHitToContact(hit: StoredOrderHit, customers: Customer[]): Credent
     customerName,
     detail: hit.detail,
     platform: hit.platform,
+    accountSize: hit.accountSize,
   });
 }
 
@@ -793,6 +818,7 @@ export default function EmailTemplatesPage() {
   const [showRecentOrdersDropdown, setShowRecentOrdersDropdown] = useState(false);
   const [recentOrdersType, setRecentOrdersType] = useState<'crypto' | 'credit' | 'accounts'>('crypto');
   const [activeAccounts, setActiveAccounts] = useState<any[]>([]);
+  const [loadingGauntletAccounts, setLoadingGauntletAccounts] = useState(false);
   
   // Bulk send state
   const [bulkRecipients, setBulkRecipients] = useState<any[]>([]);
@@ -898,6 +924,7 @@ export default function EmailTemplatesPage() {
   // Load active accounts
   const loadActiveAccounts = async () => {
     try {
+      setLoadingGauntletAccounts(true);
       const accounts: any[] = [];
       
       // Load user MetaAPI accounts with active status
@@ -959,6 +986,8 @@ export default function EmailTemplatesPage() {
       setRecentOrders(accounts);
     } catch (error) {
       console.error('Error loading active accounts:', error);
+    } finally {
+      setLoadingGauntletAccounts(false);
     }
   };
   
@@ -1055,6 +1084,9 @@ export default function EmailTemplatesPage() {
           userId: pickString(data.userId, formData.userId),
           detail,
           platform: pickString(data.platform, formData.platform),
+          accountSize: formatAccountSize(
+            data.accountSize || data.challengeAmount || formData.accountSize || formData.challengeAmount || formData.amount
+          ),
         };
       };
 
@@ -1108,18 +1140,26 @@ export default function EmailTemplatesPage() {
   };
 
   const handleEdit = (template: EmailTemplate) => {
+    const switchingTemplate = currentTemplate?.id !== template.id;
     setCurrentTemplate(template);
     setIsEditing(true);
     setShowPreview(false);
     setEmailSent(false);
-    
-    // Set recentOrdersType based on template
-    if (template.name === 'Passed Gauntlet Challenge' || template.name === 'Gauntlet Final Reminder') {
-      setRecentOrdersType('accounts');
-    } else if (template.name === 'Login Credentials') {
-      setRecentOrdersType('crypto');
+    if (switchingTemplate) {
+      setCredentialRecipients([]);
+      setCredentialFocusKey('');
+      setCredentialStep('search');
+      setCredentialQuery('');
+      setCredentialFilter('all');
+      setShowCredentialResults(false);
+      setCredentialSendNote('');
+      setCredentialSendProgress(null);
+      if (template.name === 'Login Credentials' || isGauntletPassEmail(template.name)) {
+        setSelectedUser(null);
+        setUserSearchTerm('');
+      }
     }
-
+    
     setBulkListFilter('all');
     setBulkListSearch('');
     
@@ -1249,6 +1289,7 @@ export default function EmailTemplatesPage() {
       loginId: contact.loginId,
       password: contact.password,
       server: contact.server,
+      accountSize: contact.accountSize,
     }));
   };
 
@@ -1284,7 +1325,7 @@ export default function EmailTemplatesPage() {
 
   const updateCredentialField = (
     key: string,
-    field: 'platform' | 'loginId' | 'password' | 'server' | 'email' | 'firstName',
+    field: 'platform' | 'loginId' | 'password' | 'server' | 'email' | 'firstName' | 'accountSize',
     value: string
   ) => {
     setCredentialFocusKey(key);
@@ -1310,25 +1351,34 @@ export default function EmailTemplatesPage() {
     }
   };
 
-  const handleSendLoginCredentials = async () => {
-    if (!currentTemplate || currentTemplate.name !== 'Login Credentials') return;
+  const handleSendQueuedEmails = async () => {
+    if (!currentTemplate) return;
+    const gauntletSend = isGauntletPassEmail(currentTemplate.name);
+    const loginSend = currentTemplate.name === 'Login Credentials';
+    if (!gauntletSend && !loginSend) return;
     if (sendingEmail || credentialSendLock.current) return;
     if (credentialRecipients.length === 0) {
-      alert('Add at least one person to send the login details to.');
+      alert(gauntletSend ? 'Add at least one person to send this email to.' : 'Add at least one person to send the login details to.');
       return;
     }
 
-    const incomplete = credentialRecipients.filter((recipient) => (
-      !recipient.email.includes('@') || !recipient.platform.trim() || !recipient.loginId.trim() || !recipient.password.trim() || !recipient.server.trim()
-    ));
+    const incomplete = gauntletSend
+      ? credentialRecipients.filter((recipient) => !recipient.email.includes('@') || !recipient.accountSize.trim())
+      : credentialRecipients.filter((recipient) => (
+        !recipient.email.includes('@') || !recipient.platform.trim() || !recipient.loginId.trim() || !recipient.password.trim() || !recipient.server.trim()
+      ));
     if (incomplete.length > 0) {
       const names = incomplete.slice(0, 4).map((recipient) => recipient.displayName || recipient.email || 'New person').join(', ');
-      alert(`Each person needs an email, platform, server, login, and password. Still missing for ${names}.`);
+      alert(gauntletSend
+        ? `Each person needs an email and an account size. Still missing for ${names}.`
+        : `Each person needs an email, platform, server, login, and password. Still missing for ${names}.`);
       return;
     }
 
     if (credentialRecipients.length > 1) {
-      const confirmed = window.confirm(`Send different login details to ${credentialRecipients.length} people? Each email uses the credentials on that person's card and goes out a few seconds apart.`);
+      const confirmed = window.confirm(gauntletSend
+        ? `Send this email to ${credentialRecipients.length} people? Each email uses that person's name and account size and goes out a few seconds apart.`
+        : `Send different login details to ${credentialRecipients.length} people? Each email uses the credentials on that person's card and goes out a few seconds apart.`);
       if (!confirmed) return;
     }
 
@@ -1367,23 +1417,31 @@ export default function EmailTemplatesPage() {
                 lastName: recipient.lastName,
                 displayName: recipient.displayName,
               },
-              testValues: {
-                firstName: recipient.firstName || 'Trader',
-                lastName: recipient.lastName || '',
-                email: recipient.email,
-                displayName: recipient.displayName || recipient.email,
-                platform: recipient.platform,
-                loginId: recipient.loginId,
-                password: recipient.password,
-                server: recipient.server,
-              },
+              testValues: gauntletSend
+                ? {
+                    firstName: recipient.firstName || 'Trader',
+                    lastName: recipient.lastName || '',
+                    email: recipient.email,
+                    displayName: recipient.displayName || recipient.email,
+                    accountSize: recipient.accountSize,
+                  }
+                : {
+                    firstName: recipient.firstName || 'Trader',
+                    lastName: recipient.lastName || '',
+                    email: recipient.email,
+                    displayName: recipient.displayName || recipient.email,
+                    platform: recipient.platform,
+                    loginId: recipient.loginId,
+                    password: recipient.password,
+                    server: recipient.server,
+                  },
             }),
           });
 
           if (!response.ok) throw new Error('Failed to send email');
           sent += 1;
         } catch (error) {
-          console.error(`Failed to send login details to ${recipient.email}:`, error);
+          console.error(`Failed to send email to ${recipient.email}:`, error);
           failed += 1;
           failedEmails.push(recipient.email);
         }
@@ -1413,7 +1471,9 @@ export default function EmailTemplatesPage() {
         const extra = failedEmails.length > 5 ? ` and ${failedEmails.length - 5} more` : '';
         setCredentialSendNote(`Sent ${sent}. ${failed} failed: ${preview}${extra}`);
       } else {
-        setCredentialSendNote(`Sent login details to ${sent} ${sent === 1 ? 'person' : 'people'}.`);
+        setCredentialSendNote(gauntletSend
+          ? `Sent to ${sent} ${sent === 1 ? 'person' : 'people'}.`
+          : `Sent login details to ${sent} ${sent === 1 ? 'person' : 'people'}.`);
         setEmailSent(true);
         setTimeout(() => setEmailSent(false), 3000);
       }
@@ -1430,6 +1490,7 @@ export default function EmailTemplatesPage() {
     let previewSubject = currentTemplate.subject;
     let previewBody = currentTemplate.body;
     const loginPreview = currentTemplate.name === 'Login Credentials';
+    const gauntletPreview = isGauntletPassEmail(currentTemplate.name);
     
     if (loginPreview) {
       const focused = credentialRecipients.find((recipient) => recipient.key === credentialFocusKey) || credentialRecipients[0];
@@ -1449,8 +1510,18 @@ export default function EmailTemplatesPage() {
       previewSubject = rendered.subject;
       previewBody = rendered.html;
     } else {
-      // Replace variables with test values
-      Object.entries(testValues).forEach(([key, value]) => {
+      const focusedGauntlet = gauntletPreview
+        ? credentialRecipients.find((recipient) => recipient.key === credentialFocusKey) || credentialRecipients[0]
+        : undefined;
+      const previewValues = focusedGauntlet
+        ? {
+            ...testValues,
+            firstName: focusedGauntlet.firstName,
+            email: focusedGauntlet.email,
+            accountSize: focusedGauntlet.accountSize,
+          }
+        : testValues;
+      Object.entries(previewValues).forEach(([key, value]) => {
         const regex = new RegExp(`{{${key}}}`, 'g');
         previewSubject = previewSubject.replace(regex, value);
         previewBody = previewBody.replace(regex, value);
@@ -1517,6 +1588,17 @@ export default function EmailTemplatesPage() {
   };
   
   const handleTestValueChange = (variable: string, value: string) => {
+    if (
+      isGauntletPassEmail(currentTemplate?.name) &&
+      (variable === 'firstName' || variable === 'accountSize')
+    ) {
+      const focusKey = credentialFocusKey || credentialRecipients[0]?.key;
+      if (focusKey) {
+        updateCredentialField(focusKey, variable, value);
+        return;
+      }
+    }
+
     setTestValues({
       ...testValues,
       [variable]: value
@@ -1547,11 +1629,17 @@ export default function EmailTemplatesPage() {
   // Render variable input (text input or dropdown)
   const renderVariableInput = (variable: string) => {
     const options = getVariableOptions(variable);
-    const focusedCredential = currentTemplate?.name === 'Login Credentials'
+    const queuedTemplate = currentTemplate?.name === 'Login Credentials' || isGauntletPassEmail(currentTemplate?.name);
+    const gauntletTemplate = isGauntletPassEmail(currentTemplate?.name);
+    const focusedCredential = queuedTemplate
       ? credentialRecipients.find((item) => item.key === credentialFocusKey) || credentialRecipients[0]
       : undefined;
-    const fieldValue = focusedCredential && (variable === 'platform' || variable === 'loginId' || variable === 'password' || variable === 'server')
-      ? focusedCredential[variable] || ''
+    const usesFocusedValue = Boolean(focusedCredential) && (
+      (currentTemplate?.name === 'Login Credentials' && (variable === 'platform' || variable === 'loginId' || variable === 'password' || variable === 'server'))
+      || (gauntletTemplate && (variable === 'firstName' || variable === 'accountSize'))
+    );
+    const fieldValue = usesFocusedValue && focusedCredential
+      ? String(focusedCredential[variable as keyof CredentialContact] || '')
       : testValues[variable] || '';
     
     if (options) {
@@ -2083,8 +2171,12 @@ export default function EmailTemplatesPage() {
   }, [currentTemplate?.id, isEditing]);
 
   useEffect(() => {
-    if (isEditing && currentTemplate?.name === 'Login Credentials') {
+    if (!isEditing || !currentTemplate) return;
+    if (currentTemplate.name === 'Login Credentials' || isGauntletPassEmail(currentTemplate.name)) {
       loadCredentialDirectory();
+    }
+    if (isGauntletPassEmail(currentTemplate.name)) {
+      loadActiveAccounts();
     }
   }, [currentTemplate?.id, isEditing]);
 
@@ -2105,6 +2197,8 @@ export default function EmailTemplatesPage() {
   });
   const drawdownCount = bulkRecipients.filter((r) => r.inDrawdown).length;
   const isLoginCredentialsTemplate = currentTemplate?.name === 'Login Credentials';
+  const isGauntletPassTemplate = isGauntletPassEmail(currentTemplate?.name);
+  const isQueuedRecipientTemplate = isLoginCredentialsTemplate || isGauntletPassTemplate;
   const credentialOrders = credentialOrderHits
     .map((hit) => storedHitToContact(hit, customers))
     .filter((contact): contact is CredentialContact => Boolean(contact));
@@ -2139,6 +2233,29 @@ export default function EmailTemplatesPage() {
       ...takeMatches(credentialCryptoOrders, 12),
       ...takeMatches(credentialUserContacts, 8),
     ].slice(0, 30);
+  }
+
+  const gauntletAccountContacts = activeAccounts
+    .map((account) => activeAccountContact(account))
+    .filter((contact): contact is CredentialContact => Boolean(contact));
+
+  if (isGauntletPassTemplate) {
+    if (credentialFilter === 'accounts') {
+      credentialResults = takeMatches(gauntletAccountContacts, 20);
+    } else if (credentialFilter === 'all') {
+      credentialResults = credentialQueryText
+        ? [
+            ...takeMatches(gauntletAccountContacts, 10),
+            ...takeMatches(credentialOrders, 8),
+            ...takeMatches(credentialCryptoOrders, 8),
+            ...takeMatches(credentialUserContacts, 8),
+          ].slice(0, 30)
+        : [
+            ...gauntletAccountContacts.slice(0, 10),
+            ...credentialOrders.slice(0, 8),
+            ...credentialCryptoOrders.slice(0, 8),
+          ];
+    }
   }
 
   const credentialKeySelected = (key: string) =>
@@ -2493,25 +2610,32 @@ export default function EmailTemplatesPage() {
         </div>
       )}
 
-      {/* Login credentials: search people and send to several of them */}
-      {isEditing && isLoginCredentialsTemplate && (
+      {/* Search people and send to several of them, one email a few seconds apart */}
+      {isEditing && isQueuedRecipientTemplate && (
         <div className="bg-black rounded-lg p-6 mb-6 border border-[#0FF1CE]/30">
           <div className="flex items-start justify-between gap-3 mb-4">
             <div className="flex items-center gap-3">
-              <Copy size={20} className="text-[#0FF1CE]" />
+              {isGauntletPassTemplate ? <Users size={20} className="text-[#0FF1CE]" /> : <Copy size={20} className="text-[#0FF1CE]" />}
               <div>
-                <h3 className="text-white font-medium">Send login details</h3>
-                <p className="text-gray-400 text-sm">Search for a person, then enter their login details. Add another person to search again. Emails go out a few seconds apart.</p>
+                <h3 className="text-white font-medium">{isGauntletPassTemplate ? 'Send to several people' : 'Send login details'}</h3>
+                <p className="text-gray-400 text-sm">
+                  {isGauntletPassTemplate
+                    ? 'Search for a person, then enter their account size. Add another person to search again. Emails go out a few seconds apart.'
+                    : 'Search for a person, then enter their login details. Add another person to search again. Emails go out a few seconds apart.'}
+                </p>
               </div>
             </div>
             <button
               type="button"
-              onClick={() => { void loadCredentialDirectory(); }}
-              disabled={loadingCredentialDirectory || sendingEmail}
+              onClick={() => {
+                void loadCredentialDirectory();
+                if (isGauntletPassTemplate) void loadActiveAccounts();
+              }}
+              disabled={loadingCredentialDirectory || loadingGauntletAccounts || sendingEmail}
               className="p-2 rounded-lg border border-white/10 text-gray-300 hover:text-white disabled:opacity-50"
-              title="Refresh recent orders"
+              title="Refresh people"
             >
-              <RefreshCw size={16} className={loadingCredentialDirectory ? 'animate-spin' : ''} />
+              <RefreshCw size={16} className={loadingCredentialDirectory || loadingGauntletAccounts ? 'animate-spin' : ''} />
             </button>
           </div>
 
@@ -2525,9 +2649,9 @@ export default function EmailTemplatesPage() {
             <p className={`text-xs mb-2 ${credentialDirectoryError ? 'text-amber-300' : 'text-gray-500'}`}>
               {credentialDirectoryError
                 ? credentialDirectoryError
-                : loadingCredentialDirectory
+                : loadingCredentialDirectory || (isGauntletPassTemplate && loadingGauntletAccounts)
                   ? 'Loading users and orders...'
-                  : `${customers.length} users · ${credentialOrders.length} orders · ${credentialCryptoOrders.length} crypto orders`}
+                  : `${customers.length} users · ${credentialOrders.length} orders · ${credentialCryptoOrders.length} crypto orders${isGauntletPassTemplate ? ` · ${gauntletAccountContacts.length} active accounts` : ''}`}
             </p>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
@@ -2551,13 +2675,16 @@ export default function EmailTemplatesPage() {
             {showCredentialResults && (
               <div className="mt-2 bg-black border border-white/10 rounded-lg max-h-80 overflow-y-auto">
                 <div className="sticky top-0 bg-black border-b border-white/10 p-2 flex flex-wrap gap-2">
-                  {([
-                    ['all', 'All'],
-                    ['users', 'Users'],
-                    ['credit', 'Credit'],
-                    ['orders', 'Orders'],
-                    ['crypto', 'Crypto'],
-                  ] as const).map(([id, label]) => (
+                  {(
+                    [
+                      ['all', 'All'],
+                      ['users', 'Users'],
+                      ...(isGauntletPassTemplate ? [['accounts', 'Accounts']] : []),
+                      ['credit', 'Credit'],
+                      ['orders', 'Orders'],
+                      ['crypto', 'Crypto'],
+                    ] as [CredentialFilter, string][]
+                  ).map(([id, label]) => (
                     <button
                       key={id}
                       type="button"
@@ -2580,10 +2707,17 @@ export default function EmailTemplatesPage() {
                     <Loader size={16} className="animate-spin inline mr-2" />
                     Loading orders...
                   </div>
+                ) : credentialFilter === 'accounts' && loadingGauntletAccounts && gauntletAccountContacts.length === 0 ? (
+                  <div className="p-4 text-center text-gray-400 text-sm">
+                    <Loader size={16} className="animate-spin inline mr-2" />
+                    Loading active accounts...
+                  </div>
                 ) : credentialFilter === 'users' && !credentialQueryText ? (
                   <div className="p-4 text-center text-gray-400 text-sm">Type a name or email to search users.</div>
                 ) : credentialResults.length === 0 ? (
-                  <div className="p-4 text-center text-gray-400 text-sm">No matches. Try another name, email, or filter.</div>
+                  <div className="p-4 text-center text-gray-400 text-sm">
+                    {credentialFilter === 'accounts' ? 'No active accounts found.' : 'No matches. Try another name, email, or filter.'}
+                  </div>
                 ) : (
                   credentialResults.map((contact) => {
                     const selected = credentialKeySelected(contact.key);
@@ -2649,7 +2783,9 @@ export default function EmailTemplatesPage() {
                       <div className="text-white text-sm font-medium truncate">{recipient.displayName}</div>
                       <div className="text-gray-400 text-xs truncate">{recipient.email}</div>
                       <div className="text-gray-500 text-xs truncate">
-                        {recipient.loginId ? `Login ${recipient.loginId} · ${recipient.server || 'No server yet'}` : 'Login details not entered yet'}
+                        {isGauntletPassTemplate
+                          ? (recipient.accountSize || 'Account size not entered yet')
+                          : (recipient.loginId ? `Login ${recipient.loginId} · ${recipient.server || 'No server yet'}` : 'Login details not entered yet')}
                       </div>
                     </button>
                     <span className={`text-[11px] px-2 py-0.5 rounded-full ${credentialBadgeClass(recipient.source)}`}>
@@ -2673,7 +2809,7 @@ export default function EmailTemplatesPage() {
           {credentialStep === 'details' && activeCredentialRecipient && (
           <div className="mb-4 rounded-lg border border-[#0FF1CE]/50 p-3">
             <div className="mb-3">
-              <p className="text-xs font-medium text-[#0FF1CE]">2. Login details</p>
+              <p className="text-xs font-medium text-[#0FF1CE]">{isGauntletPassTemplate ? '2. Account size' : '2. Login details'}</p>
               <p className="text-white text-sm font-medium">{activeCredentialRecipient.displayName}</p>
               <p className="text-gray-400 text-xs">{activeCredentialRecipient.email}</p>
             </div>
@@ -2702,6 +2838,21 @@ export default function EmailTemplatesPage() {
                           className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
                         />
                       </label>
+                      {isGauntletPassTemplate ? (
+                        <label className="block md:col-span-2">
+                          <span className="block text-xs text-gray-400 mb-1">Account size</span>
+                          <input
+                            type="text"
+                            value={activeCredentialRecipient.accountSize}
+                            onChange={(event) => updateCredentialField(activeCredentialRecipient.key, 'accountSize', event.target.value)}
+                            disabled={sendingEmail}
+                            autoComplete="off"
+                            placeholder="$10,000"
+                            className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
+                          />
+                        </label>
+                      ) : (
+                        <>
                       <label className="block">
                         <span className="block text-xs text-gray-400 mb-1">Platform</span>
                         <select
@@ -2752,6 +2903,8 @@ export default function EmailTemplatesPage() {
                           className="w-full bg-black border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#0FF1CE]/50"
                         />
                       </label>
+                        </>
+                      )}
                     </div>
                     <button
                       type="button"
@@ -2790,7 +2943,7 @@ export default function EmailTemplatesPage() {
           <div className="flex gap-3">
             <button
               type="button"
-              onClick={() => { void handleSendLoginCredentials(); }}
+              onClick={() => { void handleSendQueuedEmails(); }}
               disabled={sendingEmail || credentialRecipients.length === 0}
               className="flex-1 flex items-center justify-center gap-2 bg-[#0FF1CE] text-black font-bold py-3 px-6 rounded-lg hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -2813,7 +2966,7 @@ export default function EmailTemplatesPage() {
       )}
 
       {/* User Selection Section */}
-      {isEditing && currentTemplate && !currentTemplate.isBulkTemplate && currentTemplate.name !== 'Login Credentials' && (
+      {isEditing && currentTemplate && !currentTemplate.isBulkTemplate && !isQueuedRecipientTemplate && (
         <div className="bg-black rounded-lg p-6 mb-6 border border-white/10">
           <div className="flex items-center gap-3 mb-4">
             <Users size={20} className="text-[#0FF1CE]" />
@@ -3108,9 +3261,9 @@ export default function EmailTemplatesPage() {
                     <span>{showPreview ? 'Edit' : 'Preview'}</span>
                   </button>
                   
-                  {showPreview && (currentTemplate.name === 'Login Credentials' ? credentialRecipients.length > 0 : selectedUser) && (
+                  {showPreview && (isQueuedRecipientTemplate ? credentialRecipients.length > 0 : selectedUser) && (
                     <button 
-                      onClick={currentTemplate.name === 'Login Credentials' ? () => { void handleSendLoginCredentials(); } : handleSendEmail}
+                      onClick={isQueuedRecipientTemplate ? () => { void handleSendQueuedEmails(); } : handleSendEmail}
                       disabled={sendingEmail}
                       className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0FF1CE] text-black hover:bg-[#0FF1CE]/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
@@ -3126,7 +3279,7 @@ export default function EmailTemplatesPage() {
                           ? 'Sending...'
                           : emailSent
                             ? 'Sent!'
-                            : currentTemplate.name === 'Login Credentials' && credentialRecipients.length > 1
+                            : isQueuedRecipientTemplate && credentialRecipients.length > 1
                               ? `Send to ${credentialRecipients.length}`
                               : 'Send Email'}
                       </span>
@@ -3156,7 +3309,7 @@ export default function EmailTemplatesPage() {
                     <h3 className="text-white font-medium mb-4 flex items-center gap-2">
                       <Mail size={16} />
                       Email Preview
-                      {currentTemplate.name === 'Login Credentials' && credentialRecipients.length > 0 ? (
+                      {isQueuedRecipientTemplate && credentialRecipients.length > 0 ? (
                         <span className="text-sm text-gray-400">
                           → {credentialRecipients.length} {credentialRecipients.length === 1 ? 'person' : 'people'}
                         </span>
