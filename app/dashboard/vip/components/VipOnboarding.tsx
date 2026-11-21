@@ -29,11 +29,19 @@ function signedOn(value?: { toDate?: () => Date }) {
 export default function VipOnboarding({
   userId,
   activation,
-  onUpdated
+  onUpdated,
+  heading = 'Finish this allocation',
+  checkoutLabel,
+  checkoutTotal,
+  onOpenPayment
 }: {
   userId: string;
   activation: VIPActivation;
   onUpdated: () => Promise<void>;
+  heading?: string;
+  checkoutLabel?: string;
+  checkoutTotal?: string;
+  onOpenPayment?: () => void;
 }) {
   const [companyName, setCompanyName] = useState(activation.companyName || '');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -192,7 +200,7 @@ export default function VipOnboarding({
     <section className="h-full rounded-2xl border border-white/10 bg-black p-4 sm:p-5">
       <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-base font-semibold text-white">Finish this allocation</h2>
+          <h2 className="text-base font-semibold text-white">{heading}</h2>
           <p className="mt-1 text-sm text-gray-500">
             {paymentLabel} · {documentLabel}
           </p>
@@ -252,17 +260,41 @@ export default function VipOnboarding({
 
           {activation.paymentStatus === 'unpaid' && (
             <div>
-              <p className="text-sm text-gray-400">
-                Pay for this allocation on the VIP payment portal.
+              {checkoutLabel && checkoutTotal && (
+                <div className="rounded-xl border border-white/10 bg-[#0D0D0D]">
+                  <div className="flex items-start justify-between gap-4 px-4 py-3 text-sm">
+                    <span className="text-gray-400">Your selected offer</span>
+                    <span className="text-right text-white">{checkoutLabel}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-4 border-t border-white/10 px-4 py-3">
+                    <span className="font-medium text-white">Total due</span>
+                    <span className="text-base font-semibold text-white">{checkoutTotal}</span>
+                  </div>
+                </div>
+              )}
+              <p className={`text-sm text-gray-500 ${checkoutLabel ? 'mt-3' : 'text-gray-400'}`}>
+                {onOpenPayment
+                  ? 'Complete payment in the secure checkout window after reviewing the offer terms.'
+                  : 'Pay for this allocation on the VIP payment portal.'}
               </p>
-              <a
-                href={VIP_PAYMENT_PORTAL_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-4 flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] px-4 py-2.5 text-sm font-semibold text-black sm:w-auto"
-              >
-                Open payment portal
-              </a>
+              {onOpenPayment ? (
+                <button
+                  type="button"
+                  onClick={onOpenPayment}
+                  className="mt-4 flex w-full items-center justify-center rounded-xl bg-[#0FF1CE] px-4 py-3 text-sm font-semibold text-black transition hover:brightness-110"
+                >
+                  Open payment portal
+                </button>
+              ) : (
+                <a
+                  href={VIP_PAYMENT_PORTAL_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#0FF1CE] to-[#00D4FF] px-4 py-2.5 text-sm font-semibold text-black sm:w-auto"
+                >
+                  Open payment portal
+                </a>
+              )}
             </div>
           )}
         </div>

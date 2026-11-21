@@ -11,26 +11,19 @@ import {
   recordVIPPageVisit,
   VIPActivation
 } from '@/lib/firebase';
-import { VIP_RULES } from '@/lib/vip-accounts';
-import { ChevronDown, Loader2, Lock } from 'lucide-react';
+import { fetchMyVipOffers, type PortalVipOffer } from '@/lib/vip-offer-client';
+import { Loader2, Lock } from 'lucide-react';
+import AllocationOffers from './components/AllocationOffers';
 import PortalActions from './components/PortalActions';
 import VipAccountCard, { sortVipAccounts, VipAccountListItem } from './components/VipAccountCard';
-import VipOnboarding from './components/VipOnboarding';
-
-const RULES = [
-  [`${VIP_RULES.maxDrawdown}%`, 'Max drawdown'],
-  [`${VIP_RULES.maxDailyDrawdown}%`, 'Daily drawdown'],
-  [VIP_RULES.leverage, 'Leverage'],
-  [`${VIP_RULES.profitSplit}%`, 'Starting split']
-];
 
 export default function VIPPortalPage() {
   const router = useRouter();
   const [user, authLoading] = useAuthState(auth);
   const [isLoading, setIsLoading] = useState(true);
   const [activation, setActivation] = useState<VIPActivation | null>(null);
+  const [offers, setOffers] = useState<PortalVipOffer[]>([]);
   const [accounts, setAccounts] = useState<VipAccountListItem[]>([]);
-  const [rulesOpen, setRulesOpen] = useState(false);
 
   const loadData = async (uid: string) => {
     try {
@@ -38,6 +31,13 @@ export default function VIPPortalPage() {
       const vip = await getVIPActivation(uid);
       setActivation(vip);
       if (vip) recordVIPPageVisit(uid);
+      try {
+        const token = await auth.currentUser?.getIdToken();
+        setOffers(token ? await fetchMyVipOffers(token) : []);
+      } catch (offersError) {
+        console.error('Error loading VIP offers:', offersError);
+        setOffers([]);
+      }
 
       try {
         const vipAccounts = await getUserVipMetaApiAccounts(uid);
@@ -58,6 +58,18 @@ export default function VIPPortalPage() {
   };
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('offer') === 'crypto') {
+      router.replace('/dashboard/vip/payment-pending?source=offer');
+      return;
+    }
+    if (params.get('vip') === 'crypto') {
+      router.replace('/dashboard/vip/payment-pending?source=allocation');
+    }
+  }, [router]);
+
+  useEffect(() => {
     if (authLoading) return;
     if (!user) {
       router.push('/access');
@@ -76,6 +88,17 @@ export default function VIPPortalPage() {
     }
   };
 
+  const refreshOffers = async () => {
+    if (!user) return;
+    try {
+      const token = await auth.currentUser?.getIdToken();
+      if (!token) return;
+      setOffers(await fetchMyVipOffers(token));
+    } catch (error) {
+      console.error('Error refreshing VIP offers:', error);
+    }
+  };
+
   if (authLoading || isLoading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
@@ -84,7 +107,7 @@ export default function VIPPortalPage() {
     );
   }
 
-  if (!activation && accounts.length === 0) {
+  if (!activation && offers.length === 0 && accounts.length === 0) {
     return (
       <div className="mx-auto max-w-lg rounded-2xl border border-white/10 bg-black px-6 py-10 text-center">
         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-white/5">
@@ -105,17 +128,13 @@ export default function VIPPortalPage() {
     );
   }
 
-  const savings = activation?.publicPrice && activation.publicPrice > activation.price
-    ? activation.publicPrice - activation.price
-    : 0;
-
   return (
-    <div className="mx-auto max-w-5xl">
+    <div className="mx-auto max-w-3xl">
       <div className="space-y-4 md:space-y-5">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="min-w-0">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#0FF1CE]">Shockwave VIP</p>
-            <h1 className="mt-2 text-2xl font-semibold text-white sm:text-3xl">Your allocations</h1>
+            <h1 className="mt-2 text-2xl font-semibold text-white sm:text-3xl">Your allocation offers</h1>
           </div>
           <PortalActions showReset={false} buyLabel={accounts.length > 0 ? 'Buy another allocation' : 'Buy an allocation'} />
         </header>
@@ -126,55 +145,13 @@ export default function VIPPortalPage() {
           </div>
         )}
 
-        <section className="overflow-hidden rounded-2xl border border-white/10 bg-black">
-          {activation && (
-            <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
-              <div className="min-w-0">
-                {activation.tierName && (
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#0FF1CE]">{activation.tierName}</p>
-                )}
-                <h2 className="mt-1 break-words text-2xl font-semibold text-white">{activation.accountSize}</h2>
-                <p className="mt-1 text-sm text-gray-400">
-                  Your private allocation{activation.platform ? ` · ${activation.platform}` : ''}
-                </p>
-              </div>
-              {activation.paymentStatus === 'unpaid' && (
-                <div className="sm:text-right">
-                  {savings > 0 && (
-                    <p className="text-sm text-gray-500 line-through">${activation.publicPrice!.toLocaleString()}</p>
-                  )}
-                  <p className="text-2xl font-semibold text-white">${activation.price.toLocaleString()}</p>
-                  <p className="text-xs text-gray-500">{savings > 0 ? `You save $${savings.toLocaleString()}` : 'One-time fee'}</p>
-                </div>
-              )}
-            </div>
-          )}
-          <button
-            type="button"
-            onClick={() => setRulesOpen((open) => !open)}
-            className={`flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm text-gray-300 sm:px-5 ${activation ? 'border-t border-white/10' : ''}`}
-            aria-expanded={rulesOpen}
-          >
-            Allocation rules
-            <ChevronDown size={16} className={`shrink-0 text-gray-400 transition-transform ${rulesOpen ? 'rotate-180' : ''}`} />
-          </button>
-          {rulesOpen && (
-            <div className="grid grid-cols-2 gap-x-4 gap-y-4 border-t border-white/10 px-4 py-4 sm:grid-cols-4 sm:px-5">
-              {RULES.map(([value, label]) => (
-                <div key={label} className="min-w-0">
-                  <p className="text-lg font-semibold text-white">{value}</p>
-                  <p className="text-xs text-gray-500">{label}</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-
-        {activation && user && (
-          <VipOnboarding
+        {user && (activation || offers.length > 0) && (
+          <AllocationOffers
             userId={user.uid}
             activation={activation}
-            onUpdated={refreshActivation}
+            offers={offers}
+            onActivationUpdated={refreshActivation}
+            onOffersUpdated={refreshOffers}
           />
         )}
 

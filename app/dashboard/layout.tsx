@@ -20,6 +20,7 @@ import {
   Zap
 } from 'lucide-react';
 import { auth, signOut, getVIPActivation, getUserVipMetaApiAccounts } from '@/lib/firebase';
+import { fetchMyVipOffers } from '@/lib/vip-offer-client';
 import { useRouter, usePathname } from 'next/navigation';
 
 const navItems = [
@@ -64,8 +65,12 @@ export default function DashboardLayout({
               setHasVipAccess(true);
               return;
             }
-            const vipAccounts = await getUserVipMetaApiAccounts(user.uid);
-            setHasVipAccess(vipAccounts.length > 0);
+            const token = await user.getIdToken();
+            const [vipAccounts, offers] = await Promise.all([
+              getUserVipMetaApiAccounts(user.uid),
+              fetchMyVipOffers(token).catch(() => [])
+            ]);
+            setHasVipAccess(vipAccounts.length > 0 || offers.length > 0);
           })
           .catch(() => setHasVipAccess(false));
       } else {
@@ -170,7 +175,7 @@ export default function DashboardLayout({
               const isActive = item.href === '/dashboard'
                 ? pathname === '/dashboard'
                 : item.href === '/dashboard/vip'
-                  ? pathname === '/dashboard/vip'
+                  ? pathname === '/dashboard/vip' || pathname.startsWith('/dashboard/vip/payment-pending')
                   : pathname?.startsWith(item.href);
               return (
                 <Link

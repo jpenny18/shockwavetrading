@@ -339,9 +339,10 @@ export default function VipPurchaseModal({ onClose }: { onClose: () => void }) {
               </div>
               <CryptoPayment
                 challengeData={challengeData}
-                successRedirectPath="/dashboard/vip?vip=crypto"
+                successRedirectPath="/dashboard/vip/payment-pending?source=allocation"
                 onProcessingStateChange={setIsProcessing}
                 cryptoPrices={cryptoPrices}
+                hardRedirect
                 getAuthToken={async () => auth.currentUser?.getIdToken() || null}
               />
             </div>

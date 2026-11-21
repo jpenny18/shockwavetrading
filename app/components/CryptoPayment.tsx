@@ -13,6 +13,7 @@ interface CryptoPaymentProps {
   beforeSubmit?: () => boolean | Promise<boolean>;
   onPaymentSubmitted?: (orderId: string) => void | Promise<void>;
   getAuthToken?: () => Promise<string | null>;
+  hardRedirect?: boolean;
 }
 
 interface CryptoPrice {
@@ -73,7 +74,7 @@ const getQrValue = (symbol: keyof CryptoPrice, amount: number, address: string):
   return `ethereum:${address}?value=${ethToWeiString(amount)}`;
 };
 
-export default function CryptoPayment({ challengeData, successRedirectPath, onProcessingStateChange, cryptoPrices, beforeSubmit, onPaymentSubmitted, getAuthToken }: CryptoPaymentProps) {
+export default function CryptoPayment({ challengeData, successRedirectPath, onProcessingStateChange, cryptoPrices, beforeSubmit, onPaymentSubmitted, getAuthToken, hardRedirect = false }: CryptoPaymentProps) {
   const router = useRouter();
   const [selectedCrypto, setSelectedCrypto] = useState<'BTC' | 'ETH' | 'USDT' | 'USDC'>('BTC');
   const [cryptoAmount, setCryptoAmount] = useState<CryptoPrice>({ BTC: 0, ETH: 0, USDT: 0, USDC: 0 });
@@ -218,7 +219,16 @@ export default function CryptoPayment({ challengeData, successRedirectPath, onPr
       }
 
       if (onPaymentSubmitted) {
-        await onPaymentSubmitted(orderId);
+        try {
+          await onPaymentSubmitted(orderId);
+        } catch (callbackError) {
+          console.error('Payment was submitted, but the follow-up step failed:', callbackError);
+        }
+      }
+
+      if (hardRedirect) {
+        window.location.assign(successRedirectPath);
+        return;
       }
 
       router.push(successRedirectPath);

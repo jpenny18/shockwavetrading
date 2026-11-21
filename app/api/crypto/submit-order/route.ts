@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/firebase-admin';
 import { authenticateResetRequest, customerForReset, loadOwnedReset } from '@/lib/reset-order-server';
 import { resolveVipPurchase } from '@/lib/vip-purchase-server';
+import { loadOwnedVipCheckout, markVipCheckoutPending, normalizeCheckoutPlatform, pricesMatch } from '@/lib/vip-offer-server';
+import { VIP_CUSTOM_OFFER_KIND, VIP_PORTAL_OFFER_KIND } from '@/lib/vip-offers';
 
 export async function POST(req: Request) {
   try {
@@ -92,6 +94,48 @@ export async function POST(req: Request) {
       };
     }
 
+    if (challengeData?.orderKind === VIP_PORTAL_OFFER_KIND || challengeData?.orderKind === VIP_CUSTOM_OFFER_KIND) {
+      if (!cryptoDetails) {
+        return NextResponse.json({ error: 'Payment details are missing.' }, { status: 400 });
+      }
+      const authResult = await authenticateResetRequest(req);
+      if (!authResult.ok) {
+        return NextResponse.json({ error: authResult.error }, { status: authResult.status });
+      }
+      const owned = await loadOwnedVipCheckout(authResult.uid, challengeData.orderKind, challengeData.offerId);
+      if (!owned.ok) return NextResponse.json({ error: owned.error }, { status: owned.status });
+      if (!pricesMatch(challengeData.price, owned.checkout.price)) {
+        return NextResponse.json({ error: 'This offer price has changed. Close the window and try again.' }, { status: 409 });
+      }
+      const platform = normalizeCheckoutPlatform(challengeData.platform);
+      if (!platform) return NextResponse.json({ error: 'Choose MT4 or MT5.' }, { status: 400 });
+      const form = challengeData.formData || {};
+      if (!String(form.firstName || '').trim() || !String(form.lastName || '').trim() || !String(form.phone || '').trim() || !String(form.country || '').trim()) {
+        return NextResponse.json({ error: 'First name, last name, phone, and country are required.' }, { status: 400 });
+      }
+      cryptoDetails = { ...cryptoDetails, usdAmount: owned.checkout.price };
+      challengeData = {
+        ...challengeData,
+        type: owned.checkout.title,
+        amount: owned.checkout.amountLabel,
+        platform,
+        price: owned.checkout.price,
+        originalPrice: owned.checkout.price,
+        addOns: [],
+        userId: authResult.uid,
+        offerId: owned.checkout.offerId,
+        orderKind: owned.checkout.kind,
+        formData: {
+          ...form,
+          firstName: String(form.firstName).trim(),
+          lastName: String(form.lastName).trim(),
+          phone: String(form.phone).trim(),
+          country: String(form.country).trim(),
+          email: authResult.email,
+        },
+      };
+    }
+
     // Create crypto order in Firebase
     const orderData: any = {
       status: 'PENDING',
@@ -135,7 +179,28 @@ export async function POST(req: Request) {
       orderData.discountPercent = challengeData.discountPercent;
     }
 
+    if (challengeData.orderKind === VIP_PORTAL_OFFER_KIND || challengeData.orderKind === VIP_CUSTOM_OFFER_KIND) {
+      orderData.orderKind = challengeData.orderKind;
+      orderData.offerId = challengeData.offerId;
+    }
+
     const orderRef = await db.collection('crypto-orders').add(orderData);
+
+    if (challengeData.orderKind === VIP_PORTAL_OFFER_KIND || challengeData.orderKind === VIP_CUSTOM_OFFER_KIND) {
+      try {
+        await markVipCheckoutPending({
+          kind: challengeData.orderKind,
+          offerId: challengeData.offerId,
+          userId: challengeData.userId,
+          price: challengeData.price,
+          amountLabel: challengeData.amount,
+          title: challengeData.type,
+          tierName: '',
+        }, orderRef.id);
+      } catch (markError) {
+        console.error('Error marking VIP offer payment pending:', markError);
+      }
+    }
 
     return NextResponse.json({ success: true, orderId: orderRef.id });
   } catch (error) {

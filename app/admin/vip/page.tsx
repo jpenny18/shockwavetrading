@@ -34,6 +34,7 @@ import {
   Save
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import PrivateOfferComposer from './components/PrivateOfferComposer';
 
 interface VIPActivationWithId extends VIPActivation {
   id: string;
@@ -729,6 +730,8 @@ export default function AdminVIPPage() {
           </div>
         )}
       </div>
+
+      <PrivateOfferComposer />
 
       {/* Filters and Stats */}
       <div className="flex flex-col gap-3 md:grid md:grid-cols-5 md:gap-4 mb-5 md:mb-8">

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, getCachedMetrics, getUserVipMetaApiAccounts, getVIPActivation } from '@/lib/firebase';
+import { fetchMyVipOffers } from '@/lib/vip-offer-client';
 import { VIP_RULES } from '@/lib/vip-accounts';
 import { Loader2 } from 'lucide-react';
 import PortalActions from '../components/PortalActions';
@@ -26,12 +27,13 @@ export default function VipAccountsPage() {
 
     const load = async () => {
       try {
-        const [vip, vipAccounts] = await Promise.all([
+        const [vip, vipAccounts, offers] = await Promise.all([
           getVIPActivation(user.uid).catch((error) => {
             console.error('Error fetching VIP activation:', error);
             return null;
           }),
-          getUserVipMetaApiAccounts(user.uid)
+          getUserVipMetaApiAccounts(user.uid),
+          user.getIdToken().then((token) => fetchMyVipOffers(token)).catch(() => [])
         ]);
 
         const withMetrics = await Promise.all(vipAccounts.map(async (account) => ({
@@ -39,7 +41,7 @@ export default function VipAccountsPage() {
           cachedMetrics: await getCachedMetrics(account.accountId)
         })));
 
-        setHasVipAccess(!!vip || withMetrics.length > 0);
+        setHasVipAccess(!!vip || withMetrics.length > 0 || offers.length > 0);
         setAccounts(sortVipAccounts(withMetrics));
       } catch (error) {
         console.error('Error fetching VIP accounts:', error);
